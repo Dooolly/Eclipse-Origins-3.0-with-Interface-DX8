@@ -96,6 +96,7 @@ Public Enum ServerPackets
     SMapEventData
     SChatBubble
     SSpecialEffect
+    SMoney
     ' Make sure SMSG_COUNT is below everything else
     SMSG_COUNT
 End Enum

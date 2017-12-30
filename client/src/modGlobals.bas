@@ -100,6 +100,7 @@ Public InventoryItemSelected As Long
 Public SpellBuffer As Long
 Public SpellBufferTimer As Long
 Public StunDuration As Long
+Public PlayerMoney As Long
 
 ' Stops movement when updating a map
 Public CanMoveNow As Boolean

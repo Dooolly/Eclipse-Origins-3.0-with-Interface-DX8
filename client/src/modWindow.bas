@@ -8,17 +8,6 @@ Public MouseY As Single
 ' Janela que será movida
 Private MovableWind As Byte
 
-' ChatBox
-Public Const MAX_LINES As Byte = 200
-Public InChat As Boolean
-Public ChatCursor As String
-Public RenderTextChat As String
-Public MyText As String
-Public ChatScroll As Long
-Public totalChatLines As Long
-Public ChatButtonUp As Boolean
-Public ChatButtonDown As Boolean
-
 ' Descrição
 Private ActualItemDesc As Long
 Private TYPE_DESC As Byte
@@ -47,7 +36,7 @@ Private Type ButtonRec
     Height As Long
     State As Byte
     Visible As Boolean
-    text As String
+    Text As String
 End Type
 
 ' Estrutura da Janela
@@ -369,7 +358,7 @@ Public Sub MouseUp_Handle(Button As Integer, Shift As Integer, X As Single, Y As
                 CurrencyMenu = 1 ' drop
                 frmMain.lblCurrency.Caption = "Quantos items deseja jogar fora?"
                 tmpCurrencyItem = DragInvSlotNum
-                frmMain.txtCurrency.text = vbNullString
+                frmMain.txtCurrency.Text = vbNullString
                 frmMain.picCurrency.Visible = True
                 frmMain.txtCurrency.SetFocus
             End If
@@ -482,7 +471,7 @@ Private Sub Draw_MainBar()
         
             Select Case Hotbar(i, ActualHotbar).sType
                 Case 1 ' Inventário
-                    If Len(Item(Hotbar(i, ActualHotbar).Slot).name) > 0 Then
+                    If Len(Item(Hotbar(i, ActualHotbar).Slot).Name) > 0 Then
                         If Item(Hotbar(i, ActualHotbar).Slot).Pic > 0 Then
                             If Item(Hotbar(i, ActualHotbar).Slot).Pic <= numitems Then
                                 RenderTextureByRects Tex_Item(Item(Hotbar(i, ActualHotbar).Slot).Pic), sRect, dRect
@@ -490,7 +479,7 @@ Private Sub Draw_MainBar()
                         End If
                     End If
                 Case 2 ' Magia
-                    If Len(Spell(Hotbar(i, ActualHotbar).Slot).name) > 0 Then
+                    If Len(Spell(Hotbar(i, ActualHotbar).Slot).Name) > 0 Then
                         If Spell(Hotbar(i, ActualHotbar).Slot).Icon > 0 Then
                             If Spell(Hotbar(i, ActualHotbar).Slot).Icon <= NumSpellIcons Then
                                 ' Checar se a magia está congelada
@@ -693,11 +682,11 @@ Private Sub Inventory_Draw()
         RenderTexture Tex_GUI, .X, .Y, 1, 1, .Width, .Height, .Width, .Height
         
         ' Renderizar ouro do jogador
-        'If GetPlayerGold(MyIndex) > 0 Then
-            'RenderText Font_Normal, Strings.Format(GetPlayerGold(MyIndex), "###,###,###"), .X + 47, .Y + 205, White
-        'Else
+        If PlayerMoney > 0 Then
+            RenderText Fonts.Verdana, "Dinheiro: " & Strings.Format(PlayerMoney, "###,###,###"), .X + 6, .Y + 198, White
+        Else
             RenderText Fonts.Verdana, "Dinheiro: 0", .X + 6, .Y + 198, White
-        'End If
+        End If
         
         ' Loop Para desenhar os items
         For InvSlot = 1 To MAX_INV
@@ -739,7 +728,7 @@ Private Sub Inventory_Draw()
                         End If
                         
                         ' Desenhar quantidade
-                        RenderText Fonts.Verdana, Strings.Format(ConvertCurrency(Amount), "#,###,###,###"), Rec_Pos.Left, Rec_Pos.Top + 19, Colour, 0
+                        RenderText Fonts.Verdana, Strings.Format(ConvertCurrency(Amount), "#,###,###,###"), Rec_Pos.Left, Rec_Pos.Top + 19, Colour
                     End If
                 End If
             End If
@@ -907,7 +896,7 @@ Private Sub Inventory_DblClick(X As Single, Y As Single)
                 CurrencyMenu = 2 ' deposit
                 frmMain.lblCurrency.Caption = "Quantos itens você quer depositar?"
                 tmpCurrencyItem = invNum
-                frmMain.txtCurrency.text = vbNullString
+                frmMain.txtCurrency.Text = vbNullString
                 frmMain.picCurrency.Visible = True
                 frmMain.txtCurrency.SetFocus
                 Exit Sub
@@ -938,7 +927,7 @@ Private Sub Inventory_DblClick(X As Single, Y As Single)
                 CurrencyMenu = 4 ' offer in trade
                 frmMain.lblCurrency.Caption = "Quantos você quer trocar?"
                 tmpCurrencyItem = invNum
-                frmMain.txtCurrency.text = vbNullString
+                frmMain.txtCurrency.Text = vbNullString
                 frmMain.picCurrency.Visible = True
                 frmMain.txtCurrency.SetFocus
                 Exit Sub
@@ -990,21 +979,21 @@ Private Sub HUD_Draw()
         ' Desenhar face
         If GetPlayerSprite(MyIndex) <= UBound(Tex_Face) Then RenderTexture Tex_Face(GetPlayerSprite(MyIndex)), .X + 2, .Y + 2, 0, 0, 62, 62, 62, 62
         ' Desenhar Nome do Jogador
-        RenderText Fonts.Verdana, Strings.Trim$(GetPlayerName(MyIndex)), .X + 70, .Y + 3, White
+        RenderText Fonts.Verdana, Strings.Trim$(GetPlayerName(MyIndex)), .X + 130 - (TextWidth(Fonts.Verdana, Strings.Trim$(GetPlayerName(MyIndex))) / 2), .Y + 2, White
         ' Desenhar Level do jogador
-        RenderText Fonts.Verdana, "Lv. " & GetPlayerLevel(MyIndex), .X + 68, .Y + 47, White
+        RenderText Fonts.Verdana, "Lv. " & GetPlayerLevel(MyIndex), .X + 68, .Y + 46, White
         
         ' Desenhar Barra de HP
         Data = ((GetPlayerVital(MyIndex, HP) / 124) / (GetPlayerMaxVital(MyIndex, HP) / 124)) * 124
         If Data > 0 Then RenderTexture Tex_GUI, .X + 66, .Y + 17, 415, 68, Data, 16, Data, 16
         ' Desenhar HP atual/Max
-        RenderText Fonts.Verdana, GetPlayerVital(MyIndex, HP) & "/" & GetPlayerMaxVital(MyIndex, HP), .X + 66 + (124 / 2) - (TextWidth(Fonts.Verdana, GetPlayerVital(MyIndex, HP) & "/" & GetPlayerMaxVital(MyIndex, HP)) / 2), .Y + 18, White, 70
+        RenderText Fonts.Verdana, GetPlayerVital(MyIndex, HP) & "/" & GetPlayerMaxVital(MyIndex, HP), .X + 66 + (124 / 2) - (TextWidth(Fonts.Verdana, GetPlayerVital(MyIndex, HP) & "/" & GetPlayerMaxVital(MyIndex, HP)) / 2), .Y + 18, White, 200
         
         ' Desenhar Barra de MP
         Data = ((GetPlayerVital(MyIndex, MP) / 118) / (GetPlayerMaxVital(MyIndex, MP) / 118)) * 118
         If Data > 0 Then RenderTexture Tex_GUI, .X + 66, .Y + 32, 415, 83, Data, 13, Data, 13
         ' Desenhar MP atual/Max
-        RenderText Fonts.Verdana, GetPlayerVital(MyIndex, MP) & "/" & GetPlayerMaxVital(MyIndex, MP), .X + 66 + (118 / 2) - (TextWidth(Fonts.Verdana, GetPlayerVital(MyIndex, MP) & "/" & GetPlayerMaxVital(MyIndex, MP)) / 2), .Y + 32, White, 100
+        RenderText Fonts.Verdana, GetPlayerVital(MyIndex, MP) & "/" & GetPlayerMaxVital(MyIndex, MP), .X + 66 + (118 / 2) - (TextWidth(Fonts.Verdana, GetPlayerVital(MyIndex, MP) & "/" & GetPlayerMaxVital(MyIndex, MP)) / 2), .Y + 32, White, 150
     End With
     
     ' Error handler
@@ -1057,7 +1046,7 @@ Private Sub DrawItemDesc()
                 End Select
                 
                 ' Nome do item
-                tmpText = Strings.Trim$(Item(PicNum).name)
+                tmpText = Strings.Trim$(Item(PicNum).Name)
                 RenderText Fonts.Verdana, tmpText, .X + (.Width / 2) - (TextWidth(Fonts.Verdana, tmpText) / 2), .Y + 5, Colour
 
                 ' Aprimoramento do item
@@ -1070,7 +1059,7 @@ Private Sub DrawItemDesc()
                     RenderTexture Tex_GUI, .X, .Y + 33 + (13 * Height), 1, 223, .Width, 13, .Width, 11
                     Height = Height + 1
                     
-                    tmpText = Strings.Trim$(Class(Item(PicNum).ClassReq).name)
+                    tmpText = Strings.Trim$(Class(Item(PicNum).ClassReq).Name)
                     If GetPlayerClass(MyIndex) = Item(PicNum).ClassReq Then
                         Colour = Green
                     Else
@@ -1499,7 +1488,7 @@ Private Sub Skills_MouseDown(Button As Integer, X As Single, Y As Single)
     ElseIf Button = 2 Then ' right click
         If SpellNum <> 0 Then
             If PlayerSpells(SpellNum).Num > 0 Then
-                Dialogue "Deletar Magia", "Tem certeza de que quer deletar a magia " & Strings.Trim$(Spell(PlayerSpells(SpellNum).Num).name) & "?", DIALOGUE_TYPE_FORGET, True, SpellNum
+                Dialogue "Deletar Magia", "Tem certeza de que quer deletar a magia " & Strings.Trim$(Spell(PlayerSpells(SpellNum).Num).Name) & "?", DIALOGUE_TYPE_FORGET, True, SpellNum
             End If
         End If
     End If
@@ -1548,7 +1537,7 @@ Private Sub Chatbox_Draw()
         ' Desenha barra para escrever
         If InChat Then
             RenderTexture Tex_GUI, .X, .Y + (.Height + 1), 1, 477, .Width, 18, .Width, 18
-            RenderText Fonts.Verdana, RenderTextChat & ChatCursor, .X + 5, .Y + .Height + 3, White
+            RenderText Fonts.Verdana, RenderTextChat & ChatCursor, .X + 3, .Y + .Height + 2, White
         End If
         
         ' Desenhar textos so chat
