@@ -1731,7 +1731,7 @@ End Sub
 ' :: Save spell packet ::
 ' :::::::::::::::::::::::
 Sub HandleSaveSpell(ByVal Index As Long, ByRef Data() As Byte, ByVal StartAddr As Long, ByVal ExtraVar As Long)
-    Dim SpellNum As Long
+    Dim spellnum As Long
     Dim Buffer As clsBuffer
     Dim SpellSize As Long
     Dim SpellData() As Byte
@@ -1743,21 +1743,21 @@ Sub HandleSaveSpell(ByVal Index As Long, ByRef Data() As Byte, ByVal StartAddr A
 
     Set Buffer = New clsBuffer
     Buffer.WriteBytes Data()
-    SpellNum = Buffer.ReadLong
+    spellnum = Buffer.ReadLong
 
     ' Prevent hacking
-    If SpellNum < 0 Or SpellNum > MAX_SPELLS Then
+    If spellnum < 0 Or spellnum > MAX_SPELLS Then
         Exit Sub
     End If
 
-    SpellSize = LenB(Spell(SpellNum))
+    SpellSize = LenB(Spell(spellnum))
     ReDim SpellData(SpellSize - 1)
     SpellData = Buffer.ReadBytes(SpellSize)
-    CopyMemory ByVal VarPtr(Spell(SpellNum)), ByVal VarPtr(SpellData(0)), SpellSize
+    CopyMemory ByVal VarPtr(Spell(spellnum)), ByVal VarPtr(SpellData(0)), SpellSize
     ' Save it
-    Call SendUpdateSpellToAll(SpellNum)
-    Call SaveSpell(SpellNum)
-    Call AddLog(GetPlayerName(Index) & " saved Spell #" & SpellNum & ".", ADMIN_LOG)
+    Call SendUpdateSpellToAll(spellnum)
+    Call SaveSpell(spellnum)
+    Call AddLog(GetPlayerName(Index) & " saved Spell #" & spellnum & ".", ADMIN_LOG)
 End Sub
 
 ' :::::::::::::::::::::::
@@ -2093,38 +2093,39 @@ End Sub
 
 Sub HandleBuyItem(ByVal Index As Long, ByRef Data() As Byte, ByVal StartAddr As Long, ByVal ExtraVar As Long)
     Dim Buffer As clsBuffer
-    Dim shopslot As Long
+    Dim shopSlot As Long
     Dim shopNum As Long
-    Dim itemamount As Long
     
     Set Buffer = New clsBuffer
     Buffer.WriteBytes Data()
     
-    shopslot = Buffer.ReadLong
+    shopSlot = Buffer.ReadLong
     
     ' not in shop, exit out
     shopNum = TempPlayer(Index).InShop
     If shopNum < 1 Or shopNum > MAX_SHOPS Then Exit Sub
     
-    With Shop(shopNum).TradeItem(shopslot)
+    With Shop(shopNum).TradeItem(shopSlot)
         ' check trade exists
         If .Item < 1 Then Exit Sub
             
         ' check has the cost item
-        itemamount = HasItem(Index, .costitem)
-        If itemamount = 0 Or itemamount < .costvalue Then
-            PlayerMsg Index, "You do not have enough to buy this item.", BrightRed
+        If Player(Index).Money = 0 Or Player(Index).Money < .costvalue Then
+            PlayerMsg Index, "Você não tem dinheiro suficiente para isso.", BrightRed
             ResetShopAction Index
             Exit Sub
         End If
         
         ' it's fine, let's go ahead
-        TakeInvItem Index, .costitem, .costvalue
+        Player(Index).Money = Player(Index).Money - .costvalue
+        Call SendMoney(Index)
+        
         GiveInvItem Index, .Item, .ItemValue
+    
+        ' send confirmation message & reset their shop action
+        PlayerMsg Index, "Você acabou de comprar " & Strings.Trim$(Item(.Item).Name), BrightGreen
     End With
     
-    ' send confirmation message & reset their shop action
-    PlayerMsg Index, "Trade successful.", BrightGreen
     ResetShopAction Index
     
     Set Buffer = Nothing

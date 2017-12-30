@@ -126,6 +126,7 @@ Private Type PlayerRec
     exp As Long
     Access As Byte
     PK As Byte
+    Money As Long
     
     ' Vitals
     Vital(1 To Vitals.Vital_Count - 1) As Long
