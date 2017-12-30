@@ -64,18 +64,6 @@ End Type
 ' Variavel onde ficará a imagem principal
 Private Tex_GUI As DX8TextureRec
 
-'Text buffer
-Public Type ChatTextBuffer
-    text As String
-    Color As Long
-End Type
-
-'Chat vertex buffer information
-Public ChatArrayUbound As Long
-Public ChatVB As Direct3DVertexBuffer8
-Public ChatVBS As Direct3DVertexBuffer8
-Public ChatTextBuffer(1 To ChatTextBufferSize) As ChatTextBuffer
-
 ' Variavel das Janelas
 Public Window(1 To GUI.W_Count - 1) As WindowRec
 
@@ -474,7 +462,7 @@ Private Sub Draw_MainBar()
         ' Desenhar barra de EXP
         XP_Width = ((GetPlayerExp(MyIndex) / .Width) / (PlayerXP / .Width)) * .Width
         RenderTexture Tex_GUI, .X, .Y, 1, 532, XP_Width, 14, XP_Width, 14
-        RenderText Fonts.Verdana, Int(GetPlayerExp(MyIndex) / PlayerXP * 100) & "%", .X + (.Width / 2) - (TextWidth(Fonts.Verdana, Int(GetPlayerExp(MyIndex) / PlayerXP * 100)) / 2), .Y, White, 50
+        RenderText Fonts.Verdana, Int(GetPlayerExp(MyIndex) / PlayerXP * 100) & "%", .X + (.Width / 2) - (TextWidth(Fonts.Verdana, Int(GetPlayerExp(MyIndex) / PlayerXP * 100)) / 2), .Y, White, 200
         
         ' Loop para exibir itens
         For i = 1 To MAX_HOTBAR
@@ -529,7 +517,7 @@ Private Sub Draw_MainBar()
         Next
         
         ' Desenha Hotbar Atual
-        RenderText Fonts.Verdana, ActualHotbar, .X + 350, .Y + 27, White, 50
+        RenderText Fonts.Verdana, ActualHotbar, .X + 349, .Y + 26, White, 200
         
         ' Loop para desenhar botões
         For i = 1 To 9

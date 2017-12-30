@@ -262,11 +262,6 @@ Public Const DIALOGUE_TYPE_PARTY As Byte = 3
 ' Do Events
 Public Const nLng As Long = (&H80 Or &H1 Or &H4 Or &H20) + (&H8 Or &H40)
 
-' Scrolling action message constants
-Public Const ACTIONMSG_STATIC As Long = 0
-Public Const ACTIONMSG_SCROLL As Long = 1
-Public Const ACTIONMSG_SCREEN As Long = 2
-
 ' stuffs
 Public Const HalfX As Integer = ((MAX_MAPX + 1) / 2) * PIC_X
 Public Const HalfY As Integer = ((MAX_MAPY + 1) / 2) * PIC_Y

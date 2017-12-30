@@ -301,8 +301,6 @@ Dim i As Long
     Tex_Selection.Texture = NumTextures
     LoadTexture Tex_Selection
     
-    EngineInitFontTextures
-    
     ' Error handler
     Exit Sub
 errorhandler:
@@ -363,8 +361,6 @@ Dim i As Long
     Tex_Direction.Texture = 0
     Tex_Target.Texture = 0
     Tex_Selection.Texture = 0
-    
-    UnloadFontTextures
     
     ' Error handler
     Exit Sub
@@ -676,7 +672,7 @@ errorhandler:
     Exit Sub
 End Sub
 
-Public Sub DrawBlood(ByVal index As Long)
+Public Sub DrawBlood(ByVal Index As Long)
 Dim Rec As RECT
     
     ' If debug mode, handle error then exit out
@@ -684,7 +680,7 @@ Dim Rec As RECT
     'load blood then
     BloodCount = Tex_Blood.Width / 32
     
-    With Blood(index)
+    With Blood(Index)
         ' check if we should be seeing it
         If .Timer + 20000 < GetTickCount Then Exit Sub
         
@@ -703,7 +699,7 @@ errorhandler:
     Exit Sub
 End Sub
 
-Public Sub DrawAnimation(ByVal index As Long, ByVal Layer As Long)
+Public Sub DrawAnimation(ByVal Index As Long, ByVal Layer As Long)
 Dim Sprite As Long
 Dim sRect As RECT
 Dim dRect As RECT
@@ -717,16 +713,16 @@ Dim lockindex As Long
     ' If debug mode, handle error then exit out
     If Options.Debug = 1 Then On Error GoTo errorhandler
 
-    If AnimInstance(index).Animation = 0 Then
-        ClearAnimInstance index
+    If AnimInstance(Index).Animation = 0 Then
+        ClearAnimInstance Index
         Exit Sub
     End If
     
-    Sprite = Animation(AnimInstance(index).Animation).Sprite(Layer)
+    Sprite = Animation(AnimInstance(Index).Animation).Sprite(Layer)
     
     If Sprite < 1 Or Sprite > NumAnimations Then Exit Sub
     
-    FrameCount = Animation(AnimInstance(index).Animation).Frames(Layer)
+    FrameCount = Animation(AnimInstance(Index).Animation).Frames(Layer)
     
     ' total width divided by frame count
     Width = Tex_Animation(Sprite).Width / FrameCount
@@ -734,15 +730,15 @@ Dim lockindex As Long
     
     sRect.Top = 0
     sRect.Bottom = Height
-    sRect.Left = (AnimInstance(index).frameIndex(Layer) - 1) * Width
+    sRect.Left = (AnimInstance(Index).frameIndex(Layer) - 1) * Width
     sRect.Right = sRect.Left + Width
     
     ' change x or y if locked
-    If AnimInstance(index).LockType > TARGET_TYPE_NONE Then ' if <> none
+    If AnimInstance(Index).LockType > TARGET_TYPE_NONE Then ' if <> none
         ' is a player
-        If AnimInstance(index).LockType = TARGET_TYPE_PLAYER Then
+        If AnimInstance(Index).LockType = TARGET_TYPE_PLAYER Then
             ' quick save the index
-            lockindex = AnimInstance(index).lockindex
+            lockindex = AnimInstance(Index).lockindex
             ' check if is ingame
             If IsPlaying(lockindex) Then
                 ' check if on same map
@@ -752,9 +748,9 @@ Dim lockindex As Long
                     Y = (GetPlayerY(lockindex) * PIC_Y) + 16 - (Height / 2) + Player(lockindex).yOffset
                 End If
             End If
-        ElseIf AnimInstance(index).LockType = TARGET_TYPE_NPC Then
+        ElseIf AnimInstance(Index).LockType = TARGET_TYPE_NPC Then
             ' quick save the index
-            lockindex = AnimInstance(index).lockindex
+            lockindex = AnimInstance(Index).lockindex
             ' check if NPC exists
             If MapNpc(lockindex).Num > 0 Then
                 ' check if alive
@@ -764,19 +760,19 @@ Dim lockindex As Long
                     Y = (MapNpc(lockindex).Y * PIC_Y) + 16 - (Height / 2) + MapNpc(lockindex).yOffset
                 Else
                     ' npc not alive anymore, kill the animation
-                    ClearAnimInstance index
+                    ClearAnimInstance Index
                     Exit Sub
                 End If
             Else
                 ' npc not alive anymore, kill the animation
-                ClearAnimInstance index
+                ClearAnimInstance Index
                 Exit Sub
             End If
         End If
     Else
         ' no lock, default x + y
-        X = (AnimInstance(index).X * 32) + 16 - (Width / 2)
-        Y = (AnimInstance(index).Y * 32) + 16 - (Height / 2)
+        X = (AnimInstance(Index).X * 32) + 16 - (Width / 2)
+        Y = (AnimInstance(Index).Y * 32) + 16 - (Height / 2)
     End If
     
     X = ConvertMapX(X)
@@ -1225,7 +1221,7 @@ errorhandler:
     Exit Sub
 End Sub
 
-Public Sub DrawPlayer(ByVal index As Long)
+Public Sub DrawPlayer(ByVal Index As Long)
 Dim anim As Byte, i As Long, X As Long, Y As Long
 Dim Sprite As Long, spritetop As Long
 Dim Rec As RECT
@@ -1234,45 +1230,45 @@ Dim attackspeed As Long
     ' If debug mode, handle error then exit out
     If Options.Debug = 1 Then On Error GoTo errorhandler
 
-    Sprite = GetPlayerSprite(index)
+    Sprite = GetPlayerSprite(Index)
 
     If Sprite < 1 Or Sprite > NumCharacters Then Exit Sub
 
     ' speed from weapon
-    If GetPlayerEquipment(index, Weapon) > 0 Then
-        attackspeed = Item(GetPlayerEquipment(index, Weapon)).speed
+    If GetPlayerEquipment(Index, Weapon) > 0 Then
+        attackspeed = Item(GetPlayerEquipment(Index, Weapon)).speed
     Else
         attackspeed = 1000
     End If
 
     ' Reset frame
-    If Player(index).Step = 3 Then
+    If Player(Index).Step = 3 Then
         anim = 0
-    ElseIf Player(index).Step = 1 Then
+    ElseIf Player(Index).Step = 1 Then
         anim = 2
     End If
     
     ' Check for attacking animation
-    If Player(index).AttackTimer + (attackspeed / 2) > GetTickCount Then
-        If Player(index).Attacking = 1 Then
+    If Player(Index).AttackTimer + (attackspeed / 2) > GetTickCount Then
+        If Player(Index).Attacking = 1 Then
             anim = 3
         End If
     Else
         ' If not attacking, walk normally
-        Select Case GetPlayerDir(index)
+        Select Case GetPlayerDir(Index)
             Case DIR_UP
-                If (Player(index).yOffset > 8) Then anim = Player(index).Step
+                If (Player(Index).yOffset > 8) Then anim = Player(Index).Step
             Case DIR_DOWN
-                If (Player(index).yOffset < -8) Then anim = Player(index).Step
+                If (Player(Index).yOffset < -8) Then anim = Player(Index).Step
             Case DIR_LEFT
-                If (Player(index).xOffset > 8) Then anim = Player(index).Step
+                If (Player(Index).xOffset > 8) Then anim = Player(Index).Step
             Case DIR_RIGHT
-                If (Player(index).xOffset < -8) Then anim = Player(index).Step
+                If (Player(Index).xOffset < -8) Then anim = Player(Index).Step
         End Select
     End If
 
     ' Check to see if we want to stop making him attack
-    With Player(index)
+    With Player(Index)
         If .AttackTimer + attackspeed < GetTickCount Then
             .Attacking = 0
             .AttackTimer = 0
@@ -1280,7 +1276,7 @@ Dim attackspeed As Long
     End With
 
     ' Set the left
-    Select Case GetPlayerDir(index)
+    Select Case GetPlayerDir(Index)
         Case DIR_UP
             spritetop = 3
         Case DIR_RIGHT
@@ -1299,15 +1295,15 @@ Dim attackspeed As Long
     End With
 
     ' Calculate the X
-    X = GetPlayerX(index) * PIC_X + Player(index).xOffset - ((Tex_Character(Sprite).Width / 4 - 32) / 2)
+    X = GetPlayerX(Index) * PIC_X + Player(Index).xOffset - ((Tex_Character(Sprite).Width / 4 - 32) / 2)
 
     ' Is the player's height more than 32..?
     If (Tex_Character(Sprite).Height) > 32 Then
         ' Create a 32 pixel offset for larger sprites
-        Y = GetPlayerY(index) * PIC_Y + Player(index).yOffset - ((Tex_Character(Sprite).Height / 4) - 32)
+        Y = GetPlayerY(Index) * PIC_Y + Player(Index).yOffset - ((Tex_Character(Sprite).Height / 4) - 32)
     Else
         ' Proceed as normal
-        Y = GetPlayerY(index) * PIC_Y + Player(index).yOffset
+        Y = GetPlayerY(Index) * PIC_Y + Player(Index).yOffset
     End If
 
     ' render the actual sprite
@@ -1315,9 +1311,9 @@ Dim attackspeed As Long
     
     ' check for paperdolling
     For i = 1 To UBound(PaperdollOrder)
-        If GetPlayerEquipment(index, PaperdollOrder(i)) > 0 Then
-            If Item(GetPlayerEquipment(index, PaperdollOrder(i))).Paperdoll > 0 Then
-                Call DrawPaperdoll(X, Y, Item(GetPlayerEquipment(index, PaperdollOrder(i))).Paperdoll, anim, spritetop)
+        If GetPlayerEquipment(Index, PaperdollOrder(i)) > 0 Then
+            If Item(GetPlayerEquipment(Index, PaperdollOrder(i))).Paperdoll > 0 Then
+                Call DrawPaperdoll(X, Y, Item(GetPlayerEquipment(Index, PaperdollOrder(i))).Paperdoll, anim, spritetop)
             End If
         End If
     Next
@@ -3021,7 +3017,7 @@ Dim Rec_Pos As RECT, srcRect As D3DRECT
             For i = 1 To Map.CurrentEvents
                 If Map.MapEvents(i).Visible = 1 Then
                     If Map.MapEvents(i).ShowName = 1 Then
-                        DrawEventName (i)
+                        Call EventName_Draw(i)
                     End If
                 End If
             Next
@@ -3041,7 +3037,7 @@ Dim Rec_Pos As RECT, srcRect As D3DRECT
             Next
             
             For i = 1 To Action_HighIndex
-                Call DrawActionMsg(i)
+                Call ActionMsg_Draw(i)
             Next i
             
             ' Draw map name

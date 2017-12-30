@@ -153,28 +153,6 @@ Dim i As Long
     frmMenu.picRegister.Picture = LoadPicture(App.Path & "\data files\graphics\gui\menu\register.jpg")
     frmMenu.picCredits.Picture = LoadPicture(App.Path & "\data files\graphics\gui\menu\credits.jpg")
     frmMenu.picCharacter.Picture = LoadPicture(App.Path & "\data files\graphics\gui\menu\character.jpg")
-    ' main
-    frmMain.Picture = LoadPicture(App.Path & "\data files\graphics\gui\main\main.jpg")
-    frmMain.picCharacter.Picture = LoadPicture(App.Path & "\data files\graphics\gui\main\character.jpg")
-    frmMain.picOptions.Picture = LoadPicture(App.Path & "\data files\graphics\gui\main\options.jpg")
-    frmMain.picParty.Picture = LoadPicture(App.Path & "\data files\graphics\gui\main\party.jpg")
-    frmMain.picItemDesc.Picture = LoadPicture(App.Path & "\data files\graphics\gui\main\description_item.jpg")
-    frmMain.picSpellDesc.Picture = LoadPicture(App.Path & "\data files\graphics\gui\main\description_spell.jpg")
-    frmMain.picTempInv.Picture = LoadPicture(App.Path & "\data files\graphics\gui\main\dragbox.jpg")
-    frmMain.picTempBank.Picture = LoadPicture(App.Path & "\data files\graphics\gui\main\dragbox.jpg")
-    frmMain.picTempSpell.Picture = LoadPicture(App.Path & "\data files\graphics\gui\main\dragbox.jpg")
-    frmMain.picShop.Picture = LoadPicture(App.Path & "\data files\graphics\gui\main\shop.jpg")
-    frmMain.picBank.Picture = LoadPicture(App.Path & "\data files\graphics\gui\main\bank.jpg")
-    frmMain.picTrade.Picture = LoadPicture(App.Path & "\data files\graphics\gui\main\trade.jpg")
-    ' main - bars
-    frmMain.imgHPBar.Picture = LoadPicture(App.Path & "\data files\graphics\gui\main\bars\health.jpg")
-    frmMain.imgMPBar.Picture = LoadPicture(App.Path & "\data files\graphics\gui\main\bars\spirit.jpg")
-    frmMain.imgEXPBar.Picture = LoadPicture(App.Path & "\data files\graphics\gui\main\bars\experience.jpg")
-    ' main - party bars
-    For i = 1 To MAX_PARTY_MEMBERS
-        frmMain.imgPartyHealth(i).Picture = LoadPicture(App.Path & "\data files\graphics\gui\main\bars\party_health.jpg")
-        frmMain.imgPartySpirit(i).Picture = LoadPicture(App.Path & "\data files\graphics\gui\main\bars\party_spirit.jpg")
-    Next
     
     ' store the bar widths for calculations
     HPBar_Width = frmMain.imgHPBar.Width
@@ -226,7 +204,7 @@ Public Sub MenuState(ByVal State As Long)
 
             If ConnectToServer(1) Then
                 Call SetStatus("Connected, sending new account information...")
-                Call SendNewAccount(frmMenu.txtRUser.Text, frmMenu.txtRPass.Text)
+                Call SendNewAccount(frmMenu.txtRUser.text, frmMenu.txtRPass.text)
             End If
 
         Case MENU_STATE_LOGIN
@@ -238,7 +216,7 @@ Public Sub MenuState(ByVal State As Long)
 
             If ConnectToServer(1) Then
                 Call SetStatus("Connected, sending login information...")
-                Call SendLogin(frmMenu.txtLUser.Text, frmMenu.txtLPass.Text)
+                Call SendLogin(frmMenu.txtLUser.text, frmMenu.txtLPass.text)
                 Exit Sub
             End If
     End Select
@@ -426,12 +404,12 @@ Public Sub TextAdd(ByVal Txt As TextBox, Msg As String, NewLine As Boolean)
     If Options.Debug = 1 Then On Error GoTo errorhandler
 
     If NewLine Then
-        Txt.Text = Txt.Text + Msg + vbCrLf
+        Txt.text = Txt.text + Msg + vbCrLf
     Else
-        Txt.Text = Txt.Text + Msg
+        Txt.text = Txt.text + Msg
     End If
 
-    Txt.SelStart = Len(Txt.Text) - 1
+    Txt.SelStart = Len(Txt.text) - 1
     
     ' Error handler
     Exit Sub

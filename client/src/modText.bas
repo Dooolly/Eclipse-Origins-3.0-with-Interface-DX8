@@ -53,6 +53,9 @@ Public Enum Fonts
     ' Verdana
     Verdana
     
+    ' Action
+    Action
+    
     ' count value
     Fonts_Count
 End Enum
@@ -80,6 +83,11 @@ Public Const White As Byte = 15
 Public Const DarkBrown As Byte = 16
 Public Const Gold As Byte = 17
 Public Const LightGreen As Byte = 18
+
+' Scrolling action message constants
+Public Const ACTIONMSG_STATIC As Long = 0
+Public Const ACTIONMSG_SCROLL As Long = 1
+Public Const ACTIONMSG_SCREEN As Long = 2
 
 ' Caracter para alteração de cor
 Public Const ColourChar As String * 1 = "#"
@@ -111,6 +119,7 @@ Public Sub LoadFonts()
     Call SetFont(Fonts.Georgia, "Georgia", 256)
     Call SetFont(Fonts.Rockwell, "Rockwell", 256, 2, 2)
     Call SetFont(Fonts.Verdana, "Verdana", 256)
+    Call SetFont(Fonts.Action, "Action", 256)
 End Sub
 
 ' Setar configurações da fonte
@@ -584,10 +593,10 @@ Public Sub UpdateShowChatText()
 End Sub
 
 ' Desenhar bolha do chat
-Public Sub ChatBubble_Draw(ByVal index As Long)
+Public Sub ChatBubble_Draw(ByVal Index As Long)
 Dim theArray() As String, X As Long, Y As Long, i As Long, MaxWidth As Long, x2 As Long, y2 As Long, Colour As Long
     
-    With chatBubble(index)
+    With chatBubble(Index)
         If .targetType = TARGET_TYPE_PLAYER Then
             ' it's a player
             If GetPlayerMap(.target) = GetPlayerMap(MyIndex) Then
@@ -653,7 +662,7 @@ End Sub
 
 ' ##############################################################################
 ' Nome do jogador
-Public Sub PlayerName_Draw(ByVal index As Long)
+Public Sub PlayerName_Draw(ByVal Index As Long)
     Dim textX As Long, textY As Long, Colour As Long
     
     ' If debug mode, handle error then exit out
@@ -662,19 +671,19 @@ Public Sub PlayerName_Draw(ByVal index As Long)
     ' get the colour
     Colour = White
 
-    If GetPlayerAccess(index) > 0 Then Colour = Yellow ' Admin Color
+    If GetPlayerAccess(Index) > 0 Then Colour = Yellow ' Admin Color
     
-    If GetPlayerPK(index) > 0 Then Colour = BrightRed ' PK Color
+    If GetPlayerPK(Index) > 0 Then Colour = BrightRed ' PK Color
     
-    textX = ConvertMapX(GetPlayerX(index) * PIC_X) + Player(index).xOffset + (PIC_X \ 2) - (TextWidth(Fonts.Rockwell, Trim$(GetPlayerName(index))) / 2)
-    textY = ConvertMapY(GetPlayerY(index) * PIC_Y) + Player(index).yOffset - 16
+    textX = ConvertMapX(GetPlayerX(Index) * PIC_X) + Player(Index).xOffset + (PIC_X \ 2) - (TextWidth(Fonts.Rockwell, Trim$(GetPlayerName(Index))) / 2)
+    textY = ConvertMapY(GetPlayerY(Index) * PIC_Y) + Player(Index).yOffset - 16
 
-    If GetPlayerSprite(index) > 0 And GetPlayerSprite(index) <= NumCharacters Then
-        textY = ConvertMapY(GetPlayerY(index) * PIC_Y) + Player(index).yOffset - (Tex_Character(GetPlayerSprite(index)).Height / 4) + 16
+    If GetPlayerSprite(Index) > 0 And GetPlayerSprite(Index) <= NumCharacters Then
+        textY = ConvertMapY(GetPlayerY(Index) * PIC_Y) + Player(Index).yOffset - (Tex_Character(GetPlayerSprite(Index)).Height / 4) + 16
     End If
 
     ' Desenhar texto
-    Call RenderText(Fonts.Rockwell, Trim$(GetPlayerName(index)), textX, textY, Colour)
+    Call RenderText(Fonts.Rockwell, Trim$(GetPlayerName(Index)), textX, textY, Colour)
     
     ' Error handler
     Exit Sub
@@ -686,19 +695,19 @@ End Sub
 
 ' ##############################################################################
 ' Nome do NPC
-Public Sub NpcName_Draw(ByVal index As Long)
+Public Sub NpcName_Draw(ByVal Index As Long)
     Dim textX As Long, textY As Long, Colour As Long
 
     ' If debug mode, handle error then exit out
     If Options.Debug = 1 Then On Error GoTo errorhandler
     
-    If Npc(MapNpc(index).Num).Behaviour = NPC_BEHAVIOUR_ATTACKONSIGHT Or Npc(MapNpc(index).Num).Behaviour = NPC_BEHAVIOUR_ATTACKWHENATTACKED Then
+    If Npc(MapNpc(Index).Num).Behaviour = NPC_BEHAVIOUR_ATTACKONSIGHT Or Npc(MapNpc(Index).Num).Behaviour = NPC_BEHAVIOUR_ATTACKWHENATTACKED Then
         ' get the colour
-        If Npc(MapNpc(index).Num).Level <= GetPlayerLevel(MyIndex) - 3 Then
+        If Npc(MapNpc(Index).Num).Level <= GetPlayerLevel(MyIndex) - 3 Then
             Colour = Grey
-        ElseIf Npc(MapNpc(index).Num).Level <= GetPlayerLevel(MyIndex) - 2 Then
+        ElseIf Npc(MapNpc(Index).Num).Level <= GetPlayerLevel(MyIndex) - 2 Then
             Colour = Green
-        ElseIf Npc(MapNpc(index).Num).Level > GetPlayerLevel(MyIndex) Then
+        ElseIf Npc(MapNpc(Index).Num).Level > GetPlayerLevel(MyIndex) Then
             Colour = Red
         Else
             Colour = White
@@ -707,15 +716,15 @@ Public Sub NpcName_Draw(ByVal index As Long)
         Colour = White
     End If
 
-    textX = ConvertMapX(MapNpc(index).X * PIC_X) + MapNpc(index).xOffset + (PIC_X \ 2) - (TextWidth(Fonts.Rockwell, Trim$(Npc(MapNpc(index).Num).name)) / 2)
-    If Npc(MapNpc(index).Num).Sprite < 1 Or Npc(MapNpc(index).Num).Sprite > NumCharacters Then
-        textY = ConvertMapY(MapNpc(index).Y * PIC_Y) + MapNpc(index).yOffset - 16
+    textX = ConvertMapX(MapNpc(Index).X * PIC_X) + MapNpc(Index).xOffset + (PIC_X \ 2) - (TextWidth(Fonts.Rockwell, Trim$(Npc(MapNpc(Index).Num).name)) / 2)
+    If Npc(MapNpc(Index).Num).Sprite < 1 Or Npc(MapNpc(Index).Num).Sprite > NumCharacters Then
+        textY = ConvertMapY(MapNpc(Index).Y * PIC_Y) + MapNpc(Index).yOffset - 16
     Else
         ' Determine location for text
-        textY = ConvertMapY(MapNpc(index).Y * PIC_Y) + MapNpc(index).yOffset - (Tex_Character(Npc(MapNpc(index).Num).Sprite).Height / 4) + 16
+        textY = ConvertMapY(MapNpc(Index).Y * PIC_Y) + MapNpc(Index).yOffset - (Tex_Character(Npc(MapNpc(Index).Num).Sprite).Height / 4) + 16
     End If
 
-    Call RenderText(Fonts.Rockwell, Trim$(Npc(MapNpc(index).Num).name), textX, textY, Colour)
+    Call RenderText(Fonts.Rockwell, Trim$(Npc(MapNpc(Index).Num).name), textX, textY, Colour)
     
     ' Error handler
     Exit Sub
@@ -792,3 +801,118 @@ errorhandler:
     Err.Clear
     Exit Function
 End Function
+
+' Desenhar mensagem de ação
+Sub ActionMsg_Draw(ByVal Index As Integer)
+    Dim X As Long, Y As Long, i As Long, Time As Long
+    Dim LenMsg As Long
+
+    ' If debug mode, handle error then exit out
+    If Options.Debug = 1 Then On Error GoTo errorhandler
+
+    If ActionMsg(Index).Message = vbNullString Then Exit Sub
+
+    ' how long we want each message to appear
+    Select Case ActionMsg(Index).Type
+
+        Case ACTIONMSG_STATIC
+            Time = 1500
+            LenMsg = TextWidth(Fonts.Action, Trim$(ActionMsg(Index).Message))
+
+            If ActionMsg(Index).Y > 0 Then
+                X = ActionMsg(Index).X + Int(PIC_X \ 2) - (LenMsg / 2)
+                Y = ActionMsg(Index).Y + PIC_Y
+            Else
+                X = ActionMsg(Index).X + Int(PIC_X \ 2) - (LenMsg / 2)
+                Y = ActionMsg(Index).Y - Int(PIC_Y \ 2) + 18
+            End If
+
+        Case ACTIONMSG_SCROLL
+            Time = 1500
+
+            If ActionMsg(Index).Y > 0 Then
+                X = ActionMsg(Index).X + Int(PIC_X \ 2) - ((Len(Trim$(ActionMsg(Index).Message)) \ 2) * 8)
+                Y = ActionMsg(Index).Y - Int(PIC_Y \ 2) - 2 - (ActionMsg(Index).Scroll * 0.6)
+                ActionMsg(Index).Scroll = ActionMsg(Index).Scroll + 1
+            Else
+                X = ActionMsg(Index).X + Int(PIC_X \ 2) - ((Len(Trim$(ActionMsg(Index).Message)) \ 2) * 8)
+                Y = ActionMsg(Index).Y - Int(PIC_Y \ 2) + 18 + (ActionMsg(Index).Scroll * 0.001)
+                ActionMsg(Index).Scroll = ActionMsg(Index).Scroll + 1
+            End If
+
+            'If ActionMsg(Index).alpha <= 0 Then ClearActionMsg Index: Exit Sub
+
+        Case ACTIONMSG_SCREEN
+            Time = 3000
+
+            ' This will kill any action screen messages that there in the system
+            For i = MAX_BYTE To 1 Step -1
+
+                If ActionMsg(i).Type = ACTIONMSG_SCREEN Then
+                    If i <> Index Then
+                        ClearActionMsg Index
+                        Index = i
+                    End If
+                End If
+
+            Next
+
+            X = (400) - ((TextWidth(Fonts.Action, Trim$(ActionMsg(Index).Message)) \ 2))
+            Y = 24
+    End Select
+
+    X = ConvertMapX(X)
+    Y = ConvertMapY(Y)
+
+    If GetTickCount < ActionMsg(Index).Created + Time Then
+        RenderText Fonts.Action, ActionMsg(Index).Message, X, Y, ActionMsg(Index).Color
+    Else
+        Call ClearActionMsg(Index)
+    End If
+    
+    ' Error handler
+    Exit Sub
+errorhandler:
+    HandleError "ActionMsg_Draw", "modText", Err.Number, Err.Description, Err.Source, Err.HelpContext
+    Err.Clear
+    Exit Sub
+End Sub
+
+' Desenhar nomes dos eventos
+Public Sub EventName_Draw(ByVal Index As Long)
+    Dim textX As Long
+    Dim textY As Long
+
+    ' If debug mode, handle error then exit out
+    If Options.Debug = 1 Then On Error GoTo errorhandler
+    If InMapEditor Then Exit Sub
+    
+    ' calc pos
+    textX = ConvertMapX(Map.MapEvents(Index).X * PIC_X) + Map.MapEvents(Index).xOffset + (PIC_X \ 2) - (TextWidth(Fonts.Rockwell, (Trim$(Trim$(Map.MapEvents(Index).name)))) / 2)
+    If Map.MapEvents(Index).GraphicType = 0 Then
+        textY = ConvertMapY(Map.MapEvents(Index).Y * PIC_Y) + Map.MapEvents(Index).yOffset - 16
+    ElseIf Map.MapEvents(Index).GraphicType = 1 Then
+        If Map.MapEvents(Index).GraphicNum < 1 Or Map.MapEvents(Index).GraphicNum > NumCharacters Then
+            textY = ConvertMapY(Map.MapEvents(Index).Y * PIC_Y) + Map.MapEvents(Index).yOffset - 16
+        Else
+            ' Determine location for text
+            textY = ConvertMapY(Map.MapEvents(Index).Y * PIC_Y) + Map.MapEvents(Index).yOffset - (Tex_Character(Map.MapEvents(Index).GraphicNum).Height / 4) + 16
+        End If
+    ElseIf Map.MapEvents(Index).GraphicType = 2 Then
+        If Map.MapEvents(Index).GraphicY2 > 0 Then
+            textY = ConvertMapY(Map.MapEvents(Index).Y * PIC_Y) + Map.MapEvents(Index).yOffset - ((Map.MapEvents(Index).GraphicY2 - Map.MapEvents(Index).GraphicY) * 32) + 16
+        Else
+            textY = ConvertMapY(Map.MapEvents(Index).Y * PIC_Y) + Map.MapEvents(Index).yOffset - 32 + 16
+        End If
+    End If
+
+    ' Draw name
+    RenderText Fonts.Rockwell, Trim$(Map.MapEvents(Index).name), textX, textY, White
+    
+    ' Error handler
+    Exit Sub
+errorhandler:
+    HandleError "EventName_Draw", "modText", Err.Number, Err.Description, Err.Source, Err.HelpContext
+    Err.Clear
+    Exit Sub
+End Sub
