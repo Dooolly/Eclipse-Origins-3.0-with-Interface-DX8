@@ -271,7 +271,7 @@ Dim Buffer As clsBuffer
     For i = 1 To Max_Classes
 
         With Class(i)
-            .Name = Buffer.ReadString
+            .name = Buffer.ReadString
             .Vital(Vitals.HP) = Buffer.ReadLong
             .Vital(Vitals.MP) = Buffer.ReadLong
             
@@ -312,7 +312,7 @@ Dim Buffer As clsBuffer
     frmLoad.Visible = False
     frmMenu.cmbClass.Clear
     For i = 1 To Max_Classes
-        frmMenu.cmbClass.AddItem Trim$(Class(i).Name)
+        frmMenu.cmbClass.AddItem Trim$(Class(i).name)
     Next
 
     frmMenu.cmbClass.ListIndex = 0
@@ -348,7 +348,7 @@ Dim Buffer As clsBuffer
     For i = 1 To Max_Classes
 
         With Class(i)
-            .Name = Buffer.ReadString 'Trim$(Parse(n))
+            .name = Buffer.ReadString 'Trim$(Parse(n))
             .Vital(Vitals.HP) = Buffer.ReadLong 'CLng(Parse(n + 1))
             .Vital(Vitals.MP) = Buffer.ReadLong 'CLng(Parse(n + 2))
             
@@ -587,8 +587,7 @@ Dim i As Long
     Buffer.WriteBytes Data()
     
     For i = 1 To Stats.Stat_Count - 1
-        SetPlayerStat Index, i, Buffer.ReadLong
-        frmMain.lblCharStat(i).Caption = GetPlayerStat(MyIndex, i)
+        SetPlayerStat Index, i, Buffer.ReadInteger
     Next
     
     ' Error handler
@@ -631,7 +630,7 @@ Dim Buffer As clsBuffer
     i = Buffer.ReadLong
     Call SetPlayerName(i, Buffer.ReadString)
     Call SetPlayerLevel(i, Buffer.ReadLong)
-    Call SetPlayerPOINTS(i, Buffer.ReadLong)
+    Call SetPlayerPOINTS(i, Buffer.ReadInteger) ' Obter pontos
     Call SetPlayerSprite(i, Buffer.ReadLong)
     Call SetPlayerMap(i, Buffer.ReadLong)
     Call SetPlayerX(i, Buffer.ReadLong)
@@ -653,28 +652,18 @@ Dim Buffer As clsBuffer
         DirLeft = False
         DirRight = False
         
-        ' Set the character windows
-        frmMain.lblCharName = GetPlayerName(MyIndex) & " - Level " & GetPlayerLevel(MyIndex)
-        
-        For X = 1 To Stats.Stat_Count - 1
-            frmMain.lblCharStat(X).Caption = GetPlayerStat(MyIndex, X)
-        Next
-        
         ' Set training label visiblity depending on points
-        frmMain.lblPoints.Caption = GetPlayerPOINTS(MyIndex)
-        If GetPlayerPOINTS(MyIndex) > 0 Then
-            For X = 1 To Stats.Stat_Count - 1
-                If GetPlayerStat(Index, X) < 255 Then
-                    frmMain.lblTrainStat(X).Visible = True
+        For X = 1 To Stats.Stat_Count - 1
+            If GetPlayerPOINTS(i) > 0 Then
+                If GetPlayerStat(i, X) < MAX_INTEGER Then
+                    Window(GUI.W_Char).Buttons(X).Visible = True
                 Else
-                    frmMain.lblTrainStat(X).Visible = False
+                    Window(GUI.W_Char).Buttons(X).Visible = False
                 End If
-            Next
-        Else
-            For X = 1 To Stats.Stat_Count - 1
-                frmMain.lblTrainStat(X).Visible = False
-            Next
-        End If
+            Else
+                Window(GUI.W_Char).Buttons(X).Visible = False
+            End If
+        Next
     End If
 
     ' Make sure they aren't walking
@@ -1048,7 +1037,7 @@ Dim MapNum As Long
     Buffer.WriteBytes Data()
 
     MapNum = Buffer.ReadLong
-    Map.Name = Buffer.ReadString
+    Map.name = Buffer.ReadString
     Map.Music = Buffer.ReadString
     Map.BGS = Buffer.ReadString
     Map.Revision = Buffer.ReadLong
@@ -1401,7 +1390,7 @@ Dim i As Long
 
         ' Add the names
         For i = 1 To MAX_ITEMS
-            .lstIndex.AddItem i & ": " & Trim$(Item(i).Name)
+            .lstIndex.AddItem i & ": " & Trim$(Item(i).name)
         Next
 
         .Show
@@ -1429,7 +1418,7 @@ Dim i As Long
 
         ' Add the names
         For i = 1 To MAX_ANIMATIONS
-            .lstIndex.AddItem i & ": " & Trim$(Animation(i).Name)
+            .lstIndex.AddItem i & ": " & Trim$(Animation(i).name)
         Next
 
         .Show
@@ -1576,7 +1565,7 @@ Dim i As Long
 
         ' Add the names
         For i = 1 To MAX_NPCS
-            .lstIndex.AddItem i & ": " & Trim$(Npc(i).Name)
+            .lstIndex.AddItem i & ": " & Trim$(Npc(i).name)
         Next
 
         .Show
@@ -1633,7 +1622,7 @@ Dim i As Long
 
         ' Add the names
         For i = 1 To MAX_RESOURCES
-            .lstIndex.AddItem i & ": " & Trim$(Resource(i).Name)
+            .lstIndex.AddItem i & ": " & Trim$(Resource(i).name)
         Next
 
         .Show
@@ -1731,7 +1720,7 @@ Dim i As Long
 
         ' Add the names
         For i = 1 To MAX_SHOPS
-            .lstIndex.AddItem i & ": " & Trim$(Shop(i).Name)
+            .lstIndex.AddItem i & ": " & Trim$(Shop(i).name)
         Next
 
         .Show
@@ -1788,7 +1777,7 @@ Dim i As Long
 
         ' Add the names
         For i = 1 To MAX_SPELLS
-            .lstIndex.AddItem i & ": " & Trim$(Spell(i).Name)
+            .lstIndex.AddItem i & ": " & Trim$(Spell(i).name)
         Next
 
         .Show
@@ -2140,7 +2129,7 @@ End Sub
 Private Sub HandleSayMsg(ByVal Index As Long, ByRef Data() As Byte, ByVal StartAddr As Long, ByVal ExtraVar As Long)
 Dim Buffer As clsBuffer
 Dim Access As Byte
-Dim Name As String
+Dim name As String
 Dim Message As String
 Dim Colour As Long
 Dim Header As String
@@ -2152,7 +2141,7 @@ Dim PK As Byte, Channel As Byte
     Set Buffer = New clsBuffer
     Buffer.WriteBytes Data()
     
-    Name = Buffer.ReadString
+    name = Buffer.ReadString
     Access = Buffer.ReadByte
     PK = Buffer.ReadByte
     Message = Buffer.ReadString
@@ -2178,7 +2167,7 @@ Dim PK As Byte, Channel As Byte
     ' remove the colour char from the message
     ' Message = Replace$(Message, ColourChar, vbNullString)
     ' add to the chat box
-    AddText ColourChar & GetColStr(Colour) & Header & Name & ": " & ColourChar & GetColStr(Grey) & Message, Grey, , Channel
+    AddText ColourChar & GetColStr(Colour) & Header & name & ": " & ColourChar & GetColStr(Grey) & Message, Grey, , Channel
     
     ' Error handler
     Exit Sub
@@ -2631,7 +2620,7 @@ Dim Buffer As clsBuffer
     End If
 
     With Map.MapEvents(id)
-        .Name = Buffer.ReadString
+        .name = Buffer.ReadString
         .Dir = Buffer.ReadLong
         .ShowDir = .Dir
         .GraphicNum = Buffer.ReadLong
@@ -2954,7 +2943,7 @@ Dim str As String, i As Long, X As Long, Y As Long, Z As Long, w As Long
         ReDim Map.Events(0 To Map.EventCount)
         For i = 1 To Map.EventCount
             With Map.Events(i)
-                .Name = Buffer.ReadString
+                .name = Buffer.ReadString
                 .Global = Buffer.ReadLong
                 .X = Buffer.ReadLong
                 .Y = Buffer.ReadLong

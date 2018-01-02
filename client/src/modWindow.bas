@@ -21,6 +21,7 @@ Public Enum GUI
    W_DescriptionItem
    W_Chatbox
    W_Spells
+   W_Char
 
    ' Quantidade de Janelas
    W_Count
@@ -180,6 +181,28 @@ Public Sub InitGUI()
         .Buttons(1).State = 2
     End With
     
+    ' Carregar menu
+    With Window(GUI.W_Char)
+        .X = frmMain.ScaleWidth / 2
+        .Y = frmMain.ScaleHeight / 2
+        .Width = 143
+        .Height = 215
+        .Visible = False
+        .Movable = True
+        ReDim .Buttons(1 To 5)
+        
+        For i = 1 To UBound(.Buttons)
+            .Buttons(i).X = 30
+            .Buttons(i).Y = 30 + (17 * 1)
+            .Buttons(i).Pos_X = 391
+            .Buttons(i).Pos_Y = 1
+            .Buttons(i).Width = 14
+            .Buttons(i).Height = 14
+            .Buttons(i).State = 0
+            .Buttons(i).Visible = False
+        Next
+    End With
+    
     ' Error handler
     Exit Sub
 errorhandler:
@@ -200,6 +223,7 @@ Public Sub DrawInterface()
     If Window(GUI.W_Inventory).Visible Then Call Inventory_Draw ' Desenhar inventário
     If Window(GUI.W_Spells).Visible Then Call Skills_Draw ' Desenhar janela de magias
     If Window(GUI.W_DescriptionItem).Visible Then Call DrawItemDesc ' Descrição do item
+    If Window(GUI.W_Char).Visible Then Call Character_Draw
     
     If DragInvSlotNum > 0 Then Call DrawDragItem
     If DragSpell > 0 Then Call DrawDragSpell
@@ -291,10 +315,13 @@ Public Sub MouseDown_Handle(Button As Integer, Shift As Integer, X As Single, Y 
                             Call Inventory_MouseDown(Button, X, Y)
                             Exit Sub
                         Case GUI.W_Chatbox
-                            Chat_MouseDown Button, X, Y
+                            Call Chat_MouseDown(Button, X, Y)
                             Exit Sub
                         Case GUI.W_Spells
                             Call Skills_MouseDown(Button, X, Y)
+                            Exit Sub
+                        Case GUI.W_Char
+                            Call Character_MouseDown
                             Exit Sub
                     End Select
                 End If
@@ -451,7 +478,7 @@ Private Sub Draw_MainBar()
         ' Desenhar barra de EXP
         XP_Width = ((GetPlayerExp(MyIndex) / .Width) / (PlayerXP / .Width)) * .Width
         RenderTexture Tex_GUI, .X, .Y, 1, 532, XP_Width, 14, XP_Width, 14
-        RenderText Fonts.Verdana, Int(GetPlayerExp(MyIndex) / PlayerXP * 100) & "%", .X + (.Width / 2) - (TextWidth(Fonts.Verdana, Int(GetPlayerExp(MyIndex) / PlayerXP * 100)) / 2), .Y, White, 200
+        RenderText Fonts.Verdana, Format((GetPlayerExp(MyIndex) / PlayerXP * 100), "###.####") & "%", .X + (.Width / 2) - (TextWidth(Fonts.Verdana, Int(GetPlayerExp(MyIndex) / PlayerXP * 100)) / 2), .Y - 1, White, 200
         
         ' Loop para exibir itens
         For i = 1 To MAX_HOTBAR
@@ -471,7 +498,7 @@ Private Sub Draw_MainBar()
         
             Select Case Hotbar(i, ActualHotbar).sType
                 Case 1 ' Inventário
-                    If Len(Item(Hotbar(i, ActualHotbar).Slot).Name) > 0 Then
+                    If Len(Item(Hotbar(i, ActualHotbar).Slot).name) > 0 Then
                         If Item(Hotbar(i, ActualHotbar).Slot).Pic > 0 Then
                             If Item(Hotbar(i, ActualHotbar).Slot).Pic <= numitems Then
                                 RenderTextureByRects Tex_Item(Item(Hotbar(i, ActualHotbar).Slot).Pic), sRect, dRect
@@ -479,7 +506,7 @@ Private Sub Draw_MainBar()
                         End If
                     End If
                 Case 2 ' Magia
-                    If Len(Spell(Hotbar(i, ActualHotbar).Slot).Name) > 0 Then
+                    If Len(Spell(Hotbar(i, ActualHotbar).Slot).name) > 0 Then
                         If Spell(Hotbar(i, ActualHotbar).Slot).Icon > 0 Then
                             If Spell(Hotbar(i, ActualHotbar).Slot).Icon <= NumSpellIcons Then
                                 ' Checar se a magia está congelada
@@ -563,7 +590,7 @@ Private Sub MainBar_MouseDown(Button As Integer, X As Single, Y As Single)
                     Case 1 ' Inventário
                         Window(GUI.W_Inventory).Visible = Not Window(GUI.W_Inventory).Visible
                     Case 2 ' Status
-                         
+                        Window(GUI.W_Char).Visible = Not Window(GUI.W_Char).Visible
                     Case 3 ' Magias
                         Window(GUI.W_Spells).Visible = Not Window(GUI.W_Spells).Visible
                     Case 8 ' Mudar de Hotbar - Aumentar
@@ -1046,7 +1073,7 @@ Private Sub DrawItemDesc()
                 End Select
                 
                 ' Nome do item
-                tmpText = Strings.Trim$(Item(PicNum).Name)
+                tmpText = Strings.Trim$(Item(PicNum).name)
                 RenderText Fonts.Verdana, tmpText, .X + (.Width / 2) - (TextWidth(Fonts.Verdana, tmpText) / 2), .Y + 5, Colour
 
                 ' Aprimoramento do item
@@ -1059,7 +1086,7 @@ Private Sub DrawItemDesc()
                     RenderTexture Tex_GUI, .X, .Y + 33 + (13 * Height), 1, 223, .Width, 13, .Width, 11
                     Height = Height + 1
                     
-                    tmpText = Strings.Trim$(Class(Item(PicNum).ClassReq).Name)
+                    tmpText = Strings.Trim$(Class(Item(PicNum).ClassReq).name)
                     If GetPlayerClass(MyIndex) = Item(PicNum).ClassReq Then
                         Colour = Green
                     Else
@@ -1488,7 +1515,7 @@ Private Sub Skills_MouseDown(Button As Integer, X As Single, Y As Single)
     ElseIf Button = 2 Then ' right click
         If SpellNum <> 0 Then
             If PlayerSpells(SpellNum).Num > 0 Then
-                Dialogue "Deletar Magia", "Tem certeza de que quer deletar a magia " & Strings.Trim$(Spell(PlayerSpells(SpellNum).Num).Name) & "?", DIALOGUE_TYPE_FORGET, True, SpellNum
+                Dialogue "Deletar Magia", "Tem certeza de que quer deletar a magia " & Strings.Trim$(Spell(PlayerSpells(SpellNum).Num).name) & "?", DIALOGUE_TYPE_FORGET, True, SpellNum
             End If
         End If
     End If
@@ -1610,6 +1637,100 @@ Dim i As Long
     Exit Sub
 errorhandler:
     HandleError "Chat_MouseDown", "modWindow", Err.Number, Err.Description, Err.Source, Err.HelpContext
+    Err.Clear
+    Exit Sub
+End Sub
+
+Private Sub Character_Draw()
+    Dim i As Stats
+    
+    ' If debug mode, handle error then exit out
+    If Options.Debug = 1 Then On Error GoTo errorhandler
+    
+    With Window(GUI.W_Char)
+        ' Desenha designer
+        RenderTexture Tex_GUI, .X, .Y, 156, 218, .Width, .Height, .Width, .Height
+        
+        ' Renderizar textos
+        ' Nome
+        Call RenderText(Fonts.Verdana, "Nome: " & GetPlayerName(MyIndex), .X + 42, .Y + 24, White)
+        
+        ' Level
+        Call RenderText(Fonts.Verdana, "Level: " & GetPlayerLevel(MyIndex), .X + 42, .Y + 41, White)
+        
+        ' Clan
+        Call RenderText(Fonts.Verdana, "Org: Akatsuki", .X + 42, .Y + 58, White)
+        
+        ' Player Killer
+        Call RenderText(Fonts.Verdana, "Nivel PK: " & GetPlayerPK(MyIndex), .X + 42, .Y + 75, White)
+        
+        ' Tipo de conta
+        Call RenderText(Fonts.Verdana, "Tipo: Normal", .X + 42, .Y + 92, White)
+        
+        ' Status
+        Call RenderText(Fonts.Verdana, "For: ", .X + 42, .Y + 112, White)
+        Call RenderText(Fonts.Verdana, "Def: ", .X + 42, .Y + 129, White)
+        Call RenderText(Fonts.Verdana, "Agi: ", .X + 42, .Y + 146, White)
+        Call RenderText(Fonts.Verdana, "Int: ", .X + 42, .Y + 163, White)
+        Call RenderText(Fonts.Verdana, "Rec: ", .X + 42, .Y + 180, White)
+        
+        ' Botões e valores
+        For i = 1 To Stats.Stat_Count - 1
+            ' valores
+            Call RenderText(Fonts.Verdana, GetPlayerStat(MyIndex, i), .X + 120 - TextWidth(Fonts.Verdana, GetPlayerStat(MyIndex, i)), .Y + 95 + (17 * i), White)
+            
+            ' botões
+            If .Buttons(i).Visible Then
+                .Buttons(i).X = .X + 125
+                .Buttons(i).Y = .Y + 95 + (17 * i)
+                
+                With .Buttons(i)
+                    If .State = 2 Then ' Clicado
+                        RenderTexture Tex_GUI, .X, .Y, .Pos_X, .Pos_Y + (.Height * 2), .Width, .Height, .Width, .Height
+                    ElseIf (MouseX >= .X And MouseX <= .X + .Width) And (MouseY >= .Y And MouseY <= .Y + .Height) Then
+                        RenderTexture Tex_GUI, .X, .Y, .Pos_X, .Pos_Y + .Height, .Width, .Height, .Width, .Height
+                    Else ' Normal
+                        RenderTexture Tex_GUI, .X, .Y, .Pos_X, .Pos_Y, .Width, .Height, .Width, .Height
+                    End If
+                End With
+            End If
+        Next
+        
+        ' Pontos
+        Call RenderText(Fonts.Verdana, "Pontos: " & GetPlayerPOINTS(MyIndex), .X + 42, .Y + 197, White)
+    End With
+    
+    ' Error handler
+    Exit Sub
+errorhandler:
+    HandleError "Character_Draw", "modWindow", Err.Number, Err.Description, Err.Source, Err.HelpContext
+    Err.Clear
+    Exit Sub
+End Sub
+
+Private Sub Character_MouseDown()
+    Dim i As Stats
+    
+    ' If debug mode, handle error then exit out
+    If Options.Debug = 1 Then On Error GoTo errorhandler
+    
+    For i = 1 To Stats.Stat_Count - 1
+        With Window(GUI.W_Char).Buttons(i)
+            If (MouseX >= .X And MouseX <= .X + .Width) And (MouseY >= .Y And MouseY <= .Y + .Height) Then
+                .State = 2
+                
+                If GetPlayerPOINTS(MyIndex) = 0 Then Exit Sub
+                
+                SendTrainStat i
+                Exit Sub
+            End If
+        End With
+    Next
+    
+    ' Error handler
+    Exit Sub
+errorhandler:
+    HandleError "Character_MouseDown", "modWindow", Err.Number, Err.Description, Err.Source, Err.HelpContext
     Err.Clear
     Exit Sub
 End Sub

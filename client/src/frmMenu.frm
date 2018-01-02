@@ -642,10 +642,10 @@ Private Sub Form_Load()
     Next
 
     ' Load the username + pass
-    txtLUser.text = Trim$(Options.Username)
+    txtLUser.Text = Trim$(Options.Username)
     If Options.SavePass = 1 Then
-        txtLPass.text = Trim$(Options.Password)
-        chkPass.value = Options.SavePass
+        txtLPass.Text = Trim$(Options.Password)
+        chkPass.Value = Options.SavePass
     End If
     
     ' Error handler
@@ -656,7 +656,7 @@ errorhandler:
     Exit Sub
 End Sub
 
-Private Sub Form_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
+Private Sub Form_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
     ' If debug mode, handle error then exit out
     If Options.Debug = 1 Then On Error GoTo errorhandler
     
@@ -737,70 +737,11 @@ errorhandler:
     Exit Sub
 End Sub
 
-Private Sub imgButton_MouseDown(Index As Integer, Button As Integer, Shift As Integer, x As Single, y As Single)
-    ' If debug mode, handle error then exit out
-    If Options.Debug = 1 Then On Error GoTo errorhandler
-    
-    ' reset other buttons
-    resetButtons_Menu Index
-    
-    ' change the button we're hovering on
-    changeButtonState_Menu Index, 2 ' clicked
-    
-    ' Error handler
-    Exit Sub
-errorhandler:
-    HandleError "imgButton_MouseDown", "frmMenu", Err.Number, Err.Description, Err.Source, Err.HelpContext
-    Err.Clear
-    Exit Sub
-End Sub
-
-Private Sub imgButton_MouseMove(Index As Integer, Button As Integer, Shift As Integer, x As Single, y As Single)
-    ' If debug mode, handle error then exit out
-    If Options.Debug = 1 Then On Error GoTo errorhandler
-    
-    ' reset other buttons
-    resetButtons_Menu Index
-    
-    ' change the button we're hovering on
-    If Not MenuButton(Index).state = 2 Then ' make sure we're not clicking
-        changeButtonState_Menu Index, 1 ' hover
-    End If
-    
-    ' play sound
-    If Not LastButtonSound_Menu = Index Then
-        PlaySound Sound_ButtonHover, -1, -1
-        LastButtonSound_Menu = Index
-    End If
-    
-    ' Error handler
-    Exit Sub
-errorhandler:
-    HandleError "imgButton_MouseMove", "frmMenu", Err.Number, Err.Description, Err.Source, Err.HelpContext
-    Err.Clear
-    Exit Sub
-End Sub
-
-Private Sub imgButton_MouseUp(Index As Integer, Button As Integer, Shift As Integer, x As Single, y As Single)
-    ' If debug mode, handle error then exit out
-    If Options.Debug = 1 Then On Error GoTo errorhandler
-        
-    ' reset all buttons
-    resetButtons_Menu -1
-    
-    ' Error handler
-    Exit Sub
-errorhandler:
-    HandleError "imgButton_MouseUp", "frmMenu", Err.Number, Err.Description, Err.Source, Err.HelpContext
-    Err.Clear
-    Exit Sub
-End Sub
-
 Private Sub lblLAccept_Click()
     ' If debug mode, handle error then exit out
     If Options.Debug = 1 Then On Error GoTo errorhandler
     
-    If isLoginLegal(txtLUser.text, txtLPass.text) Then
+    If isLoginLegal(txtLUser.Text, txtLPass.Text) Then
         Call MenuState(MENU_STATE_LOGIN)
     End If
 
@@ -819,7 +760,7 @@ Dim spritecount As Long
     ' If debug mode, handle error then exit out
     If Options.Debug = 1 Then On Error GoTo errorhandler
     
-    If optMale.value Then
+    If optMale.Value Then
         spritecount = UBound(Class(cmbClass.ListIndex + 1).MaleSprite)
     Else
         spritecount = UBound(Class(cmbClass.ListIndex + 1).FemaleSprite)
@@ -870,7 +811,7 @@ errorhandler:
     Exit Sub
 End Sub
 
-Private Sub picCharacter_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
+Private Sub picCharacter_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
     ' If debug mode, handle error then exit out
     If Options.Debug = 1 Then On Error GoTo errorhandler
     
@@ -884,7 +825,7 @@ errorhandler:
     Exit Sub
 End Sub
 
-Private Sub picCredits_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
+Private Sub picCredits_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
     ' If debug mode, handle error then exit out
     If Options.Debug = 1 Then On Error GoTo errorhandler
     
@@ -898,7 +839,7 @@ errorhandler:
     Exit Sub
 End Sub
 
-Private Sub picLogin_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
+Private Sub picLogin_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
     ' If debug mode, handle error then exit out
     If Options.Debug = 1 Then On Error GoTo errorhandler
     
@@ -912,7 +853,7 @@ errorhandler:
     Exit Sub
 End Sub
 
-Private Sub picMain_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
+Private Sub picMain_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
     ' If debug mode, handle error then exit out
     If Options.Debug = 1 Then On Error GoTo errorhandler
     
@@ -926,7 +867,7 @@ errorhandler:
     Exit Sub
 End Sub
 
-Private Sub picRegister_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
+Private Sub picRegister_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
     ' If debug mode, handle error then exit out
     If Options.Debug = 1 Then On Error GoTo errorhandler
     
@@ -949,9 +890,9 @@ Private Sub txtRAccept_Click()
     ' If debug mode, handle error then exit out
     If Options.Debug = 1 Then On Error GoTo errorhandler
     
-    name = Trim$(txtRUser.text)
-    Password = Trim$(txtRPass.text)
-    PasswordAgain = Trim$(txtRPass2.text)
+    name = Trim$(txtRUser.Text)
+    Password = Trim$(txtRPass.Text)
+    PasswordAgain = Trim$(txtRPass2.Text)
 
     If isLoginLegal(name, Password) Then
         If Password <> PasswordAgain Then

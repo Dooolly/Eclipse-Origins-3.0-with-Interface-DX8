@@ -985,174 +985,6 @@ Begin VB.Form frmMain
          Width           =   1035
       End
    End
-   Begin VB.PictureBox picOptions 
-      Appearance      =   0  'Flat
-      AutoRedraw      =   -1  'True
-      AutoSize        =   -1  'True
-      BackColor       =   &H00000000&
-      BorderStyle     =   0  'None
-      BeginProperty Font 
-         Name            =   "MS Sans Serif"
-         Size            =   9.75
-         Charset         =   0
-         Weight          =   400
-         Underline       =   0   'False
-         Italic          =   0   'False
-         Strikethrough   =   0   'False
-      EndProperty
-      ForeColor       =   &H80000008&
-      Height          =   4050
-      Left            =   8115
-      ScaleHeight     =   270
-      ScaleMode       =   3  'Pixel
-      ScaleWidth      =   194
-      TabIndex        =   58
-      Top             =   4245
-      Visible         =   0   'False
-      Width           =   2910
-      Begin VB.PictureBox Picture4 
-         BackColor       =   &H00000000&
-         BorderStyle     =   0  'None
-         Height          =   255
-         Left            =   240
-         ScaleHeight     =   255
-         ScaleWidth      =   1935
-         TabIndex        =   64
-         Top             =   1440
-         Width           =   1935
-         Begin VB.OptionButton optSOn 
-            Appearance      =   0  'Flat
-            BackColor       =   &H00000000&
-            Caption         =   "On"
-            BeginProperty Font 
-               Name            =   "Georgia"
-               Size            =   8.25
-               Charset         =   0
-               Weight          =   400
-               Underline       =   0   'False
-               Italic          =   0   'False
-               Strikethrough   =   0   'False
-            EndProperty
-            ForeColor       =   &H00FFFFFF&
-            Height          =   255
-            Left            =   0
-            TabIndex        =   66
-            Top             =   0
-            Width           =   735
-         End
-         Begin VB.OptionButton optSOff 
-            Appearance      =   0  'Flat
-            BackColor       =   &H00000000&
-            Caption         =   "Off"
-            BeginProperty Font 
-               Name            =   "Georgia"
-               Size            =   8.25
-               Charset         =   0
-               Weight          =   400
-               Underline       =   0   'False
-               Italic          =   0   'False
-               Strikethrough   =   0   'False
-            EndProperty
-            ForeColor       =   &H00FFFFFF&
-            Height          =   255
-            Left            =   720
-            TabIndex        =   65
-            Top             =   0
-            Width           =   735
-         End
-      End
-      Begin VB.PictureBox Picture3 
-         BackColor       =   &H00000000&
-         BorderStyle     =   0  'None
-         Height          =   255
-         Left            =   240
-         ScaleHeight     =   255
-         ScaleWidth      =   1935
-         TabIndex        =   61
-         Top             =   840
-         Width           =   1935
-         Begin VB.OptionButton optMOff 
-            Appearance      =   0  'Flat
-            BackColor       =   &H00000000&
-            Caption         =   "Off"
-            BeginProperty Font 
-               Name            =   "Georgia"
-               Size            =   8.25
-               Charset         =   0
-               Weight          =   400
-               Underline       =   0   'False
-               Italic          =   0   'False
-               Strikethrough   =   0   'False
-            EndProperty
-            ForeColor       =   &H00FFFFFF&
-            Height          =   255
-            Left            =   720
-            TabIndex        =   63
-            Top             =   0
-            Width           =   735
-         End
-         Begin VB.OptionButton optMOn 
-            Appearance      =   0  'Flat
-            BackColor       =   &H00000000&
-            Caption         =   "On"
-            BeginProperty Font 
-               Name            =   "Georgia"
-               Size            =   8.25
-               Charset         =   0
-               Weight          =   400
-               Underline       =   0   'False
-               Italic          =   0   'False
-               Strikethrough   =   0   'False
-            EndProperty
-            ForeColor       =   &H00FFFFFF&
-            Height          =   255
-            Left            =   0
-            TabIndex        =   62
-            Top             =   0
-            Width           =   735
-         End
-      End
-      Begin VB.Label Label49 
-         AutoSize        =   -1  'True
-         BackStyle       =   0  'Transparent
-         Caption         =   "Sound"
-         BeginProperty Font 
-            Name            =   "Georgia"
-            Size            =   8.25
-            Charset         =   0
-            Weight          =   700
-            Underline       =   0   'False
-            Italic          =   0   'False
-            Strikethrough   =   0   'False
-         EndProperty
-         ForeColor       =   &H00FFFFFF&
-         Height          =   210
-         Left            =   240
-         TabIndex        =   60
-         Top             =   1200
-         Width           =   600
-      End
-      Begin VB.Label Label48 
-         AutoSize        =   -1  'True
-         BackStyle       =   0  'Transparent
-         Caption         =   "Music"
-         BeginProperty Font 
-            Name            =   "Georgia"
-            Size            =   8.25
-            Charset         =   0
-            Weight          =   700
-            Underline       =   0   'False
-            Italic          =   0   'False
-            Strikethrough   =   0   'False
-         EndProperty
-         ForeColor       =   &H00FFFFFF&
-         Height          =   210
-         Left            =   240
-         TabIndex        =   59
-         Top             =   600
-         Width           =   555
-      End
-   End
    Begin VB.PictureBox picCharacter 
       Appearance      =   0  'Flat
       AutoSize        =   -1  'True
@@ -1813,6 +1645,174 @@ Begin VB.Form frmMain
          TabIndex        =   98
          Top             =   465
          Width           =   2415
+      End
+   End
+   Begin VB.PictureBox picOptions 
+      Appearance      =   0  'Flat
+      AutoRedraw      =   -1  'True
+      AutoSize        =   -1  'True
+      BackColor       =   &H00000000&
+      BorderStyle     =   0  'None
+      BeginProperty Font 
+         Name            =   "MS Sans Serif"
+         Size            =   9.75
+         Charset         =   0
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      ForeColor       =   &H80000008&
+      Height          =   4050
+      Left            =   8115
+      ScaleHeight     =   270
+      ScaleMode       =   3  'Pixel
+      ScaleWidth      =   194
+      TabIndex        =   58
+      Top             =   4245
+      Visible         =   0   'False
+      Width           =   2910
+      Begin VB.PictureBox Picture4 
+         BackColor       =   &H00000000&
+         BorderStyle     =   0  'None
+         Height          =   255
+         Left            =   240
+         ScaleHeight     =   255
+         ScaleWidth      =   1935
+         TabIndex        =   64
+         Top             =   1440
+         Width           =   1935
+         Begin VB.OptionButton optSOn 
+            Appearance      =   0  'Flat
+            BackColor       =   &H00000000&
+            Caption         =   "On"
+            BeginProperty Font 
+               Name            =   "Georgia"
+               Size            =   8.25
+               Charset         =   0
+               Weight          =   400
+               Underline       =   0   'False
+               Italic          =   0   'False
+               Strikethrough   =   0   'False
+            EndProperty
+            ForeColor       =   &H00FFFFFF&
+            Height          =   255
+            Left            =   0
+            TabIndex        =   66
+            Top             =   0
+            Width           =   735
+         End
+         Begin VB.OptionButton optSOff 
+            Appearance      =   0  'Flat
+            BackColor       =   &H00000000&
+            Caption         =   "Off"
+            BeginProperty Font 
+               Name            =   "Georgia"
+               Size            =   8.25
+               Charset         =   0
+               Weight          =   400
+               Underline       =   0   'False
+               Italic          =   0   'False
+               Strikethrough   =   0   'False
+            EndProperty
+            ForeColor       =   &H00FFFFFF&
+            Height          =   255
+            Left            =   720
+            TabIndex        =   65
+            Top             =   0
+            Width           =   735
+         End
+      End
+      Begin VB.PictureBox Picture3 
+         BackColor       =   &H00000000&
+         BorderStyle     =   0  'None
+         Height          =   255
+         Left            =   240
+         ScaleHeight     =   255
+         ScaleWidth      =   1935
+         TabIndex        =   61
+         Top             =   840
+         Width           =   1935
+         Begin VB.OptionButton optMOff 
+            Appearance      =   0  'Flat
+            BackColor       =   &H00000000&
+            Caption         =   "Off"
+            BeginProperty Font 
+               Name            =   "Georgia"
+               Size            =   8.25
+               Charset         =   0
+               Weight          =   400
+               Underline       =   0   'False
+               Italic          =   0   'False
+               Strikethrough   =   0   'False
+            EndProperty
+            ForeColor       =   &H00FFFFFF&
+            Height          =   255
+            Left            =   720
+            TabIndex        =   63
+            Top             =   0
+            Width           =   735
+         End
+         Begin VB.OptionButton optMOn 
+            Appearance      =   0  'Flat
+            BackColor       =   &H00000000&
+            Caption         =   "On"
+            BeginProperty Font 
+               Name            =   "Georgia"
+               Size            =   8.25
+               Charset         =   0
+               Weight          =   400
+               Underline       =   0   'False
+               Italic          =   0   'False
+               Strikethrough   =   0   'False
+            EndProperty
+            ForeColor       =   &H00FFFFFF&
+            Height          =   255
+            Left            =   0
+            TabIndex        =   62
+            Top             =   0
+            Width           =   735
+         End
+      End
+      Begin VB.Label Label49 
+         AutoSize        =   -1  'True
+         BackStyle       =   0  'Transparent
+         Caption         =   "Sound"
+         BeginProperty Font 
+            Name            =   "Georgia"
+            Size            =   8.25
+            Charset         =   0
+            Weight          =   700
+            Underline       =   0   'False
+            Italic          =   0   'False
+            Strikethrough   =   0   'False
+         EndProperty
+         ForeColor       =   &H00FFFFFF&
+         Height          =   210
+         Left            =   240
+         TabIndex        =   60
+         Top             =   1200
+         Width           =   600
+      End
+      Begin VB.Label Label48 
+         AutoSize        =   -1  'True
+         BackStyle       =   0  'Transparent
+         Caption         =   "Music"
+         BeginProperty Font 
+            Name            =   "Georgia"
+            Size            =   8.25
+            Charset         =   0
+            Weight          =   700
+            Underline       =   0   'False
+            Italic          =   0   'False
+            Strikethrough   =   0   'False
+         EndProperty
+         ForeColor       =   &H00FFFFFF&
+         Height          =   210
+         Left            =   240
+         TabIndex        =   59
+         Top             =   600
+         Width           =   555
       End
    End
    Begin VB.Label lblEXP 
