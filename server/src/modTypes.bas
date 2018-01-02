@@ -132,7 +132,7 @@ Private Type PlayerRec
     Vital(1 To Vitals.Vital_Count - 1) As Long
     
     ' Stats
-    stat(1 To Stats.Stat_Count - 1) As Byte
+    Stat(1 To Stats.Stat_Count - 1) As Integer
     POINTS As Long
     
     ' Worn equipment
@@ -429,7 +429,7 @@ End Type
 
 Private Type ClassRec
     Name As String * NAME_LENGTH
-    stat(1 To Stats.Stat_Count - 1) As Byte
+    Stat(1 To Stats.Stat_Count - 1) As Byte
     MaleSprite() As Integer
     FemaleSprite() As Integer
     
@@ -498,7 +498,7 @@ Private Type NpcRec
     DropChance As Long
     DropItem As Long
     DropItemValue As Long
-    stat(1 To Stats.Stat_Count - 1) As Byte
+    Stat(1 To Stats.Stat_Count - 1) As Byte
     HP As Long
     exp As Long
     Animation As Long
