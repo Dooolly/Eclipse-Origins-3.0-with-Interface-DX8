@@ -10,3 +10,5 @@ por uma feita completamente do zero, e totalmente feita com Directx8
 - Removido constantes inutilizadas
 - Adicionado fonte do ActionMSG
 - Novo chatBubble
+- Adicionado casas decimais na experiência
+- Adicionar janela de personagem(INCOMPLETO)
