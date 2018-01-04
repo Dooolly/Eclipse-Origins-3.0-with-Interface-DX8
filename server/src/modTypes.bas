@@ -84,14 +84,15 @@ Private Type OptionsRec
 End Type
 
 Public Type PartyRec
-    Leader As Long
-    Member(1 To MAX_PARTY_MEMBERS) As Long
-    MemberCount As Long
+    Leader As Integer
+    Member(1 To MAX_PARTY_MEMBERS) As Integer
+    MemberCount As Byte
 End Type
 
 Public Type PlayerInvRec
-    Num As Long
+    Num As Integer
     Value As Long
+    Enhancement As Byte
 End Type
 
 Private Type Cache
@@ -112,6 +113,11 @@ Public Type PlayerSpellRec
     Level As Byte
 End Type
 
+Public Type PlayerEquipmentRec
+    Num As Integer
+    Enhancement As Byte
+End Type
+
 Private Type PlayerRec
     ' Account
     Login As String * ACCOUNT_LENGTH
@@ -120,10 +126,10 @@ Private Type PlayerRec
     ' General
     Name As String * ACCOUNT_LENGTH
     Sex As Byte
-    Class As Long
+    Class As Byte
     Sprite As Long
     Level As Byte
-    exp As Long
+    Exp As Long
     Access As Byte
     PK As Byte
     Money As Long
@@ -136,7 +142,7 @@ Private Type PlayerRec
     POINTS As Long
     
     ' Worn equipment
-    Equipment(1 To Equipment.Equipment_Count - 1) As Long
+    Equipment(1 To Equipment.Equipment_Count - 1) As PlayerEquipmentRec
     
     ' Inventory
     Inv(1 To MAX_INV) As PlayerInvRec
@@ -500,7 +506,7 @@ Private Type NpcRec
     DropItemValue As Long
     Stat(1 To Stats.Stat_Count - 1) As Byte
     HP As Long
-    exp As Long
+    Exp As Long
     Animation As Long
     Damage As Long
     Level As Long

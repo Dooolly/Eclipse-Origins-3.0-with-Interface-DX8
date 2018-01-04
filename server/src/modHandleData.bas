@@ -1731,7 +1731,7 @@ End Sub
 ' :: Save spell packet ::
 ' :::::::::::::::::::::::
 Sub HandleSaveSpell(ByVal Index As Long, ByRef Data() As Byte, ByVal StartAddr As Long, ByVal ExtraVar As Long)
-    Dim spellnum As Long
+    Dim spellNum As Long
     Dim Buffer As clsBuffer
     Dim SpellSize As Long
     Dim SpellData() As Byte
@@ -1743,21 +1743,21 @@ Sub HandleSaveSpell(ByVal Index As Long, ByRef Data() As Byte, ByVal StartAddr A
 
     Set Buffer = New clsBuffer
     Buffer.WriteBytes Data()
-    spellnum = Buffer.ReadLong
+    spellNum = Buffer.ReadLong
 
     ' Prevent hacking
-    If spellnum < 0 Or spellnum > MAX_SPELLS Then
+    If spellNum < 0 Or spellNum > MAX_SPELLS Then
         Exit Sub
     End If
 
-    SpellSize = LenB(Spell(spellnum))
+    SpellSize = LenB(Spell(spellNum))
     ReDim SpellData(SpellSize - 1)
     SpellData = Buffer.ReadBytes(SpellSize)
-    CopyMemory ByVal VarPtr(Spell(spellnum)), ByVal VarPtr(SpellData(0)), SpellSize
+    CopyMemory ByVal VarPtr(Spell(spellNum)), ByVal VarPtr(SpellData(0)), SpellSize
     ' Save it
-    Call SendUpdateSpellToAll(spellnum)
-    Call SaveSpell(spellnum)
-    Call AddLog(GetPlayerName(Index) & " saved Spell #" & spellnum & ".", ADMIN_LOG)
+    Call SendUpdateSpellToAll(spellNum)
+    Call SaveSpell(spellNum)
+    Call AddLog(GetPlayerName(Index) & " saved Spell #" & spellNum & ".", ADMIN_LOG)
 End Sub
 
 ' :::::::::::::::::::::::
@@ -1998,7 +1998,9 @@ Sub HandleUnequip(ByVal Index As Long, ByRef Data() As Byte, ByVal StartAddr As 
     Dim Buffer As clsBuffer
     Set Buffer = New clsBuffer
     Buffer.WriteBytes Data()
-    PlayerUnequipItem Index, Buffer.ReadLong
+    
+    PlayerUnequipItem Index, Buffer.ReadByte
+    
     Set Buffer = Nothing
 End Sub
 
@@ -2056,32 +2058,32 @@ End Sub
 
 Sub HandleForgetSpell(ByVal Index As Long, ByRef Data() As Byte, ByVal StartAddr As Long, ByVal ExtraVar As Long)
     Dim Buffer As clsBuffer
-    Dim spellslot As Long
+    Dim spellSlot As Long
     
     Set Buffer = New clsBuffer
     Buffer.WriteBytes Data()
     
-    spellslot = Buffer.ReadLong
+    spellSlot = Buffer.ReadLong
     
     ' Check for subscript out of range
-    If spellslot < 1 Or spellslot > MAX_PLAYER_SPELLS Then
+    If spellSlot < 1 Or spellSlot > MAX_PLAYER_SPELLS Then
         Exit Sub
     End If
     
     ' dont let them forget a spell which is in CD
-    If TempPlayer(Index).SpellCD(spellslot) > GetTickCount Then
+    If TempPlayer(Index).SpellCD(spellSlot) > GetTickCount Then
         PlayerMsg Index, "Não pode esquecer esse jutsu enquanto não estiver pronto!", BrightRed
         Exit Sub
     End If
     
     ' dont let them forget a spell which is buffered
-    If TempPlayer(Index).spellBuffer.Spell = spellslot Then
+    If TempPlayer(Index).spellBuffer.Spell = spellSlot Then
         PlayerMsg Index, "Não pode esquecer esse jutsu enquanto estivar usando!", BrightRed
         Exit Sub
     End If
     
-    Player(Index).Spell(spellslot).Num = 0
-    Player(Index).Spell(spellslot).Level = 0
+    Player(Index).Spell(spellSlot).Num = 0
+    Player(Index).Spell(spellSlot).Level = 0
     SendPlayerSpells Index
     
     Set Buffer = Nothing
@@ -2807,17 +2809,17 @@ End Sub
 
 Private Sub HandlePlusSkill(ByVal Index As Long, ByRef Data() As Byte, ByVal StartAddr As Long, ByVal ExtraVar As Long)
     Dim Buffer As clsBuffer
-    Dim spellslot As Byte
+    Dim spellSlot As Byte
     
     Set Buffer = New clsBuffer
     Buffer.WriteBytes Data()
-    spellslot = Buffer.ReadByte
+    spellSlot = Buffer.ReadByte
     Set Buffer = Nothing
     
-    If GetPlayerSpellLevel(Index, spellslot) < MAX_SPELL_LEVEL Then
+    If GetPlayerSpellLevel(Index, spellSlot) < MAX_SPELL_LEVEL Then
         If Player(Index).Energy > 0 Then
             Player(Index).Energy = Player(Index).Energy - 1
-            Call SetPlayerSpellLevel(Index, spellslot, GetPlayerSpellLevel(Index, spellslot) + 1)
+            Call SetPlayerSpellLevel(Index, spellSlot, GetPlayerSpellLevel(Index, spellSlot) + 1)
             
             SendPlayerSpells Index
         Else
