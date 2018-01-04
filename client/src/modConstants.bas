@@ -40,12 +40,6 @@ Public Const ShopOffsetY As Long = 2
 Public Const ShopOffsetX As Long = 4
 Public Const ShopColumns As Long = 5
 
-' Character consts
-Public Const EqTop As Long = 224
-Public Const EqLeft As Long = 18
-Public Const EqOffsetX As Long = 10
-Public Const EqColumns As Long = 4
-
 ' values
 Public Const MAX_BYTE As Byte = 255
 Public Const MAX_INTEGER As Integer = 32767

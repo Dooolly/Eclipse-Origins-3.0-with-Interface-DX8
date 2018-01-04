@@ -271,7 +271,7 @@ Dim Buffer As clsBuffer
     For i = 1 To Max_Classes
 
         With Class(i)
-            .name = Buffer.ReadString
+            .Name = Buffer.ReadString
             .Vital(Vitals.HP) = Buffer.ReadLong
             .Vital(Vitals.MP) = Buffer.ReadLong
             
@@ -312,7 +312,7 @@ Dim Buffer As clsBuffer
     frmLoad.Visible = False
     frmMenu.cmbClass.Clear
     For i = 1 To Max_Classes
-        frmMenu.cmbClass.AddItem Trim$(Class(i).name)
+        frmMenu.cmbClass.AddItem Trim$(Class(i).Name)
     Next
 
     frmMenu.cmbClass.ListIndex = 0
@@ -348,7 +348,7 @@ Dim Buffer As clsBuffer
     For i = 1 To Max_Classes
 
         With Class(i)
-            .name = Buffer.ReadString 'Trim$(Parse(n))
+            .Name = Buffer.ReadString 'Trim$(Parse(n))
             .Vital(Vitals.HP) = Buffer.ReadLong 'CLng(Parse(n + 1))
             .Vital(Vitals.MP) = Buffer.ReadLong 'CLng(Parse(n + 2))
             
@@ -474,18 +474,10 @@ Dim Buffer As clsBuffer
     
     Set Buffer = New clsBuffer
     Buffer.WriteBytes Data()
-    Call SetPlayerEquipment(MyIndex, Buffer.ReadLong, Armor)
-    Call SetPlayerEquipment(MyIndex, Buffer.ReadLong, Weapon)
-    Call SetPlayerEquipment(MyIndex, Buffer.ReadLong, Helmet)
-    Call SetPlayerEquipment(MyIndex, Buffer.ReadLong, Shield)
-    
-    ' changes to inventory, need to clear any drop menu
-    frmMain.picCurrency.Visible = False
-    frmMain.txtCurrency.Text = vbNullString
-    tmpCurrencyItem = 0
-    CurrencyMenu = 0 ' clear
-    
-    frmMain.picCharacter.Refresh
+    Call SetPlayerEquipment(MyIndex, Buffer.ReadInteger, Armor)
+    Call SetPlayerEquipment(MyIndex, Buffer.ReadInteger, Weapon)
+    Call SetPlayerEquipment(MyIndex, Buffer.ReadInteger, Helmet)
+    Call SetPlayerEquipment(MyIndex, Buffer.ReadInteger, Shield)
     
     Set Buffer = Nothing
     
@@ -499,7 +491,7 @@ End Sub
 
 Sub HandleMapWornEq(ByVal Index As Long, ByRef Data() As Byte, ByVal StartAddr As Long, ByVal ExtraVar As Long)
 Dim Buffer As clsBuffer
-Dim playerNum As Long
+Dim playerNum As Integer
 
     ' If debug mode, handle error then exit out
     If Options.Debug = 1 Then On Error GoTo errorhandler
@@ -508,11 +500,11 @@ Dim playerNum As Long
     
     Buffer.WriteBytes Data()
     
-    playerNum = Buffer.ReadLong
-    Call SetPlayerEquipment(playerNum, Buffer.ReadLong, Armor)
-    Call SetPlayerEquipment(playerNum, Buffer.ReadLong, Weapon)
-    Call SetPlayerEquipment(playerNum, Buffer.ReadLong, Helmet)
-    Call SetPlayerEquipment(playerNum, Buffer.ReadLong, Shield)
+    playerNum = Buffer.ReadInteger
+    Call SetPlayerEquipment(playerNum, Buffer.ReadInteger, Armor)
+    Call SetPlayerEquipment(playerNum, Buffer.ReadInteger, Weapon)
+    Call SetPlayerEquipment(playerNum, Buffer.ReadInteger, Helmet)
+    Call SetPlayerEquipment(playerNum, Buffer.ReadInteger, Shield)
     
     Set Buffer = Nothing
     
@@ -1037,7 +1029,7 @@ Dim MapNum As Long
     Buffer.WriteBytes Data()
 
     MapNum = Buffer.ReadLong
-    Map.name = Buffer.ReadString
+    Map.Name = Buffer.ReadString
     Map.Music = Buffer.ReadString
     Map.BGS = Buffer.ReadString
     Map.Revision = Buffer.ReadLong
@@ -1390,7 +1382,7 @@ Dim i As Long
 
         ' Add the names
         For i = 1 To MAX_ITEMS
-            .lstIndex.AddItem i & ": " & Trim$(Item(i).name)
+            .lstIndex.AddItem i & ": " & Trim$(Item(i).Name)
         Next
 
         .Show
@@ -1418,7 +1410,7 @@ Dim i As Long
 
         ' Add the names
         For i = 1 To MAX_ANIMATIONS
-            .lstIndex.AddItem i & ": " & Trim$(Animation(i).name)
+            .lstIndex.AddItem i & ": " & Trim$(Animation(i).Name)
         Next
 
         .Show
@@ -1565,7 +1557,7 @@ Dim i As Long
 
         ' Add the names
         For i = 1 To MAX_NPCS
-            .lstIndex.AddItem i & ": " & Trim$(Npc(i).name)
+            .lstIndex.AddItem i & ": " & Trim$(Npc(i).Name)
         Next
 
         .Show
@@ -1622,7 +1614,7 @@ Dim i As Long
 
         ' Add the names
         For i = 1 To MAX_RESOURCES
-            .lstIndex.AddItem i & ": " & Trim$(Resource(i).name)
+            .lstIndex.AddItem i & ": " & Trim$(Resource(i).Name)
         Next
 
         .Show
@@ -1720,7 +1712,7 @@ Dim i As Long
 
         ' Add the names
         For i = 1 To MAX_SHOPS
-            .lstIndex.AddItem i & ": " & Trim$(Shop(i).name)
+            .lstIndex.AddItem i & ": " & Trim$(Shop(i).Name)
         Next
 
         .Show
@@ -1777,7 +1769,7 @@ Dim i As Long
 
         ' Add the names
         For i = 1 To MAX_SPELLS
-            .lstIndex.AddItem i & ": " & Trim$(Spell(i).name)
+            .lstIndex.AddItem i & ": " & Trim$(Spell(i).Name)
         Next
 
         .Show
@@ -2129,7 +2121,7 @@ End Sub
 Private Sub HandleSayMsg(ByVal Index As Long, ByRef Data() As Byte, ByVal StartAddr As Long, ByVal ExtraVar As Long)
 Dim Buffer As clsBuffer
 Dim Access As Byte
-Dim name As String
+Dim Name As String
 Dim Message As String
 Dim Colour As Long
 Dim Header As String
@@ -2141,7 +2133,7 @@ Dim PK As Byte, Channel As Byte
     Set Buffer = New clsBuffer
     Buffer.WriteBytes Data()
     
-    name = Buffer.ReadString
+    Name = Buffer.ReadString
     Access = Buffer.ReadByte
     PK = Buffer.ReadByte
     Message = Buffer.ReadString
@@ -2167,7 +2159,7 @@ Dim PK As Byte, Channel As Byte
     ' remove the colour char from the message
     ' Message = Replace$(Message, ColourChar, vbNullString)
     ' add to the chat box
-    AddText ColourChar & GetColStr(Colour) & Header & name & ": " & ColourChar & GetColStr(Grey) & Message, Grey, , Channel
+    AddText ColourChar & GetColStr(Colour) & Header & Name & ": " & ColourChar & GetColStr(Grey) & Message, Grey, , Channel
     
     ' Error handler
     Exit Sub
@@ -2620,7 +2612,7 @@ Dim Buffer As clsBuffer
     End If
 
     With Map.MapEvents(id)
-        .name = Buffer.ReadString
+        .Name = Buffer.ReadString
         .Dir = Buffer.ReadLong
         .ShowDir = .Dir
         .GraphicNum = Buffer.ReadLong
@@ -2943,7 +2935,7 @@ Dim str As String, i As Long, X As Long, Y As Long, Z As Long, w As Long
         ReDim Map.Events(0 To Map.EventCount)
         For i = 1 To Map.EventCount
             With Map.Events(i)
-                .name = Buffer.ReadString
+                .Name = Buffer.ReadString
                 .Global = Buffer.ReadLong
                 .X = Buffer.ReadLong
                 .Y = Buffer.ReadLong

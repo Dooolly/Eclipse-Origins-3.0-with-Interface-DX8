@@ -193,7 +193,7 @@ Dim Y As Long, i As Long, Z As Long, w As Long
 
     f = FreeFile
     Open fileName For Binary As #f
-    Put #f, , Map.name
+    Put #f, , Map.Name
     Put #f, , Map.Music
     Put #f, , Map.BGS
     Put #f, , Map.Revision
@@ -260,7 +260,7 @@ Dim Y As Long, i As Long, Z As Long, w As Long, p As Long
     ClearMap
     f = FreeFile
     Open fileName For Binary As #f
-    Get #f, , Map.name
+    Get #f, , Map.Name
     Get #f, , Map.Music
     Get #f, , Map.BGS
     Get #f, , Map.Revision
@@ -650,7 +650,7 @@ Sub ClearPlayer(ByVal Index As Long)
     If Options.Debug = 1 Then On Error GoTo errorhandler
 
     Call ZeroMemory(ByVal VarPtr(Player(Index)), LenB(Player(Index)))
-    Player(Index).name = vbNullString
+    Player(Index).Name = vbNullString
     
     ' Error handler
     Exit Sub
@@ -665,7 +665,7 @@ Sub ClearItem(ByVal Index As Long)
     If Options.Debug = 1 Then On Error GoTo errorhandler
 
     Call ZeroMemory(ByVal VarPtr(Item(Index)), LenB(Item(Index)))
-    Item(Index).name = vbNullString
+    Item(Index).Name = vbNullString
     Item(Index).Desc = vbNullString
     Item(Index).sound = "None."
     
@@ -714,7 +714,7 @@ Sub ClearAnimation(ByVal Index As Long)
     If Options.Debug = 1 Then On Error GoTo errorhandler
 
     Call ZeroMemory(ByVal VarPtr(Animation(Index)), LenB(Animation(Index)))
-    Animation(Index).name = vbNullString
+    Animation(Index).Name = vbNullString
     Animation(Index).sound = "None."
     
     ' Error handler
@@ -748,7 +748,7 @@ Sub ClearNPC(ByVal Index As Long)
     If Options.Debug = 1 Then On Error GoTo errorhandler
 
     Call ZeroMemory(ByVal VarPtr(Npc(Index)), LenB(Npc(Index)))
-    Npc(Index).name = vbNullString
+    Npc(Index).Name = vbNullString
     Npc(Index).sound = "None."
     
     ' Error handler
@@ -782,7 +782,7 @@ Sub ClearSpell(ByVal Index As Long)
     If Options.Debug = 1 Then On Error GoTo errorhandler
 
     Call ZeroMemory(ByVal VarPtr(Spell(Index)), LenB(Spell(Index)))
-    Spell(Index).name = vbNullString
+    Spell(Index).Name = vbNullString
     Spell(Index).Desc = vbNullString
     Spell(Index).sound = "None."
     
@@ -817,7 +817,7 @@ Sub ClearShop(ByVal Index As Long)
     If Options.Debug = 1 Then On Error GoTo errorhandler
 
     Call ZeroMemory(ByVal VarPtr(Shop(Index)), LenB(Shop(Index)))
-    Shop(Index).name = vbNullString
+    Shop(Index).Name = vbNullString
     
     ' Error handler
     Exit Sub
@@ -850,7 +850,7 @@ Sub ClearResource(ByVal Index As Long)
     If Options.Debug = 1 Then On Error GoTo errorhandler
 
     Call ZeroMemory(ByVal VarPtr(Resource(Index)), LenB(Resource(Index)))
-    Resource(Index).name = vbNullString
+    Resource(Index).Name = vbNullString
     Resource(Index).SuccessMessage = vbNullString
     Resource(Index).EmptyMessage = vbNullString
     Resource(Index).sound = "None."
@@ -900,7 +900,7 @@ Sub ClearMap()
     If Options.Debug = 1 Then On Error GoTo errorhandler
 
     Call ZeroMemory(ByVal VarPtr(Map), LenB(Map))
-    Map.name = vbNullString
+    Map.Name = vbNullString
     Map.MaxX = MAX_MAPX
     Map.MaxY = MAX_MAPY
     ReDim Map.Tile(0 To Map.MaxX, 0 To Map.MaxY)
@@ -972,7 +972,7 @@ Function GetPlayerName(ByVal Index As Long) As String
     If Options.Debug = 1 Then On Error GoTo errorhandler
 
     If Index > MAX_PLAYERS Then Exit Function
-    GetPlayerName = Trim$(Player(Index).name)
+    GetPlayerName = Trim$(Player(Index).Name)
     
     ' Error handler
     Exit Function
@@ -982,12 +982,12 @@ errorhandler:
     Exit Function
 End Function
 
-Sub SetPlayerName(ByVal Index As Long, ByVal name As String)
+Sub SetPlayerName(ByVal Index As Long, ByVal Name As String)
     ' If debug mode, handle error then exit out
     If Options.Debug = 1 Then On Error GoTo errorhandler
 
     If Index > MAX_PLAYERS Then Exit Sub
-    Player(Index).name = name
+    Player(Index).Name = Name
     
     ' Error handler
     Exit Sub
@@ -1458,7 +1458,7 @@ errorhandler:
     Exit Sub
 End Sub
 
-Function GetPlayerInvItemValue(ByVal Index As Long, ByVal InvSlot As Long) As Long
+Function GetPlayerInvItemValue(ByVal Index As Integer, ByVal InvSlot As Byte) As Long
     ' If debug mode, handle error then exit out
     If Options.Debug = 1 Then On Error GoTo errorhandler
 
@@ -1473,7 +1473,7 @@ errorhandler:
     Exit Function
 End Function
 
-Sub SetPlayerInvItemValue(ByVal Index As Long, ByVal InvSlot As Long, ByVal ItemValue As Long)
+Sub SetPlayerInvItemValue(ByVal Index As Integer, ByVal InvSlot As Byte, ByVal ItemValue As Long)
     ' If debug mode, handle error then exit out
     If Options.Debug = 1 Then On Error GoTo errorhandler
 
@@ -1488,12 +1488,28 @@ errorhandler:
     Exit Sub
 End Sub
 
-Function GetPlayerEquipment(ByVal Index As Long, ByVal EquipmentSlot As Equipment) As Long
+Function GetPlayerInvItemEnhancement(ByVal Index As Integer, ByVal InvSlot As Byte) As Byte
     ' If debug mode, handle error then exit out
     If Options.Debug = 1 Then On Error GoTo errorhandler
 
     If Index > MAX_PLAYERS Then Exit Function
-    GetPlayerEquipment = Player(Index).Equipment(EquipmentSlot)
+    If InvSlot = 0 Then Exit Function
+    GetPlayerInvItemEnhancement = PlayerInv(InvSlot).Enhancement
+    
+    ' Error handler
+    Exit Function
+errorhandler:
+    HandleError "GetPlayerInvItemNum", "modDatabase", Err.Number, Err.Description, Err.Source, Err.HelpContext
+    Err.Clear
+    Exit Function
+End Function
+
+Function GetPlayerEquipment(ByVal Index As Integer, ByVal EquipmentSlot As Equipment) As Integer
+    ' If debug mode, handle error then exit out
+    If Options.Debug = 1 Then On Error GoTo errorhandler
+
+    If Index > MAX_PLAYERS Then Exit Function
+    GetPlayerEquipment = Player(Index).Equipment(EquipmentSlot).Num
     
     ' Error handler
     Exit Function
@@ -1503,12 +1519,12 @@ errorhandler:
     Exit Function
 End Function
 
-Sub SetPlayerEquipment(ByVal Index As Long, ByVal invNum As Long, ByVal EquipmentSlot As Equipment)
+Sub SetPlayerEquipment(ByVal Index As Integer, ByVal invNum As Integer, ByVal EquipmentSlot As Equipment)
     ' If debug mode, handle error then exit out
     If Options.Debug = 1 Then On Error GoTo errorhandler
 
     If Index < 1 Or Index > MAX_PLAYERS Then Exit Sub
-    Player(Index).Equipment(EquipmentSlot) = invNum
+    Player(Index).Equipment(EquipmentSlot).Num = invNum
     
     ' Error handler
     Exit Sub

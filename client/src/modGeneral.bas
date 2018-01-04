@@ -204,7 +204,7 @@ Public Sub MenuState(ByVal State As Long)
 
             If ConnectToServer(1) Then
                 Call SetStatus("Connected, sending new account information...")
-                Call SendNewAccount(frmMenu.txtRUser.text, frmMenu.txtRPass.text)
+                Call SendNewAccount(frmMenu.txtRUser.Text, frmMenu.txtRPass.Text)
             End If
 
         Case MENU_STATE_LOGIN
@@ -216,7 +216,7 @@ Public Sub MenuState(ByVal State As Long)
 
             If ConnectToServer(1) Then
                 Call SetStatus("Connected, sending login information...")
-                Call SendLogin(frmMenu.txtLUser.text, frmMenu.txtLPass.text)
+                Call SendLogin(frmMenu.txtLUser.Text, frmMenu.txtLPass.Text)
                 Exit Sub
             End If
     End Select
@@ -289,7 +289,6 @@ Dim buffer As clsBuffer, i As Long
     frmMain.picDialogue.Visible = False
     frmMain.picTrade.Visible = False
     frmMain.picCover.Visible = False
-    frmMain.picCharacter.Visible = False
     frmMain.picOptions.Visible = False
     frmMain.picParty.Visible = False
 End Sub
@@ -404,12 +403,12 @@ Public Sub TextAdd(ByVal Txt As TextBox, Msg As String, NewLine As Boolean)
     If Options.Debug = 1 Then On Error GoTo errorhandler
 
     If NewLine Then
-        Txt.text = Txt.text + Msg + vbCrLf
+        Txt.Text = Txt.Text + Msg + vbCrLf
     Else
-        Txt.text = Txt.text + Msg
+        Txt.Text = Txt.Text + Msg
     End If
 
-    Txt.SelStart = Len(Txt.text) - 1
+    Txt.SelStart = Len(Txt.Text) - 1
     
     ' Error handler
     Exit Sub

@@ -256,6 +256,8 @@ Public Sub MouseMove_Handle(Button As Integer, Shift As Integer, X As Single, Y 
                             ' none
                         Case GUI.W_Inventory
                             Call Inventory_MouseMove(Button, X, Y)
+                        Case GUI.W_Char
+                            Call Character_MouseMove(X, Y)
                     End Select
                 End If
             End If
@@ -321,7 +323,7 @@ Public Sub MouseDown_Handle(Button As Integer, Shift As Integer, X As Single, Y 
                             Call Skills_MouseDown(Button, X, Y)
                             Exit Sub
                         Case GUI.W_Char
-                            Call Character_MouseDown
+                            Call Character_MouseDown(Button, X, Y)
                             Exit Sub
                     End Select
                 End If
@@ -498,7 +500,7 @@ Private Sub Draw_MainBar()
         
             Select Case Hotbar(i, ActualHotbar).sType
                 Case 1 ' Inventário
-                    If Len(Item(Hotbar(i, ActualHotbar).Slot).name) > 0 Then
+                    If Len(Item(Hotbar(i, ActualHotbar).Slot).Name) > 0 Then
                         If Item(Hotbar(i, ActualHotbar).Slot).Pic > 0 Then
                             If Item(Hotbar(i, ActualHotbar).Slot).Pic <= numitems Then
                                 RenderTextureByRects Tex_Item(Item(Hotbar(i, ActualHotbar).Slot).Pic), sRect, dRect
@@ -506,7 +508,7 @@ Private Sub Draw_MainBar()
                         End If
                     End If
                 Case 2 ' Magia
-                    If Len(Spell(Hotbar(i, ActualHotbar).Slot).name) > 0 Then
+                    If Len(Spell(Hotbar(i, ActualHotbar).Slot).Name) > 0 Then
                         If Spell(Hotbar(i, ActualHotbar).Slot).Icon > 0 Then
                             If Spell(Hotbar(i, ActualHotbar).Slot).Icon <= NumSpellIcons Then
                                 ' Checar se a magia está congelada
@@ -1034,7 +1036,7 @@ End Sub
 ' ##############################################################
 ' ### - DESCRIÇÃO DO ITEM - ####################################
 Private Sub DrawItemDesc()
-    Dim PicNum As Long
+    Dim itemNum As Integer
     Dim Colour As Long
     Dim Height As Byte
     Dim tmpText As String
@@ -1050,14 +1052,14 @@ Private Sub DrawItemDesc()
         ' Desenhar dados do item
         If ActualItemDesc > 0 Then
             If TYPE_DESC = 1 Then
-                PicNum = GetPlayerEquipment(MyIndex, ActualItemDesc)
+                itemNum = GetPlayerEquipment(MyIndex, ActualItemDesc)
             Else
-                PicNum = GetPlayerInvItemNum(MyIndex, ActualItemDesc)
+                itemNum = GetPlayerInvItemNum(MyIndex, ActualItemDesc)
             End If
 
-            If PicNum > 0 Then
+            If itemNum > 0 Then
                 ' Raridade do item
-                Select Case Item(PicNum).Rarity
+                Select Case Item(itemNum).Rarity
                     Case 1
                         Colour = BrightGreen
                     Case 2
@@ -1067,27 +1069,27 @@ Private Sub DrawItemDesc()
                     Case 4
                         Colour = Yellow
                     Case 5
-                        'Colour = Orange
+                        Colour = Gold
                     Case Else
                         Colour = White
                 End Select
                 
                 ' Nome do item
-                tmpText = Strings.Trim$(Item(PicNum).name)
+                tmpText = Strings.Trim$(Item(itemNum).Name)
                 RenderText Fonts.Verdana, tmpText, .X + (.Width / 2) - (TextWidth(Fonts.Verdana, tmpText) / 2), .Y + 5, Colour
 
                 ' Aprimoramento do item
-                'If GetPlayerInvItemCombine(MyIndex, ActualItemDesc) > 0 Then
-                    'RenderText Fonts.Verdana, "+" & GetPlayerInvItemCombine(MyIndex, ActualItemDesc), .X + .Width - 23, .Y + 5, Colour
-                'End If
+                If GetPlayerInvItemEnhancement(MyIndex, itemNum) > 0 Then
+                    RenderText Fonts.Verdana, "+" & GetPlayerInvItemEnhancement(MyIndex, ActualItemDesc), .X + .Width - 23, .Y + 5, Colour
+                End If
 
                 ' Classe Requerida
-                If Item(PicNum).ClassReq > 0 Then
+                If Item(itemNum).ClassReq > 0 Then
                     RenderTexture Tex_GUI, .X, .Y + 33 + (13 * Height), 1, 223, .Width, 13, .Width, 11
                     Height = Height + 1
                     
-                    tmpText = Strings.Trim$(Class(Item(PicNum).ClassReq).name)
-                    If GetPlayerClass(MyIndex) = Item(PicNum).ClassReq Then
+                    tmpText = Strings.Trim$(Class(Item(itemNum).ClassReq).Name)
+                    If GetPlayerClass(MyIndex) = Item(itemNum).ClassReq Then
                         Colour = Green
                     Else
                         Colour = BrightRed
@@ -1097,12 +1099,12 @@ Private Sub DrawItemDesc()
                 End If
 
                 ' Level Requerido
-                If Item(PicNum).LevelReq > 0 Then
+                If Item(itemNum).LevelReq > 0 Then
                     RenderTexture Tex_GUI, .X, .Y + 33 + (13 * Height), 1, 223, .Width, 13, .Width, 11
                     Height = Height + 1
                     
-                    tmpText = "Level: " & Item(PicNum).LevelReq
-                    If GetPlayerLevel(MyIndex) >= Item(PicNum).LevelReq Then
+                    tmpText = "Level: " & Item(itemNum).LevelReq
+                    If GetPlayerLevel(MyIndex) >= Item(itemNum).LevelReq Then
                         Colour = Green
                     Else
                         Colour = BrightRed
@@ -1112,25 +1114,25 @@ Private Sub DrawItemDesc()
                 End If
                 
                 ' Valor
-                If Item(PicNum).Price > 0 Then
+                If Item(itemNum).Price > 0 Then
                     RenderTexture Tex_GUI, .X, .Y + 33 + (13 * Height), 1, 223, .Width, 13, .Width, 11
                     Height = Height + 1
                     
-                    tmpText = "Valor: " & Item(PicNum).Price & "g"
+                    tmpText = "Valor: " & Item(itemNum).Price & " yens"
                     Colour = Yellow
              
                     RenderText Fonts.Verdana, tmpText, .X + (.Width / 2) - (TextWidth(Fonts.Verdana, tmpText) / 2), .Y + 32 + (13 * (Height - 1)), Colour
                 End If
                 
                 ' Tipo do Item
-                Select Case Item(PicNum).Type
+                Select Case Item(itemNum).Type
                     Case ITEM_TYPE_WEAPON
                         tmpText = "Arma"
                         RenderText Fonts.Verdana, tmpText, .X + (.Width / 2) - (TextWidth(Fonts.Verdana, tmpText) / 2), .Y + 19, White, 100
 
                         ' Add Stats
                         For Colour = 1 To Stats.Stat_Count - 1
-                            If Item(PicNum).Add_Stat(Colour) > 0 Then
+                            If Item(itemNum).Add_Stat(Colour) > 0 Then
                                 RenderTexture Tex_GUI, .X, .Y + 33 + (13 * Height), 1, 223, .Width, 13, .Width, 11
                                 Height = Height + 1
                     
@@ -1147,7 +1149,7 @@ Private Sub DrawItemDesc()
                                         tmpText = "Recuperação: +"
                                 End Select
                     
-                                tmpText = tmpText & Item(PicNum).Add_Stat(Colour)
+                                tmpText = tmpText & Item(itemNum).Add_Stat(Colour)
                                 RenderText Fonts.Verdana, tmpText, .X + (.Width / 2) - (TextWidth(Fonts.Verdana, tmpText) / 2), .Y + 32 + (13 * (Height - 1)), White
                             End If
                         Next
@@ -1157,7 +1159,7 @@ Private Sub DrawItemDesc()
                         
                         ' Add Stats
                         For Colour = 1 To Stats.Stat_Count - 1
-                            If Item(PicNum).Add_Stat(Colour) > 0 Then
+                            If Item(itemNum).Add_Stat(Colour) > 0 Then
                                 RenderTexture Tex_GUI, .X, .Y + 33 + (13 * Height), 1, 223, .Width, 13, .Width, 11
                                 Height = Height + 1
                     
@@ -1174,7 +1176,7 @@ Private Sub DrawItemDesc()
                                         tmpText = "Recuperação: +"
                                 End Select
                     
-                                tmpText = tmpText & Item(PicNum).Add_Stat(Colour)
+                                tmpText = tmpText & Item(itemNum).Add_Stat(Colour)
                                 RenderText Fonts.Verdana, tmpText, .X + (.Width / 2) - (TextWidth(Fonts.Verdana, tmpText) / 2), .Y + 32 + (13 * (Height - 1)), White
                             End If
                         Next
@@ -1184,7 +1186,7 @@ Private Sub DrawItemDesc()
                         
                         ' Add Stats
                         For Colour = 1 To Stats.Stat_Count - 1
-                            If Item(PicNum).Add_Stat(Colour) > 0 Then
+                            If Item(itemNum).Add_Stat(Colour) > 0 Then
                                 RenderTexture Tex_GUI, .X, .Y + 33 + (13 * Height), 1, 223, .Width, 13, .Width, 11
                                 Height = Height + 1
                     
@@ -1201,7 +1203,7 @@ Private Sub DrawItemDesc()
                                         tmpText = "Recuperação: +"
                                 End Select
                     
-                                tmpText = tmpText & Item(PicNum).Add_Stat(Colour)
+                                tmpText = tmpText & Item(itemNum).Add_Stat(Colour)
                                 RenderText Fonts.Verdana, tmpText, .X + (.Width / 2) - (TextWidth(Fonts.Verdana, tmpText) / 2), .Y + 32 + (13 * (Height - 1)), White
                             End If
                         Next
@@ -1211,7 +1213,7 @@ Private Sub DrawItemDesc()
                         
                         ' Add Stats
                         For Colour = 1 To Stats.Stat_Count - 1
-                            If Item(PicNum).Add_Stat(Colour) > 0 Then
+                            If Item(itemNum).Add_Stat(Colour) > 0 Then
                                 RenderTexture Tex_GUI, .X, .Y + 33 + (13 * Height), 1, 223, .Width, 13, .Width, 11
                                 Height = Height + 1
                     
@@ -1228,7 +1230,7 @@ Private Sub DrawItemDesc()
                                         tmpText = "Recuperação: +"
                                 End Select
                     
-                                tmpText = tmpText & Item(PicNum).Add_Stat(Colour)
+                                tmpText = tmpText & Item(itemNum).Add_Stat(Colour)
                                 RenderText Fonts.Verdana, tmpText, .X + (.Width / 2) - (TextWidth(Fonts.Verdana, tmpText) / 2), .Y + 32 + (13 * (Height - 1)), White
                             End If
                         Next
@@ -1237,29 +1239,29 @@ Private Sub DrawItemDesc()
                         RenderText Fonts.Verdana, tmpText, .X + (.Width / 2) - (TextWidth(Fonts.Verdana, tmpText) / 2), .Y + 19, White, 100
                     
                         ' Exibir o total de HP que recupera
-                        If Item(PicNum).AddHP > 0 Then
+                        If Item(itemNum).AddHP > 0 Then
                             RenderTexture Tex_GUI, .X, .Y + 33 + (13 * Height), 1, 223, .Width, 13, .Width, 11
                             Height = Height + 1
                             
-                            tmpText = "Recuperar HP: " & Item(PicNum).AddHP
+                            tmpText = "Recuperar HP: " & Item(itemNum).AddHP
                             RenderText Fonts.Verdana, tmpText, .X + (.Width / 2) - (TextWidth(Fonts.Verdana, tmpText) / 2), .Y + 32 + (13 * (Height - 1)), Pink
                         End If
                         
                         ' Exibir o total de MP que recupera
-                        If Item(PicNum).AddMP > 0 Then
+                        If Item(itemNum).AddMP > 0 Then
                             RenderTexture Tex_GUI, .X, .Y + 33 + (13 * Height), 1, 223, .Width, 13, .Width, 11
                             Height = Height + 1
                             
-                            tmpText = "Recuperar MP: " & Item(PicNum).AddMP
+                            tmpText = "Recuperar MP: " & Item(itemNum).AddMP
                             RenderText Fonts.Verdana, tmpText, .X + (.Width / 2) - (TextWidth(Fonts.Verdana, tmpText) / 2), .Y + 32 + (13 * (Height - 1)), Pink
                         End If
                         
                         ' Exibir o total de EXP que ganha
-                        If Item(PicNum).AddEXP > 0 Then
+                        If Item(itemNum).AddEXP > 0 Then
                             RenderTexture Tex_GUI, .X, .Y + 33 + (13 * Height), 1, 223, .Width, 13, .Width, 11
                             Height = Height + 1
                             
-                            tmpText = "Adicionar EXP: " & Item(PicNum).AddEXP
+                            tmpText = "Adicionar EXP: " & Item(itemNum).AddEXP
                             RenderText Fonts.Verdana, tmpText, .X + (.Width / 2) - (TextWidth(Fonts.Verdana, tmpText) / 2), .Y + 32 + (13 * (Height - 1)), Pink
                         End If
                     Case ITEM_TYPE_CURRENCY
@@ -1267,12 +1269,12 @@ Private Sub DrawItemDesc()
                         RenderText Fonts.Verdana, tmpText, .X + (.Width / 2) - (TextWidth(Fonts.Verdana, tmpText) / 2), .Y + 19, White, 100
                     
                         ' Desenha descrição
-                        If Strings.Trim$(Item(PicNum).Desc) <> vbNullString Then
+                        If Strings.Trim$(Item(itemNum).Desc) <> vbNullString Then
                             Dim Text_Array() As String
                             Dim Text_Lines(0 To 9) As String
                             Dim i As Byte
                             
-                            Text_Array = Split(Strings.Trim(Item(PicNum).Desc), " ")
+                            Text_Array = Split(Strings.Trim(Item(itemNum).Desc), " ")
 
                             For Colour = 0 To UBound(Text_Array)
                                 If TextWidth(Fonts.Verdana, Strings.Trim$(Text_Lines(i) & Text_Array(Colour) & " ")) < .Width - 12 Then
@@ -1497,7 +1499,7 @@ Private Sub Skills_MouseDown(Button As Integer, X As Single, Y As Single)
     SpellNum = IsPlayerSpell(X, Y)
     If Button = 1 Then ' left click
         If SpellNum <> 0 Then
-            'If Player(MyIndex).Energy > 0 And PlayerSpells(SpellNum).Level < MAX_SPELL_LEVEL Then
+            If Player(MyIndex).Energy > 0 And PlayerSpells(SpellNum).Level < MAX_SPELL_LEVEL Then
                 With Window(GUI.W_Spells).Buttons(SpellNum)
                     If (MouseX >= .X And MouseX <= .X + .Width) And (MouseY >= .Y And MouseY <= .Y + .Height) Then
                         .State = 2
@@ -1505,7 +1507,7 @@ Private Sub Skills_MouseDown(Button As Integer, X As Single, Y As Single)
                         Exit Sub
                     End If
                 End With
-            'End If
+            End If
             
             If PlayerSpells(SpellNum).Level > 0 Then
                 DragSpell = SpellNum
@@ -1515,7 +1517,7 @@ Private Sub Skills_MouseDown(Button As Integer, X As Single, Y As Single)
     ElseIf Button = 2 Then ' right click
         If SpellNum <> 0 Then
             If PlayerSpells(SpellNum).Num > 0 Then
-                Dialogue "Deletar Magia", "Tem certeza de que quer deletar a magia " & Strings.Trim$(Spell(PlayerSpells(SpellNum).Num).name) & "?", DIALOGUE_TYPE_FORGET, True, SpellNum
+                Dialogue "Deletar Magia", "Tem certeza de que quer deletar a magia " & Strings.Trim$(Spell(PlayerSpells(SpellNum).Num).Name) & "?", DIALOGUE_TYPE_FORGET, True, SpellNum
             End If
         End If
     End If
@@ -1551,7 +1553,7 @@ End Sub
 ' ##############################################################
 ' ### - CHAT - #################################################
 Private Sub Chatbox_Draw()
-    Dim i As Long, tmpY As Long
+    Dim i As Byte
 
     ' If debug mode, handle error then exit out
     If Options.Debug = 1 Then On Error GoTo errorhandler
@@ -1602,7 +1604,7 @@ End Sub
 
 ' scroll bar
 Private Sub Chat_MouseDown(ByVal Button As Integer, ByVal X As Single, ByVal Y As Single)
-Dim i As Long
+    Dim i As Byte
     
     ' If debug mode, handle error then exit out
     If Options.Debug = 1 Then On Error GoTo errorhandler
@@ -1698,6 +1700,13 @@ Private Sub Character_Draw()
         
         ' Pontos
         Call RenderText(Fonts.Verdana, "Pontos: " & GetPlayerPOINTS(MyIndex), .X + 42, .Y + 197, White)
+        
+        ' Equipamentos
+        For i = 1 To Equipment.Equipment_Count - 1
+            If GetPlayerEquipment(MyIndex, i) > 0 Then
+                RenderTexture Tex_Item(Item(GetPlayerEquipment(MyIndex, i)).Pic), .X + 4, .Y + 48 + (34 * (i - 1)), 0, 0, 32, 32, 32, 32
+            End If
+        Next
     End With
     
     ' Error handler
@@ -1708,29 +1717,88 @@ errorhandler:
     Exit Sub
 End Sub
 
-Private Sub Character_MouseDown()
+Private Function isEquipItem(ByVal X As Single, ByVal Y As Single) As Integer
+    Dim i As Long
+    
+    ' If debug mode, handle error then exit out
+    If Options.Debug = 1 Then On Error GoTo errorhandler
+
+    isEquipItem = 0
+
+    For i = 1 To Equipment.Equipment_Count - 1
+        If GetPlayerEquipment(MyIndex, i) > 0 And GetPlayerEquipment(MyIndex, i) <= MAX_ITEMS Then
+            If X >= Window(GUI.W_Char).X + 4 And X <= Window(GUI.W_Char).X + 36 Then
+                If Y >= Window(GUI.W_Char).Y + 48 + (34 * (i - 1)) And Y <= Window(GUI.W_Char).Y + 80 + (34 * (i - 1)) Then
+                    isEquipItem = i
+                    Exit Function
+                End If
+            End If
+        End If
+    Next
+
+    ' Error handler
+    Exit Function
+errorhandler:
+    HandleError "isEquipItem", "modWindow", Err.Number, Err.Description, Err.Source, Err.HelpContext
+    Err.Clear
+    Exit Function
+End Function
+
+Private Sub Character_MouseDown(Button As Integer, X As Single, Y As Single)
     Dim i As Stats
     
     ' If debug mode, handle error then exit out
     If Options.Debug = 1 Then On Error GoTo errorhandler
     
-    For i = 1 To Stats.Stat_Count - 1
-        With Window(GUI.W_Char).Buttons(i)
-            If (MouseX >= .X And MouseX <= .X + .Width) And (MouseY >= .Y And MouseY <= .Y + .Height) Then
-                .State = 2
-                
-                If GetPlayerPOINTS(MyIndex) = 0 Then Exit Sub
-                
-                SendTrainStat i
-                Exit Sub
-            End If
-        End With
-    Next
+    If Button = 1 Then
+        For i = 1 To Stats.Stat_Count - 1
+            With Window(GUI.W_Char).Buttons(i)
+                If (MouseX >= .X And MouseX <= .X + .Width) And (MouseY >= .Y And MouseY <= .Y + .Height) Then
+                    .State = 2
+                    
+                    If GetPlayerPOINTS(MyIndex) = 0 Then Exit Sub
+                    
+                    SendTrainStat i
+                    Exit Sub
+                End If
+            End With
+        Next
+    ElseIf Button = 2 Then
+        If isEquipItem(X, Y) <> 0 Then
+            SendUnequip isEquipItem(X, Y)
+        End If
+    End If
     
     ' Error handler
     Exit Sub
 errorhandler:
     HandleError "Character_MouseDown", "modWindow", Err.Number, Err.Description, Err.Source, Err.HelpContext
+    Err.Clear
+    Exit Sub
+End Sub
+
+Private Sub Character_MouseMove(X As Single, Y As Single)
+    
+    ' If debug mode, handle error then exit out
+    If Options.Debug = 1 Then On Error GoTo errorhandler
+
+    If isEquipItem(X, Y) <> 0 Then
+        ActualItemDesc = isEquipItem(X, Y)
+        TYPE_DESC = 1
+        With Window(GUI.W_DescriptionItem)
+            .X = Window(GUI.W_Char).X - .Width - 1
+            .Y = Window(GUI.W_Char).Y
+            .Visible = True
+        End With
+    Else
+        Window(GUI.W_DescriptionItem).Visible = False
+        ActualItemDesc = 0
+    End If
+    
+    ' Error handler
+    Exit Sub
+errorhandler:
+    HandleError "Character_MouseMove", "modWindow", Err.Number, Err.Description, Err.Source, Err.HelpContext
     Err.Clear
     Exit Sub
 End Sub

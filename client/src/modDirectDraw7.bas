@@ -1627,105 +1627,6 @@ errorhandler:
     Exit Sub
 End Sub
 
-Sub DrawFace()
-Dim Rec As RECT, Rec_Pos As RECT, faceNum As Long, srcRect As D3DRECT
-    
-    ' If debug mode, handle error then exit out
-    If Options.Debug = 1 Then On Error GoTo errorhandler
-
-    If NumFaces = 0 Then Exit Sub
-
-    faceNum = GetPlayerSprite(MyIndex)
-    
-    If faceNum <= 0 Or faceNum > NumFaces Then Exit Sub
-    
-    Direct3D_Device.Clear 0, ByVal 0, D3DCLEAR_TARGET, D3DColorRGBA(0, 0, 0, 0), 1#, 0
-    Direct3D_Device.BeginScene
-
-    With Rec
-        .Top = 0
-        .Bottom = 100
-        .Left = 0
-        .Right = 100
-    End With
-
-    With Rec_Pos
-        .Top = 0
-        .Bottom = 100
-        .Left = 0
-        .Right = 100
-    End With
-
-    RenderTextureByRects Tex_Face(faceNum), Rec, Rec_Pos
-    With srcRect
-        .x1 = 0
-        .x2 = frmMain.picFace.Width
-        .y1 = 0
-        .y2 = frmMain.picFace.Height
-    End With
-    Direct3D_Device.EndScene
-    Direct3D_Device.Present srcRect, srcRect, frmMain.picFace.hwnd, ByVal (0)
-    
-    ' Error handler
-    Exit Sub
-errorhandler:
-    HandleError "DrawFace", "modGraphics", Err.Number, Err.Description, Err.Source, Err.HelpContext
-    Err.Clear
-    Exit Sub
-End Sub
-
-Sub DrawEquipment()
-Dim i As Long, itemNum As Long, itemPic As Long
-Dim Rec As RECT, Rec_Pos As RECT, srcRect As D3DRECT, destRect As D3DRECT
-    
-    ' If debug mode, handle error then exit out
-    If Options.Debug = 1 Then On Error GoTo errorhandler
-
-    If numitems = 0 Then Exit Sub
-    
-    'frmMain.picCharacter.Cls
-    For i = 1 To Equipment.Equipment_Count - 1
-        itemNum = GetPlayerEquipment(MyIndex, i)
-
-        If itemNum > 0 Then
-            itemPic = Item(itemNum).Pic
-
-            With Rec
-                .Top = 0
-                .Bottom = 32
-                .Left = 32
-                .Right = 64
-            End With
-
-            With Rec_Pos
-                .Top = EqTop
-                .Bottom = .Top + PIC_Y
-                .Left = EqLeft + ((EqOffsetX + 32) * (((i - 1) Mod EqColumns)))
-                .Right = .Left + PIC_X
-            End With
-            Direct3D_Device.Clear 0, ByVal 0, D3DCLEAR_TARGET, D3DColorRGBA(0, 0, 0, 0), 1#, 0
-            Direct3D_Device.BeginScene
-            RenderTextureByRects Tex_Item(itemPic), Rec, Rec_Pos
-            Direct3D_Device.EndScene
-            With srcRect
-                .x1 = Rec_Pos.Left
-                .x2 = Rec_Pos.Right
-                .y1 = Rec_Pos.Top
-                .y2 = Rec_Pos.Bottom
-            End With
-            Direct3D_Device.Present srcRect, srcRect, frmMain.picCharacter.hwnd, ByVal (0)
-        End If
-    Next
-    
-
-    ' Error handler
-    Exit Sub
-errorhandler:
-    HandleError "DrawEquipment", "modGraphics", Err.Number, Err.Description, Err.Source, Err.HelpContext
-    Err.Clear
-    Exit Sub
-End Sub
-
 Sub DrawTrade()
 Dim i As Long, X As Long, Y As Long, itemNum As Long, itemPic As Long, srcRect As D3DRECT, destRect As D3DRECT
 Dim Amount As Long
@@ -3970,7 +3871,6 @@ Public Sub DrawGDI()
         If frmMain.picSpellDesc.Visible Then DrawSpellDesc LastSpellDesc
         If frmMain.picItemDesc.Visible Then DrawItemDesc LastItemDesc
         If frmMain.picItemDesc.Visible Then DrawItemDesc LastItemDesc
-        If frmMain.picCharacter.Visible Then DrawFace: DrawEquipment
         If frmMain.picShop.Visible Then DrawShop
         If frmMain.picTempBank.Visible Then DrawBankItem frmMain.picTempBank.Left, frmMain.picTempBank.Top
         If frmMain.picBank.Visible Then DrawBank

@@ -137,7 +137,7 @@ errorhandler:
     Exit Function
 End Function
 
-Sub SendData(ByRef data() As Byte)
+Sub SendData(ByRef Data() As Byte)
 Dim Buffer As clsBuffer
     
     ' If debug mode, handle error then exit out
@@ -146,8 +146,8 @@ Dim Buffer As clsBuffer
     If IsConnected Then
         Set Buffer = New clsBuffer
                 
-        Buffer.WriteLong (UBound(data) - LBound(data)) + 1
-        Buffer.WriteBytes data()
+        Buffer.WriteLong (UBound(Data) - LBound(Data)) + 1
+        Buffer.WriteBytes Data()
         frmMain.Socket.SendData Buffer.ToArray()
     End If
     
@@ -162,7 +162,7 @@ End Sub
 ' *****************************
 ' ** Outgoing Client Packets **
 ' *****************************
-Public Sub SendNewAccount(ByVal name As String, ByVal Password As String)
+Public Sub SendNewAccount(ByVal Name As String, ByVal Password As String)
 Dim Buffer As clsBuffer
     
     ' If debug mode, handle error then exit out
@@ -170,7 +170,7 @@ Dim Buffer As clsBuffer
     
     Set Buffer = New clsBuffer
     Buffer.WriteLong CNewAccount
-    Buffer.WriteString name
+    Buffer.WriteString Name
     Buffer.WriteString Password
     SendData Buffer.ToArray()
     Set Buffer = Nothing
@@ -183,7 +183,7 @@ errorhandler:
     Exit Sub
 End Sub
 
-Public Sub SendDelAccount(ByVal name As String, ByVal Password As String)
+Public Sub SendDelAccount(ByVal Name As String, ByVal Password As String)
 Dim Buffer As clsBuffer
 
     ' If debug mode, handle error then exit out
@@ -191,7 +191,7 @@ Dim Buffer As clsBuffer
     
     Set Buffer = New clsBuffer
     Buffer.WriteLong CDelAccount
-    Buffer.WriteString name
+    Buffer.WriteString Name
     Buffer.WriteString Password
     SendData Buffer.ToArray()
     Set Buffer = Nothing
@@ -204,7 +204,7 @@ errorhandler:
     Exit Sub
 End Sub
 
-Public Sub SendLogin(ByVal name As String, ByVal Password As String)
+Public Sub SendLogin(ByVal Name As String, ByVal Password As String)
 Dim Buffer As clsBuffer
 
     ' If debug mode, handle error then exit out
@@ -212,7 +212,7 @@ Dim Buffer As clsBuffer
     
     Set Buffer = New clsBuffer
     Buffer.WriteLong CLogin
-    Buffer.WriteString name
+    Buffer.WriteString Name
     Buffer.WriteString Password
     Buffer.WriteLong App.Major
     Buffer.WriteLong App.Minor
@@ -228,7 +228,7 @@ errorhandler:
     Exit Sub
 End Sub
 
-Public Sub SendAddChar(ByVal name As String, ByVal Sex As Long, ByVal ClassNum As Long, ByVal Sprite As Long)
+Public Sub SendAddChar(ByVal Name As String, ByVal Sex As Long, ByVal ClassNum As Long, ByVal Sprite As Long)
 Dim Buffer As clsBuffer
 
     ' If debug mode, handle error then exit out
@@ -236,7 +236,7 @@ Dim Buffer As clsBuffer
     
     Set Buffer = New clsBuffer
     Buffer.WriteLong CAddChar
-    Buffer.WriteString name
+    Buffer.WriteString Name
     Buffer.WriteLong Sex
     Buffer.WriteLong ClassNum
     Buffer.WriteLong Sprite
@@ -450,7 +450,7 @@ Dim Buffer As clsBuffer
 
     With Map
         Buffer.WriteLong CMapData
-        Buffer.WriteString Trim$(.name)
+        Buffer.WriteString Trim$(.Name)
         Buffer.WriteString Trim$(.Music)
         Buffer.WriteString Trim$(.BGS)
         Buffer.WriteByte .Moral
@@ -472,7 +472,7 @@ Dim Buffer As clsBuffer
         Buffer.WriteLong Map.Red
         Buffer.WriteLong Map.Green
         Buffer.WriteLong Map.Blue
-        Buffer.WriteLong Map.Alpha
+        Buffer.WriteLong Map.alpha
         
         Buffer.WriteByte .MaxX
         Buffer.WriteByte .MaxY
@@ -516,7 +516,7 @@ Dim Buffer As clsBuffer
     If Map.EventCount > 0 Then
         For i = 1 To Map.EventCount
             With Map.Events(i)
-                Buffer.WriteString .name
+                Buffer.WriteString .Name
                 Buffer.WriteLong .Global
                 Buffer.WriteLong .X
                 Buffer.WriteLong .Y
@@ -638,7 +638,7 @@ errorhandler:
     Exit Sub
 End Sub
 
-Public Sub WarpMeTo(ByVal name As String)
+Public Sub WarpMeTo(ByVal Name As String)
 Dim Buffer As clsBuffer
 
     ' If debug mode, handle error then exit out
@@ -646,7 +646,7 @@ Dim Buffer As clsBuffer
     
     Set Buffer = New clsBuffer
     Buffer.WriteLong CWarpMeTo
-    Buffer.WriteString name
+    Buffer.WriteString Name
     SendData Buffer.ToArray()
     Set Buffer = Nothing
     
@@ -658,7 +658,7 @@ errorhandler:
     Exit Sub
 End Sub
 
-Public Sub WarpToMe(ByVal name As String)
+Public Sub WarpToMe(ByVal Name As String)
 Dim Buffer As clsBuffer
 
     ' If debug mode, handle error then exit out
@@ -666,7 +666,7 @@ Dim Buffer As clsBuffer
     
     Set Buffer = New clsBuffer
     Buffer.WriteLong CWarpToMe
-    Buffer.WriteString name
+    Buffer.WriteString Name
     SendData Buffer.ToArray()
     Set Buffer = Nothing
     
@@ -698,7 +698,7 @@ errorhandler:
     Exit Sub
 End Sub
 
-Public Sub SendSetAccess(ByVal name As String, ByVal Access As Byte)
+Public Sub SendSetAccess(ByVal Name As String, ByVal Access As Byte)
 Dim Buffer As clsBuffer
 
     ' If debug mode, handle error then exit out
@@ -706,7 +706,7 @@ Dim Buffer As clsBuffer
     
     Set Buffer = New clsBuffer
     Buffer.WriteLong CSetAccess
-    Buffer.WriteString name
+    Buffer.WriteString Name
     Buffer.WriteLong Access
     SendData Buffer.ToArray()
     Set Buffer = Nothing
@@ -739,7 +739,7 @@ errorhandler:
     Exit Sub
 End Sub
 
-Public Sub SendKick(ByVal name As String)
+Public Sub SendKick(ByVal Name As String)
 Dim Buffer As clsBuffer
 
     ' If debug mode, handle error then exit out
@@ -747,7 +747,7 @@ Dim Buffer As clsBuffer
     
     Set Buffer = New clsBuffer
     Buffer.WriteLong CKickPlayer
-    Buffer.WriteString name
+    Buffer.WriteString Name
     SendData Buffer.ToArray()
     Set Buffer = Nothing
     
@@ -759,7 +759,7 @@ errorhandler:
     Exit Sub
 End Sub
 
-Public Sub SendBan(ByVal name As String)
+Public Sub SendBan(ByVal Name As String)
 Dim Buffer As clsBuffer
 
     ' If debug mode, handle error then exit out
@@ -767,7 +767,7 @@ Dim Buffer As clsBuffer
     
     Set Buffer = New clsBuffer
     Buffer.WriteLong CBanPlayer
-    Buffer.WriteString name
+    Buffer.WriteString Name
     SendData Buffer.ToArray()
     Set Buffer = Nothing
     
@@ -1278,7 +1278,7 @@ errorhandler:
     Exit Sub
 End Sub
 
-Sub SendUnequip(ByVal EqNum As Long)
+Sub SendUnequip(ByVal EqNum As Byte)
 Dim Buffer As clsBuffer
 
     ' If debug mode, handle error then exit out
@@ -1286,7 +1286,8 @@ Dim Buffer As clsBuffer
     
     Set Buffer = New clsBuffer
     Buffer.WriteLong CUnequip
-    Buffer.WriteLong EqNum
+    Buffer.WriteByte EqNum
+    
     SendData Buffer.ToArray()
     Set Buffer = Nothing
     
