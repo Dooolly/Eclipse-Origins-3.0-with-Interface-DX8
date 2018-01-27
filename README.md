@@ -15,6 +15,9 @@ por uma feita completamente do zero, e totalmente feita com Directx8
 - Adicionar janela de personagem
 - Alterado a estrutura dos itens ligados ao jogador, permitindo aprimoramento
 - Alterado boa parte dos tipos de variaveis, reduzindo o gasto excessivo de memoria(Não está 100%)
+- Adicionado sistema de missões do alatar, com varias modificações feitas por mim(Não está 100%)
+- Corrigido Overflow causado pela Eclipse Origins Destroyer
+- Corrigido bug na contagem dos pacotes
 
 # Creditos
 - Robin Perris
