@@ -593,6 +593,7 @@ End Sub
 Public Sub DrawMapFringeTile(ByVal X As Long, ByVal Y As Long)
 Dim Rec As RECT
 Dim i As Long
+Dim Alpha As Byte
 
     ' If debug mode, handle error then exit out
     If Options.Debug = 1 Then On Error GoTo errorhandler
@@ -601,7 +602,14 @@ Dim i As Long
         For i = MapLayer.Fringe To MapLayer.Fringe2
             If Autotile(X, Y).Layer(i).renderState = RENDER_STATE_NORMAL Then
                 ' Draw normally
-                RenderTexture Tex_Tileset(.Layer(i).Tileset), ConvertMapX(X * PIC_X), ConvertMapY(Y * PIC_Y), .Layer(i).X * 32, .Layer(i).Y * 32, 32, 32, 32, 32, -1
+                If X = GetPlayerX(MyIndex) And Y = GetPlayerY(MyIndex) Or X = GetPlayerX(MyIndex) And Y = GetPlayerY(MyIndex) - 1 Or X = GetPlayerX(MyIndex) And Y = GetPlayerY(MyIndex) + 1 Or X = GetPlayerX(MyIndex) - 1 And Y = GetPlayerY(MyIndex) Or X = GetPlayerX(MyIndex) + 1 And Y = GetPlayerY(MyIndex) Then
+                    Alpha = 200
+                Else
+                    Alpha = 255
+                End If
+                
+                ' Draw normally
+                RenderTexture Tex_Tileset(.Layer(i).Tileset), ConvertMapX(X * PIC_X), ConvertMapY(Y * PIC_Y), .Layer(i).X * 32, .Layer(i).Y * 32, 32, 32, 32, 32, D3DColorRGBA(255, 255, 255, Alpha)
             ElseIf Autotile(X, Y).Layer(i).renderState = RENDER_STATE_AUTOTILE Then
                 ' Draw autotiles
                 DrawAutoTile i, ConvertMapX(X * PIC_X), ConvertMapY(Y * PIC_Y), 1, X, Y
@@ -1089,13 +1097,13 @@ Dim i As Long, npcNum As Long, partyIndex As Long
         ' exists?
         If npcNum > 0 Then
             ' alive?
-            If MapNpc(i).Vital(Vitals.HP) > 0 And MapNpc(i).Vital(Vitals.HP) < Npc(npcNum).HP Then
+            If MapNpc(i).Vital(Vitals.HP) > 0 And MapNpc(i).Vital(Vitals.HP) < NPC(npcNum).HP Then
                 ' lock to npc
                 tmpX = MapNpc(i).X * PIC_X + MapNpc(i).xOffset + 16 - (sWidth / 2)
                 tmpY = MapNpc(i).Y * PIC_Y + MapNpc(i).yOffset + 35
                 
                 ' calculate the width to fill
-                barWidth = ((MapNpc(i).Vital(Vitals.HP) / sWidth) / (Npc(npcNum).HP / sWidth)) * sWidth
+                barWidth = ((MapNpc(i).Vital(Vitals.HP) / sWidth) / (NPC(npcNum).HP / sWidth)) * sWidth
                 
                 ' draw bar background
                 With sRect
@@ -1336,7 +1344,7 @@ Dim attackspeed As Long
 
     If MapNpc(MapNpcNum).Num = 0 Then Exit Sub ' no npc set
     
-    Sprite = Npc(MapNpc(MapNpcNum).Num).Sprite
+    Sprite = NPC(MapNpc(MapNpcNum).Num).Sprite
 
     If Sprite < 1 Or Sprite > NumCharacters Then Exit Sub
 
@@ -2942,7 +2950,7 @@ Dim Rec_Pos As RECT, srcRect As D3DRECT
             Next i
             
             ' Draw map name
-            RenderText Fonts.Verdana, Map.name, DrawMapNameX, DrawMapNameY, DrawMapNameColor, 0
+            RenderText Fonts.Verdana, Map.Name, DrawMapNameX, DrawMapNameY, DrawMapNameColor, 0
             
             If InMapEditor And frmEditor_Map.optEvent.Value = True Then DrawEvents
             

@@ -122,6 +122,11 @@ Public Sub InitMessages()
     
     HandleDataSub(SMoney) = GetAddress(AddressOf HandleMoney)
     
+    HandleDataSub(SQuestEditor) = GetAddress(AddressOf HandleQuestEditor)
+    HandleDataSub(SUpdateQuest) = GetAddress(AddressOf HandleUpdateQuest)
+    HandleDataSub(SPlayerQuest) = GetAddress(AddressOf HandlePlayerQuest)
+    HandleDataSub(SQuestMessage) = GetAddress(AddressOf HandleQuestMessage)
+    
     ' Error handler
     Exit Sub
 errorhandler:
@@ -1079,7 +1084,7 @@ Dim MapNum As Long
     Next
 
     For X = 1 To MAX_MAP_NPCS
-        Map.Npc(X) = Buffer.ReadLong
+        Map.NPC(X) = Buffer.ReadLong
         Map.NpcSpawnType(X) = Buffer.ReadLong
         n = n + 1
     Next
@@ -1557,7 +1562,7 @@ Dim i As Long
 
         ' Add the names
         For i = 1 To MAX_NPCS
-            .lstIndex.AddItem i & ": " & Trim$(Npc(i).Name)
+            .lstIndex.AddItem i & ": " & Trim$(NPC(i).Name)
         Next
 
         .Show
@@ -1587,10 +1592,10 @@ Dim NpcData() As Byte
     
     n = Buffer.ReadLong
     
-    NpcSize = LenB(Npc(n))
+    NpcSize = LenB(NPC(n))
     ReDim NpcData(NpcSize - 1)
     NpcData = Buffer.ReadBytes(NpcSize)
-    CopyMemory ByVal VarPtr(Npc(n)), ByVal VarPtr(NpcData(0)), NpcSize
+    CopyMemory ByVal VarPtr(NPC(n)), ByVal VarPtr(NpcData(0)), NpcSize
     
     Set Buffer = Nothing
     
@@ -3125,3 +3130,77 @@ errorhandler:
     Exit Sub
 End Sub
 
+Private Sub HandleQuestEditor()
+    Dim i As Long
+    
+    With frmEditor_Quest
+        Editor = EDITOR_TASKS
+        .lstIndex.Clear
+
+        ' Add the names
+        For i = 1 To MAX_QUESTS
+            .lstIndex.AddItem i & ": " & Trim$(Quest(i).Name)
+        Next
+
+        .Show
+        .lstIndex.ListIndex = 0
+        QuestEditorInit
+    End With
+
+End Sub
+
+Private Sub HandleUpdateQuest(ByVal Index As Long, ByRef Data() As Byte, ByVal StartAddr As Long, ByVal ExtraVar As Long)
+    Dim n As Long
+    Dim Buffer As clsBuffer
+    Dim QuestSize As Long
+    Dim QuestData() As Byte
+    Set Buffer = New clsBuffer
+    Buffer.WriteBytes Data()
+    n = Buffer.ReadLong
+    ' Update the Quest
+    QuestSize = LenB(Quest(n))
+    ReDim QuestData(QuestSize - 1)
+    QuestData = Buffer.ReadBytes(QuestSize)
+    CopyMemory ByVal VarPtr(Quest(n)), ByVal VarPtr(QuestData(0)), QuestSize
+    Set Buffer = Nothing
+End Sub
+
+Private Sub HandlePlayerQuest(ByVal Index As Long, ByRef Data() As Byte, ByVal StartAddr As Long, ByVal ExtraVar As Long)
+    Dim Buffer As clsBuffer
+    Dim i As Long
+
+    Set Buffer = New clsBuffer
+    Buffer.WriteBytes Data()
+        
+    For i = 1 To MAX_QUESTS
+        PlayerQuest(i).Status = Buffer.ReadByte
+        PlayerQuest(i).ActualTask = Buffer.ReadByte
+        PlayerQuest(i).CurrentCount = Buffer.ReadByte
+    Next
+    
+    Set Buffer = Nothing
+End Sub
+
+Private Sub HandleQuestMessage(ByVal Index As Long, ByRef Data() As Byte, ByVal StartAddr As Long, ByVal ExtraVar As Long)
+    Dim Buffer As clsBuffer
+    Dim i As Long, QuestNum As Long, QuestNumForStart As Long
+    Dim Message As String
+    
+    Set Buffer = New clsBuffer
+    Buffer.WriteBytes Data()
+    QuestNum = Buffer.ReadLong
+    Message = Trim$(Buffer.ReadString)
+    QuestNumForStart = Buffer.ReadLong
+    
+    frmMain.lblQuestName = Trim$(Quest(QuestNum).Name)
+    frmMain.lblQuestSay = Message
+    frmMain.lblQuestSubtitle = "Info:"
+    frmMain.picQuestDialogue.Visible = True
+    
+    If QuestNumForStart > 0 And QuestNumForStart <= MAX_QUESTS Then
+        frmMain.lblQuestAccept.Visible = True
+        frmMain.lblQuestAccept.Tag = QuestNumForStart
+    End If
+        
+    Set Buffer = Nothing
+End Sub

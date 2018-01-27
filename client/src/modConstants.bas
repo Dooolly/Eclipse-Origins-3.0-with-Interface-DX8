@@ -8,7 +8,6 @@ Public Declare Function GetForegroundWindow Lib "user32" () As Long
 
 ' animated buttons
 Public Const MAX_MENUBUTTONS As Long = 4
-Public Const MAX_MAINBUTTONS As Long = 6
 Public Const MENUBUTTON_PATH As String = "\Data Files\graphics\gui\menu\buttons\"
 Public Const MAINBUTTON_PATH As String = "\Data Files\graphics\gui\main\buttons\"
 

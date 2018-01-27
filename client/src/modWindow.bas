@@ -12,6 +12,9 @@ Private MovableWind As Byte
 Private ActualItemDesc As Long
 Private TYPE_DESC As Byte
 
+' Missões
+Private ListIndex_Quest As Byte
+
 ' Constantes das janelas
 Public Enum GUI
    W_None
@@ -22,6 +25,7 @@ Public Enum GUI
    W_Chatbox
    W_Spells
    W_Char
+   W_Quests
 
    ' Quantidade de Janelas
    W_Count
@@ -72,6 +76,7 @@ Public Sub InitGUI()
     
     ActualHotbar = 1
     ChatScroll = 0
+    ListIndex_Quest = 0
     
     ' Carregar Barra principal
     With Window(GUI.W_MainBar)
@@ -203,6 +208,17 @@ Public Sub InitGUI()
         Next
     End With
     
+    ' Carregar missões
+    With Window(GUI.W_Quests)
+        .X = frmMain.ScaleWidth / 2 - (409 / 2)
+        .Y = frmMain.ScaleHeight / 2 - (211 / 2)
+        .Width = 409
+        .Height = 211
+        .Visible = False
+        .Movable = True
+        ReDim .Buttons(1 To 5)
+    End With
+    
     ' Error handler
     Exit Sub
 errorhandler:
@@ -224,6 +240,7 @@ Public Sub DrawInterface()
     If Window(GUI.W_Spells).Visible Then Call Skills_Draw ' Desenhar janela de magias
     If Window(GUI.W_DescriptionItem).Visible Then Call DrawItemDesc ' Descrição do item
     If Window(GUI.W_Char).Visible Then Call Character_Draw
+    If Window(GUI.W_Quests).Visible Then Call Quests_Draw
     
     If DragInvSlotNum > 0 Then Call DrawDragItem
     If DragSpell > 0 Then Call DrawDragSpell
@@ -324,6 +341,9 @@ Public Sub MouseDown_Handle(Button As Integer, Shift As Integer, X As Single, Y 
                             Exit Sub
                         Case GUI.W_Char
                             Call Character_MouseDown(Button, X, Y)
+                            Exit Sub
+                        Case GUI.W_Quests
+                            Call Quest_MouseDown(Button, X, Y)
                             Exit Sub
                     End Select
                 End If
@@ -595,6 +615,8 @@ Private Sub MainBar_MouseDown(Button As Integer, X As Single, Y As Single)
                         Window(GUI.W_Char).Visible = Not Window(GUI.W_Char).Visible
                     Case 3 ' Magias
                         Window(GUI.W_Spells).Visible = Not Window(GUI.W_Spells).Visible
+                    Case 4 ' Missões
+                        Window(GUI.W_Quests).Visible = Not Window(GUI.W_Quests).Visible
                     Case 8 ' Mudar de Hotbar - Aumentar
                          If ActualHotbar >= 3 Then
                             ActualHotbar = 1
@@ -1799,6 +1821,82 @@ Private Sub Character_MouseMove(X As Single, Y As Single)
     Exit Sub
 errorhandler:
     HandleError "Character_MouseMove", "modWindow", Err.Number, Err.Description, Err.Source, Err.HelpContext
+    Err.Clear
+    Exit Sub
+End Sub
+
+' ALATAR
+Private Sub Quests_Draw()
+    Dim i As Integer
+    
+    ' If debug mode, handle error then exit out
+    If Options.Debug = 1 Then On Error GoTo errorhandler
+    
+    With Window(GUI.W_Quests)
+        ' Desenha designer
+        RenderTexture Tex_GUI, .X, .Y, 300, 218, .Width, .Height, .Width, .Height
+        
+        ' Indice da lista
+        If ListIndex_Quest > 0 Then RenderTexture Tex_GUI, .X + 5, .Y + 11 + (15 * ListIndex_Quest), 531, 430, 133, 14, 133, 14
+        
+        ' Desenhar lista de itens
+        For i = 1 To MAX_QUESTS
+            If Not PlayerQuest(i).Status = QUEST_NOT_STARTED Then
+                If QuestInProgress(i) Then
+                    RenderText Fonts.Verdana, Trim(Quest(i).Name), .X + 8, .Y + 11 + (15 * i), White
+                ElseIf QuestCompleted(i) Then
+                    RenderText Fonts.Verdana, Trim(Quest(i).Name), .X + 8, .Y + 11 + (15 * i), Green
+                End If
+            End If
+        Next
+        
+        ' Desenhar itens da missão
+        If ListIndex_Quest > 0 Then
+            ' Exibir história da missão
+            RenderText Fonts.Verdana, WordWrap(Fonts.Verdana, Trim(Quest(ListIndex_Quest).StartMessage), 260), .X + 142, .Y + 26, White
+            
+            ' Verificar estado da missão
+            If QuestInProgress(ListIndex_Quest) Then
+                ' Objetivo
+                RenderText Fonts.Verdana, WordWrap(Fonts.Verdana, "Objetivo " & PlayerQuest(ListIndex_Quest).ActualTask & ": " & ColourChar & GetColStr(White) & Trim(Quest(ListIndex_Quest).Task(PlayerQuest(ListIndex_Quest).ActualTask).TaskLog), 265), .X + 142, .Y + 90, Magenta
+                
+                ' Recompensas
+                RenderText Fonts.Verdana, "Dinheiro: +" & Quest(ListIndex_Quest).RewardMoney, .X + 142, .Y + 192, Gold
+                RenderText Fonts.Verdana, "Experiência: +" & Quest(ListIndex_Quest).RewardExp, .X + 153 + TextWidth(Verdana, "Dinheiro: +" & Quest(ListIndex_Quest).RewardMoney), .Y + 192, Gold
+            Else
+                RenderText Fonts.Verdana, "Missão concluida!", .X + 142, .Y + 90, Green
+            End If
+        End If
+    End With
+        
+    ' Error handler
+    Exit Sub
+errorhandler:
+    HandleError "Quests_Draw", "modWindow", Err.Number, Err.Description, Err.Source, Err.HelpContext
+    Err.Clear
+    Exit Sub
+End Sub
+
+Private Sub Quest_MouseDown(ByVal Button As Integer, ByVal X As Single, ByVal Y As Single)
+    Dim i As Byte
+    
+    ' If debug mode, handle error then exit out
+    If Options.Debug = 1 Then On Error GoTo errorhandler
+    
+    With Window(GUI.W_Quests)
+        For i = 1 To 12
+            If (X >= .X + 5 And X <= .X + 138) And (Y >= .Y + 26 And Y <= .Y + 26 + (15 * i)) Then
+                If PlayerQuest(i).Status = QUEST_NOT_STARTED Then Exit Sub
+                ListIndex_Quest = i
+                Exit Sub
+            End If
+        Next
+    End With
+    
+    ' Error handler
+    Exit Sub
+errorhandler:
+    HandleError "Quest_MouseDown", "modWindow", Err.Number, Err.Description, Err.Source, Err.HelpContext
     Err.Clear
     Exit Sub
 End Sub

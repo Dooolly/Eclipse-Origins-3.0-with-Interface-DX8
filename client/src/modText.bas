@@ -214,46 +214,46 @@ Private Sub LoadFontHeader(ByRef theFont As CustomFont, ByVal fileName As String
 End Sub
 
 ' Obter cores
-Public Function DX8Colour(ByVal colourNum As Byte, ByVal alpha As Byte) As Long
+Public Function DX8Colour(ByVal colourNum As Byte, ByVal Alpha As Byte) As Long
     Select Case colourNum
         Case 0 ' Black
-            DX8Colour = D3DColorARGB(alpha, 0, 0, 0)
+            DX8Colour = D3DColorARGB(Alpha, 0, 0, 0)
         Case 1 ' Blue
-            DX8Colour = D3DColorARGB(alpha, 16, 104, 237)
+            DX8Colour = D3DColorARGB(Alpha, 16, 104, 237)
         Case 2 ' Green
-            DX8Colour = D3DColorARGB(alpha, 119, 188, 84)
+            DX8Colour = D3DColorARGB(Alpha, 119, 188, 84)
         Case 3 ' Cyan
-            DX8Colour = D3DColorARGB(alpha, 16, 224, 237)
+            DX8Colour = D3DColorARGB(Alpha, 16, 224, 237)
         Case 4 ' Red
-            DX8Colour = D3DColorARGB(alpha, 201, 0, 0)
+            DX8Colour = D3DColorARGB(Alpha, 201, 0, 0)
         Case 5 ' Magenta
-            DX8Colour = D3DColorARGB(alpha, 255, 0, 255)
+            DX8Colour = D3DColorARGB(Alpha, 255, 0, 255)
         Case 6 ' Brown
-            DX8Colour = D3DColorARGB(alpha, 175, 149, 92)
+            DX8Colour = D3DColorARGB(Alpha, 175, 149, 92)
         Case 7 ' Grey
-            DX8Colour = D3DColorARGB(alpha, 192, 192, 192)
+            DX8Colour = D3DColorARGB(Alpha, 192, 192, 192)
         Case 8 ' DarkGrey
-            DX8Colour = D3DColorARGB(alpha, 128, 128, 128)
+            DX8Colour = D3DColorARGB(Alpha, 128, 128, 128)
         Case 9 ' BrightBlue
-            DX8Colour = D3DColorARGB(alpha, 126, 182, 240)
+            DX8Colour = D3DColorARGB(Alpha, 126, 182, 240)
         Case 10 ' BrightGreen
-            DX8Colour = D3DColorARGB(alpha, 126, 240, 137)
+            DX8Colour = D3DColorARGB(Alpha, 126, 240, 137)
         Case 11 ' BrightCyan
-            DX8Colour = D3DColorARGB(alpha, 157, 242, 242)
+            DX8Colour = D3DColorARGB(Alpha, 157, 242, 242)
         Case 12 ' BrightRed
-            DX8Colour = D3DColorARGB(alpha, 255, 0, 0)
+            DX8Colour = D3DColorARGB(Alpha, 255, 0, 0)
         Case 13 ' Pink
-            DX8Colour = D3DColorARGB(alpha, 255, 118, 221)
+            DX8Colour = D3DColorARGB(Alpha, 255, 118, 221)
         Case 14 ' Yellow
-            DX8Colour = D3DColorARGB(alpha, 255, 255, 0)
+            DX8Colour = D3DColorARGB(Alpha, 255, 255, 0)
         Case 15 ' White
-            DX8Colour = D3DColorARGB(alpha, 255, 255, 255)
+            DX8Colour = D3DColorARGB(Alpha, 255, 255, 255)
         Case 16 ' dark brown
-            DX8Colour = D3DColorARGB(alpha, 98, 84, 52)
+            DX8Colour = D3DColorARGB(Alpha, 98, 84, 52)
         Case 17 ' gold
-            DX8Colour = D3DColorARGB(alpha, 255, 215, 0)
+            DX8Colour = D3DColorARGB(Alpha, 255, 215, 0)
         Case 18 ' light green
-            DX8Colour = D3DColorARGB(alpha, 124, 205, 80)
+            DX8Colour = D3DColorARGB(Alpha, 124, 205, 80)
     End Select
 End Function
 
@@ -267,7 +267,7 @@ Function GetColStr(Colour As Long)
 End Function
 
 ' Renderizar textos
-Public Sub RenderText(ByRef UseFont As Fonts, ByVal Text As String, ByVal X As Long, ByVal Y As Long, ByVal Color As Long, Optional ByVal alpha As Long = 255, Optional Shadow As Boolean = True)
+Public Sub RenderText(ByRef UseFont As Fonts, ByVal Text As String, ByVal X As Long, ByVal Y As Long, ByVal Color As Long, Optional ByVal Alpha As Long = 255, Optional Shadow As Boolean = True)
     Dim TempVA(0 To 3) As TLVERTEX, TempStr() As String
     Dim Count As Integer, i As Integer, j As Integer, tmpNum As Integer
     Dim Ascii() As Byte
@@ -276,7 +276,7 @@ Public Sub RenderText(ByRef UseFont As Fonts, ByVal Text As String, ByVal X As L
     Dim ignoreChar As Byte
 
     ' set the color
-    Color = DX8Colour(Color, alpha)
+    Color = DX8Colour(Color, Alpha)
 
     'Check for valid text to render
     If LenB(Text) = 0 Then Exit Sub
@@ -310,7 +310,7 @@ Public Sub RenderText(ByRef UseFont As Fonts, ByVal Text As String, ByVal X As L
                     If Color = -1 Then
                         TempColor = resetColor
                     Else
-                        TempColor = DX8Colour(Color, alpha)
+                        TempColor = DX8Colour(Color, Alpha)
                     End If
                     ignoreChar = 3
                 End If
@@ -369,7 +369,7 @@ Public Function TextHeight(ByRef UseFont As Fonts) As Long
 End Function
 
 ' Quebra de texto
-Private Function WordWrap(theFont As Fonts, ByVal Text As String, ByVal MaxLineLen As Integer, Optional ByRef lineCount As Byte) As String
+Public Function WordWrap(theFont As Fonts, ByVal Text As String, ByVal MaxLineLen As Integer, Optional ByRef lineCount As Byte) As String
     Dim TempSplit() As String, TSLoop As Long, lastSpace As Long, size As Long, i As Long, b As Long, tmpNum As Long, skipCount As Long
 
     'Too small of text
@@ -507,7 +507,7 @@ End Sub
 
 ' CHATBOX
 ' Adicionar Texto
-Public Sub AddText(ByVal Text As String, ByVal Color As Long, Optional ByVal alpha As Long = 255, Optional Channel As Byte = 0)
+Public Sub AddText(ByVal Text As String, ByVal Color As Long, Optional ByVal Alpha As Long = 255, Optional Channel As Byte = 0)
 Dim i As Long
 
     Chat_HighIndex = 0
@@ -702,19 +702,21 @@ End Sub
 
 ' ##############################################################################
 ' Nome do NPC
-Public Sub NpcName_Draw(ByVal Index As Long)
+Public Sub NpcName_Draw(ByVal Index As Integer)
     Dim textX As Long, textY As Long, Colour As Long
+    Dim NpcText As String
+    Dim i As Byte
 
     ' If debug mode, handle error then exit out
     If Options.Debug = 1 Then On Error GoTo errorhandler
     
-    If Npc(MapNpc(Index).Num).Behaviour = NPC_BEHAVIOUR_ATTACKONSIGHT Or Npc(MapNpc(Index).Num).Behaviour = NPC_BEHAVIOUR_ATTACKWHENATTACKED Then
+    If NPC(MapNpc(Index).Num).Behaviour = NPC_BEHAVIOUR_ATTACKONSIGHT Or NPC(MapNpc(Index).Num).Behaviour = NPC_BEHAVIOUR_ATTACKWHENATTACKED Then
         ' get the colour
-        If Npc(MapNpc(Index).Num).Level <= GetPlayerLevel(MyIndex) - 3 Then
+        If NPC(MapNpc(Index).Num).Level <= GetPlayerLevel(MyIndex) - 3 Then
             Colour = Grey
-        ElseIf Npc(MapNpc(Index).Num).Level <= GetPlayerLevel(MyIndex) - 2 Then
+        ElseIf NPC(MapNpc(Index).Num).Level <= GetPlayerLevel(MyIndex) - 2 Then
             Colour = Green
-        ElseIf Npc(MapNpc(Index).Num).Level > GetPlayerLevel(MyIndex) Then
+        ElseIf NPC(MapNpc(Index).Num).Level > GetPlayerLevel(MyIndex) Then
             Colour = Red
         Else
             Colour = White
@@ -723,15 +725,51 @@ Public Sub NpcName_Draw(ByVal Index As Long)
         Colour = White
     End If
 
-    textX = ConvertMapX(MapNpc(Index).X * PIC_X) + MapNpc(Index).xOffset + (PIC_X \ 2) - (TextWidth(Fonts.Rockwell, Trim$(Npc(MapNpc(Index).Num).Name)) / 2)
-    If Npc(MapNpc(Index).Num).Sprite < 1 Or Npc(MapNpc(Index).Num).Sprite > NumCharacters Then
+    NpcText = Trim$(NPC(MapNpc(Index).Num).Name)
+    
+    For i = 1 To MAX_QUESTS
+        'check if the npc is the next task to any quest: [?] symbol
+        If Not Quest(i).Name = vbNullString Then
+            If PlayerQuest(i).Status = QUEST_STARTED Then
+                If Quest(i).Task(PlayerQuest(i).ActualTask).NPC = MapNpc(Index).Num Then
+                    If Quest(i).Task(PlayerQuest(i).ActualTask).Order = QUEST_TYPE_GOSLAY Then
+                        NpcText = ColourChar & GetColStr(Cyan) & "* " & ColourChar & GetColStr(Colour) & Trim$(NPC(MapNpc(Index).Num).Name) & ColourChar & GetColStr(Cyan) & " *"
+                        Exit For
+                    End If
+                End If
+            End If
+
+            'check if the npc is the starter to any quest: [!] symbol
+            'can accept the quest as a new one?
+            If PlayerQuest(i).Status = QUEST_NOT_STARTED Or PlayerQuest(i).Status = QUEST_COMPLETED_BUT Then
+                'the npc gives this quest?
+                If NPC(Index).QuestNum = i Then
+                    textX = ConvertMapX(MapNpc(Index).X * PIC_X) + MapNpc(Index).xOffset + (PIC_X \ 2) - (TextWidth(Fonts.Action, "!") / 2) + 4
+                    If NPC(MapNpc(Index).Num).Sprite < 1 Or NPC(MapNpc(Index).Num).Sprite > NumCharacters Then
+                        textY = ConvertMapY(MapNpc(Index).Y * PIC_Y) + MapNpc(Index).yOffset - 8
+                    Else
+                        ' Determine location for text
+                        textY = ConvertMapY(MapNpc(Index).Y * PIC_Y) + MapNpc(Index).yOffset - (Tex_Character(NPC(MapNpc(Index).Num).Sprite).Height / 4) - 16
+                    End If
+                
+                    Call RenderText(Fonts.Action, "!", textX, textY, Yellow)
+                    Exit For
+                End If
+            End If
+        End If
+    Next
+    
+    
+
+    textX = ConvertMapX(MapNpc(Index).X * PIC_X) + MapNpc(Index).xOffset + (PIC_X \ 2) - (TextWidth(Fonts.Rockwell, NpcText) / 2)
+    If NPC(MapNpc(Index).Num).Sprite < 1 Or NPC(MapNpc(Index).Num).Sprite > NumCharacters Then
         textY = ConvertMapY(MapNpc(Index).Y * PIC_Y) + MapNpc(Index).yOffset - 16
     Else
         ' Determine location for text
-        textY = ConvertMapY(MapNpc(Index).Y * PIC_Y) + MapNpc(Index).yOffset - (Tex_Character(Npc(MapNpc(Index).Num).Sprite).Height / 4) + 16
+        textY = ConvertMapY(MapNpc(Index).Y * PIC_Y) + MapNpc(Index).yOffset - (Tex_Character(NPC(MapNpc(Index).Num).Sprite).Height / 4) + 16
     End If
 
-    Call RenderText(Fonts.Rockwell, Trim$(Npc(MapNpc(Index).Num).Name), textX, textY, Colour)
+    Call RenderText(Fonts.Rockwell, NpcText, textX, textY, Colour)
     
     ' Error handler
     Exit Sub

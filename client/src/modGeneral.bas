@@ -243,14 +243,14 @@ errorhandler:
 End Sub
 
 Public Sub logoutGame()
-Dim buffer As clsBuffer, i As Long
+Dim Buffer As clsBuffer, i As Long
 
     isLogging = True
     InGame = False
-    Set buffer = New clsBuffer
-    buffer.WriteLong CQuit
-    SendData buffer.ToArray()
-    Set buffer = Nothing
+    Set Buffer = New clsBuffer
+    Buffer.WriteLong CQuit
+    SendData Buffer.ToArray()
+    Set Buffer = Nothing
     Call DestroyTCP
     
     ' destroy the animations loaded
@@ -530,42 +530,6 @@ Public Sub cacheButtons()
         .State = 0 ' normal
     End With
     
-    ' main - inv
-    With MainButton(1)
-        .fileName = "inv"
-        .State = 0 ' normal
-    End With
-    
-    ' main - skills
-    With MainButton(2)
-        .fileName = "skills"
-        .State = 0 ' normal
-    End With
-    
-    ' main - char
-    With MainButton(3)
-        .fileName = "char"
-        .State = 0 ' normal
-    End With
-    
-    ' main - opt
-    With MainButton(4)
-        .fileName = "opt"
-        .State = 0 ' normal
-    End With
-    
-    ' main - trade
-    With MainButton(5)
-        .fileName = "trade"
-        .State = 0 ' normal
-    End With
-    
-    ' main - party
-    With MainButton(6)
-        .fileName = "party"
-        .State = 0 ' normal
-    End With
-    
     ' Error handler
     Exit Sub
 errorhandler:
@@ -645,81 +609,6 @@ Public Sub changeButtonState_Menu(ByVal buttonNum As Long, ByVal bState As Byte)
     Exit Sub
 errorhandler:
     HandleError "changeButtonState_Menu", "modGeneral", Err.Number, Err.Description, Err.Source, Err.HelpContext
-    Err.Clear
-    Exit Sub
-End Sub
-
-' main specific buttons
-Public Sub resetButtons_Main(Optional ByVal exceptionNum As Long = 0)
-Dim i As Long
-
-    ' If debug mode, handle error then exit out
-    If Options.Debug = 1 Then On Error GoTo errorhandler
-    
-    ' loop through entire array
-    For i = 1 To MAX_MAINBUTTONS
-        ' only change if different and not exception
-        If Not MainButton(i).State = 0 And Not i = exceptionNum Then
-            ' reset state and render
-            MainButton(i).State = 0 'normal
-            renderButton_Main i
-        End If
-    Next
-    
-    If exceptionNum = 0 Then LastButtonSound_Main = 0
-    
-    ' Error handler
-    Exit Sub
-errorhandler:
-    HandleError "resetButtons_Main", "modGeneral", Err.Number, Err.Description, Err.Source, Err.HelpContext
-    Err.Clear
-    Exit Sub
-End Sub
-
-Public Sub renderButton_Main(ByVal buttonNum As Long)
-Dim bSuffix As String
-
-    ' If debug mode, handle error then exit out
-    If Options.Debug = 1 Then On Error GoTo errorhandler
-    
-    ' get the suffix
-    Select Case MainButton(buttonNum).State
-        Case 0 ' normal
-            bSuffix = "_norm"
-        Case 1 ' hover
-            bSuffix = "_hover"
-        Case 2 ' click
-            bSuffix = "_click"
-    End Select
-    
-    ' render the button
-    frmMain.imgButton(buttonNum).Picture = LoadPicture(App.Path & MAINBUTTON_PATH & MainButton(buttonNum).fileName & bSuffix & ".jpg")
-    
-    ' Error handler
-    Exit Sub
-errorhandler:
-    HandleError "renderButton_Main", "modGeneral", Err.Number, Err.Description, Err.Source, Err.HelpContext
-    Err.Clear
-    Exit Sub
-End Sub
-
-Public Sub changeButtonState_Main(ByVal buttonNum As Long, ByVal bState As Byte)
-    ' If debug mode, handle error then exit out
-    If Options.Debug = 1 Then On Error GoTo errorhandler
-    
-    ' valid state?
-    If bState >= 0 And bState <= 2 Then
-        ' exit out early if state already is same
-        If MainButton(buttonNum).State = bState Then Exit Sub
-        ' change and render
-        MainButton(buttonNum).State = bState
-        renderButton_Main buttonNum
-    End If
-    
-    ' Error handler
-    Exit Sub
-errorhandler:
-    HandleError "changeButtonState_Main", "modGeneral", Err.Number, Err.Description, Err.Source, Err.HelpContext
     Err.Clear
     Exit Sub
 End Sub

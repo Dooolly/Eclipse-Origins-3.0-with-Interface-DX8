@@ -26,6 +26,140 @@ Begin VB.Form frmMain
    ScaleWidth      =   1024
    StartUpPosition =   2  'CenterScreen
    Visible         =   0   'False
+   Begin VB.PictureBox picQuestDialogue 
+      Appearance      =   0  'Flat
+      BackColor       =   &H00404040&
+      BorderStyle     =   0  'None
+      ForeColor       =   &H80000008&
+      Height          =   2295
+      Left            =   2760
+      ScaleHeight     =   153
+      ScaleMode       =   3  'Pixel
+      ScaleWidth      =   327
+      TabIndex        =   97
+      Top             =   2400
+      Visible         =   0   'False
+      Width           =   4905
+      Begin VB.Label lblQuestSay 
+         BackStyle       =   0  'Transparent
+         Caption         =   "-"
+         BeginProperty Font 
+            Name            =   "Georgia"
+            Size            =   8.25
+            Charset         =   0
+            Weight          =   400
+            Underline       =   0   'False
+            Italic          =   0   'False
+            Strikethrough   =   0   'False
+         EndProperty
+         ForeColor       =   &H00FFFFFF&
+         Height          =   1125
+         Left            =   240
+         TabIndex        =   103
+         Top             =   720
+         Width           =   4425
+      End
+      Begin VB.Label lblQuestAccept 
+         AutoSize        =   -1  'True
+         BackStyle       =   0  'Transparent
+         Caption         =   "Accept Quest"
+         BeginProperty Font 
+            Name            =   "Georgia"
+            Size            =   8.25
+            Charset         =   0
+            Weight          =   700
+            Underline       =   0   'False
+            Italic          =   0   'False
+            Strikethrough   =   0   'False
+         EndProperty
+         ForeColor       =   &H00C0FFC0&
+         Height          =   210
+         Left            =   240
+         TabIndex        =   102
+         Top             =   1920
+         Visible         =   0   'False
+         Width           =   1245
+      End
+      Begin VB.Label lblQuestClose 
+         AutoSize        =   -1  'True
+         BackStyle       =   0  'Transparent
+         Caption         =   "Close"
+         BeginProperty Font 
+            Name            =   "Georgia"
+            Size            =   8.25
+            Charset         =   0
+            Weight          =   700
+            Underline       =   0   'False
+            Italic          =   0   'False
+            Strikethrough   =   0   'False
+         EndProperty
+         ForeColor       =   &H008080FF&
+         Height          =   210
+         Left            =   4200
+         TabIndex        =   101
+         Top             =   1920
+         Width           =   495
+      End
+      Begin VB.Label lblQuestName 
+         BackStyle       =   0  'Transparent
+         Caption         =   "Quest Name"
+         BeginProperty Font 
+            Name            =   "Verdana"
+            Size            =   9.75
+            Charset         =   0
+            Weight          =   700
+            Underline       =   0   'False
+            Italic          =   0   'False
+            Strikethrough   =   0   'False
+         EndProperty
+         ForeColor       =   &H0080C0FF&
+         Height          =   240
+         Left            =   240
+         TabIndex        =   100
+         Top             =   120
+         Width           =   4335
+      End
+      Begin VB.Label lblQuestExtra 
+         AutoSize        =   -1  'True
+         BackStyle       =   0  'Transparent
+         Caption         =   "Extra"
+         BeginProperty Font 
+            Name            =   "Georgia"
+            Size            =   8.25
+            Charset         =   0
+            Weight          =   700
+            Underline       =   0   'False
+            Italic          =   0   'False
+            Strikethrough   =   0   'False
+         EndProperty
+         ForeColor       =   &H0000FFFF&
+         Height          =   210
+         Left            =   240
+         TabIndex        =   99
+         Top             =   1920
+         Visible         =   0   'False
+         Width           =   540
+      End
+      Begin VB.Label lblQuestSubtitle 
+         BackStyle       =   0  'Transparent
+         Caption         =   "Subtitle"
+         BeginProperty Font 
+            Name            =   "Verdana"
+            Size            =   8.25
+            Charset         =   0
+            Weight          =   700
+            Underline       =   0   'False
+            Italic          =   0   'False
+            Strikethrough   =   0   'False
+         EndProperty
+         ForeColor       =   &H0080C0FF&
+         Height          =   240
+         Left            =   240
+         TabIndex        =   98
+         Top             =   480
+         Width           =   4335
+      End
+   End
    Begin VB.PictureBox picEventChat 
       BackColor       =   &H000C0E10&
       BorderStyle     =   0  'None
@@ -1845,8 +1979,6 @@ Private Sub Form_MouseMove(Button As Integer, Shift As Integer, X As Single, Y A
     picItemDesc.Visible = False
     picSpellDesc.Visible = False
     
-    ' reset all buttons
-    resetButtons_Main
     
     MouseMove_Handle Button, Shift, X, Y
     
@@ -1872,74 +2004,15 @@ errorhandler:
     Exit Sub
 End Sub
 
-Private Sub imgButton_MouseMove(Index As Integer, Button As Integer, Shift As Integer, X As Single, Y As Single)
-    ' If debug mode, handle error then exit out
-    If Options.Debug = 1 Then On Error GoTo errorhandler
-    
-    ' reset other buttons
-    resetButtons_Main Index
-    
-    ' change the button we're hovering on
-    If Not MainButton(Index).State = 2 Then ' make sure we're not clicking
-        changeButtonState_Main Index, 1 ' hover
-    End If
-    
-    ' play sound
-    If Not LastButtonSound_Main = Index Then
-        PlaySound Sound_ButtonHover, -1, -1
-        LastButtonSound_Main = Index
-    End If
-    
-    ' Error handler
-    Exit Sub
-errorhandler:
-    HandleError "imgButton_MouseMove", "frmMain", Err.Number, Err.Description, Err.Source, Err.HelpContext
-    Err.Clear
-    Exit Sub
-End Sub
-
-Private Sub imgButton_MouseUp(Index As Integer, Button As Integer, Shift As Integer, X As Single, Y As Single)
-    ' If debug mode, handle error then exit out
-    If Options.Debug = 1 Then On Error GoTo errorhandler
-        
-    ' reset all buttons
-    resetButtons_Main -1
-    
-    ' Error handler
-    Exit Sub
-errorhandler:
-    HandleError "imgButton_MouseUp", "frmMain", Err.Number, Err.Description, Err.Source, Err.HelpContext
-    Err.Clear
-    Exit Sub
-End Sub
-
-Private Sub imgButton_MouseDown(Index As Integer, Button As Integer, Shift As Integer, X As Single, Y As Single)
-    ' If debug mode, handle error then exit out
-    If Options.Debug = 1 Then On Error GoTo errorhandler
-    
-    ' reset other buttons
-    resetButtons_Main Index
-    
-    ' change the button we're hovering on
-    changeButtonState_Main Index, 2 ' clicked
-    
-    ' Error handler
-    Exit Sub
-errorhandler:
-    HandleError "imgButton_MouseDown", "frmMain", Err.Number, Err.Description, Err.Source, Err.HelpContext
-    Err.Clear
-    Exit Sub
-End Sub
-
 Private Sub lblChoices_Click(Index As Integer)
-Dim buffer As clsBuffer
-Set buffer = New clsBuffer
-buffer.WriteLong CEventChatReply
-buffer.WriteLong EventReplyID
-buffer.WriteLong EventReplyPage
-buffer.WriteLong Index
-SendData buffer.ToArray
-Set buffer = Nothing
+Dim Buffer As clsBuffer
+Set Buffer = New clsBuffer
+Buffer.WriteLong CEventChatReply
+Buffer.WriteLong EventReplyID
+Buffer.WriteLong EventReplyPage
+Buffer.WriteLong Index
+SendData Buffer.ToArray
+Set Buffer = Nothing
 ClearEventChat
 InEvent = False
 End Sub
@@ -1976,18 +2049,18 @@ errorhandler:
 End Sub
 
 Private Sub imgLeaveShop_Click()
-Dim buffer As clsBuffer
+Dim Buffer As clsBuffer
     
     ' If debug mode, handle error then exit out
     If Options.Debug = 1 Then On Error GoTo errorhandler
 
-    Set buffer = New clsBuffer
+    Set Buffer = New clsBuffer
     
-    buffer.WriteLong CCloseShop
+    Buffer.WriteLong CCloseShop
     
-    SendData buffer.ToArray()
+    SendData Buffer.ToArray()
     
-    Set buffer = Nothing
+    Set Buffer = Nothing
     
     picCover.Visible = False
     picShop.Visible = False
@@ -2093,14 +2166,14 @@ Private Sub lblEventChat_MouseMove(Button As Integer, Shift As Integer, X As Sin
 End Sub
 
 Private Sub lblEventChatContinue_Click()
-Dim buffer As clsBuffer
-Set buffer = New clsBuffer
-buffer.WriteLong CEventChatReply
-buffer.WriteLong EventReplyID
-buffer.WriteLong EventReplyPage
-buffer.WriteLong 0
-SendData buffer.ToArray
-Set buffer = Nothing
+Dim Buffer As clsBuffer
+Set Buffer = New clsBuffer
+Buffer.WriteLong CEventChatReply
+Buffer.WriteLong EventReplyID
+Buffer.WriteLong EventReplyPage
+Buffer.WriteLong 0
+SendData Buffer.ToArray
+Set Buffer = Nothing
 ClearEventChat
 InEvent = False
 End Sub
@@ -2168,6 +2241,30 @@ errorhandler:
     Exit Sub
 End Sub
 
+'ALATAR
+
+'QuestDialogue:
+
+Private Sub lblQuestAccept_Click()
+    PlayerHandleQuest CLng(lblQuestAccept.Tag), 1
+    picQuestDialogue.Visible = False
+    lblQuestAccept.Visible = False
+    lblQuestAccept.Tag = vbNullString
+    lblQuestSay = "-"
+End Sub
+
+Private Sub lblQuestExtra_Click()
+    RunQuestDialogueExtraLabel
+End Sub
+
+Private Sub lblQuestClose_Click()
+    picQuestDialogue.Visible = False
+    lblQuestExtra.Visible = False
+    lblQuestAccept.Visible = False
+    lblQuestAccept.Tag = vbNullString
+    lblQuestSay = "-"
+End Sub
+
 Private Sub optMOff_Click()
     ' If debug mode, handle error then exit out
     If Options.Debug = 1 Then On Error GoTo errorhandler
@@ -2215,7 +2312,7 @@ Private Sub optSOff_Click()
     If Options.Debug = 1 Then On Error GoTo errorhandler
     
     StopAllSounds
-    Options.sound = 0
+    Options.Sound = 0
     ' save to config.ini
     SaveOptions
     
@@ -2231,7 +2328,7 @@ Private Sub optSOn_Click()
     ' If debug mode, handle error then exit out
     If Options.Debug = 1 Then On Error GoTo errorhandler
 
-    Options.sound = 1
+    Options.Sound = 1
     ' save to config.ini
     SaveOptions
     
@@ -2250,9 +2347,6 @@ Private Sub picCover_MouseMove(Button As Integer, Shift As Integer, X As Single,
     ' hide the descriptions
     picItemDesc.Visible = False
     picSpellDesc.Visible = False
-    
-    ' reset all buttons
-    resetButtons_Main
     
     ' Error handler
     Exit Sub
@@ -2322,8 +2416,6 @@ Private Sub picShop_MouseMove(Button As Integer, Shift As Integer, X As Single, 
     picItemDesc.Visible = False
     picSpellDesc.Visible = False
     
-    ' reset all buttons
-    resetButtons_Main
 End Sub
 
 Private Sub picShopItems_MouseDown(Button As Integer, Shift As Integer, X As Single, Y As Single)
@@ -2338,7 +2430,7 @@ Dim shopItem As Long
         Select Case ShopAction
             Case 0 ' no action, give cost
                 With Shop(InShop).TradeItem(shopItem)
-                    AddText "You can buy this item for " & .CostValue & " " & Trim$(Item(.CostItem).name) & ".", White
+                    AddText "You can buy this item for " & .CostValue & " " & Trim$(Item(.CostItem).Name) & ".", White
                 End With
             Case 1 ' buy item
                 ' buy item code
@@ -2528,7 +2620,7 @@ Private Sub scrlAItem_Change()
     ' If debug mode, handle error then exit out
     If Options.Debug = 1 Then On Error GoTo errorhandler
 
-    lblAItem.Caption = "Item: " & Trim$(Item(scrlAItem.Value).name)
+    lblAItem.Caption = "Item: " & Trim$(Item(scrlAItem.Value).Name)
     If Item(scrlAItem.Value).Type = ITEM_TYPE_CURRENCY Then
         scrlAAmount.Enabled = True
         Exit Sub
@@ -3079,6 +3171,8 @@ errorhandler:
     Err.Clear
     Exit Sub
 End Sub
+
+
 
 Private Sub cmdAAccess_Click()
     ' If debug mode, handle error then exit out

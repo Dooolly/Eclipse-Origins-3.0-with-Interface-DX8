@@ -57,6 +57,22 @@ Begin VB.Form frmEditor_NPC
       TabIndex        =   3
       Top             =   120
       Width           =   5055
+      Begin VB.HScrollBar scrlQuest 
+         Height          =   255
+         Left            =   1560
+         Max             =   255
+         TabIndex        =   52
+         Top             =   7080
+         Width           =   3015
+      End
+      Begin VB.CheckBox chkQuest 
+         Caption         =   "Quest Giver?"
+         Height          =   255
+         Left            =   120
+         TabIndex        =   51
+         Top             =   7080
+         Width           =   1335
+      End
       Begin VB.ComboBox cmbSound 
          Height          =   300
          Left            =   1320
@@ -150,10 +166,10 @@ Begin VB.Form frmEditor_NPC
       End
       Begin VB.Frame fraDrop 
          Caption         =   "Drop"
-         Height          =   2175
+         Height          =   2055
          Left            =   120
          TabIndex        =   17
-         Top             =   5160
+         Top             =   4920
          Width           =   4815
          Begin VB.TextBox txtSpawnSecs 
             Alignment       =   1  'Right Justify
@@ -243,7 +259,7 @@ Begin VB.Form frmEditor_NPC
          Height          =   1455
          Left            =   120
          TabIndex        =   6
-         Top             =   3600
+         Top             =   3480
          Width           =   4815
          Begin VB.HScrollBar scrlStat 
             Height          =   255
@@ -354,6 +370,16 @@ Begin VB.Form frmEditor_NPC
          TabIndex        =   4
          Top             =   2520
          Width           =   1575
+      End
+      Begin VB.Label lblQuest 
+         Alignment       =   1  'Right Justify
+         AutoSize        =   -1  'True
+         Caption         =   "0"
+         Height          =   180
+         Left            =   4680
+         TabIndex        =   53
+         Top             =   7080
+         Width           =   225
       End
       Begin VB.Label Label1 
          Caption         =   "Sound:"
@@ -493,7 +519,7 @@ Private Sub cmbBehaviour_Click()
     ' If debug mode, handle error then exit out
     If Options.Debug = 1 Then On Error GoTo errorhandler
     
-    Npc(EditorIndex).Behaviour = cmbBehaviour.ListIndex
+    NPC(EditorIndex).Behaviour = cmbBehaviour.ListIndex
     
     ' Error handler
     Exit Sub
@@ -513,7 +539,7 @@ Dim tmpIndex As Long
     
     tmpIndex = lstIndex.ListIndex
     lstIndex.RemoveItem EditorIndex - 1
-    lstIndex.AddItem EditorIndex & ": " & Npc(EditorIndex).name, EditorIndex - 1
+    lstIndex.AddItem EditorIndex & ": " & NPC(EditorIndex).Name, EditorIndex - 1
     lstIndex.ListIndex = tmpIndex
     
     NpcEditorInit
@@ -588,9 +614,9 @@ Dim sString As String
     ' If debug mode, handle error then exit out
     If Options.Debug = 1 Then On Error GoTo errorhandler
     
-    If scrlAnimation.value = 0 Then sString = "None" Else sString = Trim$(Animation(scrlAnimation.value).name)
+    If scrlAnimation.Value = 0 Then sString = "None" Else sString = Trim$(Animation(scrlAnimation.Value).Name)
     lblAnimation.Caption = "Anim: " & sString
-    Npc(EditorIndex).Animation = scrlAnimation.value
+    NPC(EditorIndex).Animation = scrlAnimation.Value
     
     ' Error handler
     Exit Sub
@@ -600,12 +626,25 @@ errorhandler:
     Exit Sub
 End Sub
 
+'ALATAR
+
+Private Sub chkQuest_Click()
+    NPC(EditorIndex).Quest = chkQuest.Value
+End Sub
+
+Private Sub scrlQuest_Change()
+    lblQuest = scrlQuest.Value
+    NPC(EditorIndex).QuestNum = scrlQuest.Value
+End Sub
+
+'/ALATAR
+
 Private Sub scrlSprite_Change()
     ' If debug mode, handle error then exit out
     If Options.Debug = 1 Then On Error GoTo errorhandler
     
-    lblSprite.Caption = "Sprite: " & scrlSprite.value
-    Npc(EditorIndex).Sprite = scrlSprite.value
+    lblSprite.Caption = "Sprite: " & scrlSprite.Value
+    NPC(EditorIndex).Sprite = scrlSprite.Value
     
     ' Error handler
     Exit Sub
@@ -619,8 +658,8 @@ Private Sub scrlRange_Change()
     ' If debug mode, handle error then exit out
     If Options.Debug = 1 Then On Error GoTo errorhandler
     
-    lblRange.Caption = "Range: " & scrlRange.value
-    Npc(EditorIndex).Range = scrlRange.value
+    lblRange.Caption = "Range: " & scrlRange.Value
+    NPC(EditorIndex).Range = scrlRange.Value
     
     ' Error handler
     Exit Sub
@@ -634,13 +673,13 @@ Private Sub scrlNum_Change()
     ' If debug mode, handle error then exit out
     If Options.Debug = 1 Then On Error GoTo errorhandler
     
-    lblNum.Caption = "Num: " & scrlNum.value
+    lblNum.Caption = "Num: " & scrlNum.Value
 
-    If scrlNum.value > 0 Then
-        lblItemName.Caption = "Item: " & Trim$(Item(scrlNum.value).name)
+    If scrlNum.Value > 0 Then
+        lblItemName.Caption = "Item: " & Trim$(Item(scrlNum.Value).Name)
     End If
     
-    Npc(EditorIndex).DropItem = scrlNum.value
+    NPC(EditorIndex).DropItem = scrlNum.Value
     
     ' Error handler
     Exit Sub
@@ -667,8 +706,8 @@ Dim prefix As String
         Case 5
             prefix = "Will: "
     End Select
-    lblStat(Index).Caption = prefix & scrlStat(Index).value
-    Npc(EditorIndex).Stat(Index) = scrlStat(Index).value
+    lblStat(Index).Caption = prefix & scrlStat(Index).Value
+    NPC(EditorIndex).Stat(Index) = scrlStat(Index).Value
     
     ' Error handler
     Exit Sub
@@ -682,8 +721,8 @@ Private Sub scrlValue_Change()
     ' If debug mode, handle error then exit out
     If Options.Debug = 1 Then On Error GoTo errorhandler
     
-    lblValue.Caption = "Value: " & scrlValue.value
-    Npc(EditorIndex).DropItemValue = scrlValue.value
+    lblValue.Caption = "Value: " & scrlValue.Value
+    NPC(EditorIndex).DropItemValue = scrlValue.Value
     
     ' Error handler
     Exit Sub
@@ -697,7 +736,7 @@ Private Sub txtAttackSay_Change()
     ' If debug mode, handle error then exit out
     If Options.Debug = 1 Then On Error GoTo errorhandler
     
-    Npc(EditorIndex).AttackSay = txtAttackSay.text
+    NPC(EditorIndex).AttackSay = txtAttackSay.Text
     
     ' Error handler
     Exit Sub
@@ -711,8 +750,8 @@ Private Sub txtChance_Change()
     ' If debug mode, handle error then exit out
     If Options.Debug = 1 Then On Error GoTo errorhandler
     
-    If Not Len(txtChance.text) > 0 Then Exit Sub
-    If IsNumeric(txtChance.text) Then Npc(EditorIndex).DropChance = Val(txtChance.text)
+    If Not Len(txtChance.Text) > 0 Then Exit Sub
+    If IsNumeric(txtChance.Text) Then NPC(EditorIndex).DropChance = Val(txtChance.Text)
     
     ' Error handler
     Exit Sub
@@ -726,8 +765,8 @@ Private Sub txtDamage_Change()
     ' If debug mode, handle error then exit out
     If Options.Debug = 1 Then On Error GoTo errorhandler
     
-    If Not Len(txtDamage.text) > 0 Then Exit Sub
-    If IsNumeric(txtDamage.text) Then Npc(EditorIndex).Damage = Val(txtDamage.text)
+    If Not Len(txtDamage.Text) > 0 Then Exit Sub
+    If IsNumeric(txtDamage.Text) Then NPC(EditorIndex).Damage = Val(txtDamage.Text)
     
     ' Error handler
     Exit Sub
@@ -741,8 +780,8 @@ Private Sub txtEXP_Change()
     ' If debug mode, handle error then exit out
     If Options.Debug = 1 Then On Error GoTo errorhandler
     
-    If Not Len(txtEXP.text) > 0 Then Exit Sub
-    If IsNumeric(txtEXP.text) Then Npc(EditorIndex).EXP = Val(txtEXP.text)
+    If Not Len(txtEXP.Text) > 0 Then Exit Sub
+    If IsNumeric(txtEXP.Text) Then NPC(EditorIndex).Exp = Val(txtEXP.Text)
     
     ' Error handler
     Exit Sub
@@ -756,8 +795,8 @@ Private Sub txtHP_Change()
     ' If debug mode, handle error then exit out
     If Options.Debug = 1 Then On Error GoTo errorhandler
     
-    If Not Len(txtHP.text) > 0 Then Exit Sub
-    If IsNumeric(txtHP.text) Then Npc(EditorIndex).HP = Val(txtHP.text)
+    If Not Len(txtHP.Text) > 0 Then Exit Sub
+    If IsNumeric(txtHP.Text) Then NPC(EditorIndex).HP = Val(txtHP.Text)
     
     ' Error handler
     Exit Sub
@@ -771,8 +810,8 @@ Private Sub txtLevel_Change()
     ' If debug mode, handle error then exit out
     If Options.Debug = 1 Then On Error GoTo errorhandler
     
-    If Not Len(txtLevel.text) > 0 Then Exit Sub
-    If IsNumeric(txtLevel.text) Then Npc(EditorIndex).Level = Val(txtLevel.text)
+    If Not Len(txtLevel.Text) > 0 Then Exit Sub
+    If IsNumeric(txtLevel.Text) Then NPC(EditorIndex).Level = Val(txtLevel.Text)
     
     ' Error handler
     Exit Sub
@@ -790,9 +829,9 @@ Dim tmpIndex As Long
     
     If EditorIndex = 0 Then Exit Sub
     tmpIndex = lstIndex.ListIndex
-    Npc(EditorIndex).name = Trim$(txtName.text)
+    NPC(EditorIndex).Name = Trim$(txtName.Text)
     lstIndex.RemoveItem EditorIndex - 1
-    lstIndex.AddItem EditorIndex & ": " & Npc(EditorIndex).name, EditorIndex - 1
+    lstIndex.AddItem EditorIndex & ": " & NPC(EditorIndex).Name, EditorIndex - 1
     lstIndex.ListIndex = tmpIndex
     
     ' Error handler
@@ -807,8 +846,8 @@ Private Sub txtSpawnSecs_Change()
     ' If debug mode, handle error then exit out
     If Options.Debug = 1 Then On Error GoTo errorhandler
     
-    If Not Len(txtSpawnSecs.text) > 0 Then Exit Sub
-    Npc(EditorIndex).SpawnSecs = Val(txtSpawnSecs.text)
+    If Not Len(txtSpawnSecs.Text) > 0 Then Exit Sub
+    NPC(EditorIndex).SpawnSecs = Val(txtSpawnSecs.Text)
     
     ' Error handler
     Exit Sub
@@ -823,9 +862,9 @@ Private Sub cmbSound_Click()
     If Options.Debug = 1 Then On Error GoTo errorhandler
     
     If cmbSound.ListIndex >= 0 Then
-        Npc(EditorIndex).sound = cmbSound.List(cmbSound.ListIndex)
+        NPC(EditorIndex).Sound = cmbSound.List(cmbSound.ListIndex)
     Else
-        Npc(EditorIndex).sound = "None."
+        NPC(EditorIndex).Sound = "None."
     End If
     
     ' Error handler

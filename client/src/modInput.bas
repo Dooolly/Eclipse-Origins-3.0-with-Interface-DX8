@@ -97,11 +97,11 @@ End Sub
 
 Public Sub HandleKeyPresses(ByVal KeyAscii As Integer)
 Dim ChatText As String
-Dim name As String
+Dim Name As String
 Dim i As Long
 Dim n As Long
 Dim Command() As String
-Dim buffer As clsBuffer
+Dim Buffer As clsBuffer
 
     ' If debug mode, handle error then exit out
     If Options.Debug = 1 Then On Error GoTo errorhandler
@@ -171,13 +171,13 @@ Dim buffer As clsBuffer
         ' Player message
         If Left$(ChatText, 3) = "/p " Then
             ChatText = Mid$(ChatText, 4, Len(ChatText) - 3)
-            name = vbNullString
+            Name = vbNullString
 
             ' Get the desired player from the user text
             For i = 1 To Len(ChatText)
 
                 If Mid$(ChatText, i, 1) <> Space(1) Then
-                    name = name & Mid$(ChatText, i, 1)
+                    Name = Name & Mid$(ChatText, i, 1)
                 Else
                     Exit For
                 End If
@@ -188,7 +188,7 @@ Dim buffer As clsBuffer
             If Len(ChatText) - i > 0 Then
                 ChatText = Mid$(ChatText, i + 1, Len(ChatText) - i)
                 ' Send the message to the player
-                Call PlayerMsg(ChatText, name)
+                Call PlayerMsg(ChatText, Name)
             Else
                 Call AddText("Usage: /p playername (message)", AlertColor)
             End If
@@ -221,11 +221,11 @@ Dim buffer As clsBuffer
                         GoTo Continue
                     End If
 
-                    Set buffer = New clsBuffer
-                    buffer.WriteLong CPlayerInfoRequest
-                    buffer.WriteString Command(1)
-                    SendData buffer.ToArray()
-                    Set buffer = Nothing
+                    Set Buffer = New clsBuffer
+                    Buffer.WriteLong CPlayerInfoRequest
+                    Buffer.WriteString Command(1)
+                    SendData Buffer.ToArray()
+                    Set Buffer = Nothing
                     ' Whos Online
                 Case "/who"
                     SendWhosOnline
@@ -237,15 +237,15 @@ Dim buffer As clsBuffer
                     FPS_Lock = Not FPS_Lock
                     ' Request stats
                 Case "/stats"
-                    Set buffer = New clsBuffer
-                    buffer.WriteLong CGetStats
-                    SendData buffer.ToArray()
-                    Set buffer = Nothing
+                    Set Buffer = New clsBuffer
+                    Buffer.WriteLong CGetStats
+                    SendData Buffer.ToArray()
+                    Set Buffer = Nothing
                     ' // Monitor Admin Commands //
                     ' Admin Help
                 Case "/admin"
                     If GetPlayerAccess(MyIndex) < ADMIN_MONITOR Then GoTo Continue
-                    frmMain.picAdmin.Visible = Not frmMain.picAdmin.Visible
+                    frmAdmin.Visible = Not frmAdmin.Visible
                     ' Kicking a player
                 Case "/kick"
                     If GetPlayerAccess(MyIndex) < ADMIN_MONITOR Then GoTo Continue

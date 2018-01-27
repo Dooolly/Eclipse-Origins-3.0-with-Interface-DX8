@@ -20,6 +20,7 @@ Class=clsBuffer; Src\clsBuffer.cls
 Module=modCombat; src\modCombat.bas
 Module=modEventLogic; src\modEventLogic.bas
 Module=modCustomScripts; src\modCustomScripts.bas
+Module=modSvQuests; src\modSvQuests.bas
 IconForm="frmServer"
 Startup="Sub Main"
 HelpFile=""

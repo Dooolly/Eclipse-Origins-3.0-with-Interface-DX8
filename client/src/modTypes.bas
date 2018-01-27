@@ -8,7 +8,7 @@ Public TempTile() As TempTileRec
 Public Player(1 To MAX_PLAYERS) As PlayerRec
 Public Class() As ClassRec
 Public Item(1 To MAX_ITEMS) As ItemRec
-Public Npc(1 To MAX_NPCS) As NpcRec
+Public NPC(1 To MAX_NPCS) As NpcRec
 Public MapItem(1 To MAX_MAP_ITEMS) As MapItemRec
 Public MapNpc(1 To MAX_MAP_NPCS) As MapNpcRec
 Public Shop(1 To MAX_SHOPS) As ShopRec
@@ -27,7 +27,6 @@ Public ActionMsg(1 To MAX_BYTE) As ActionMsgRec
 Public Blood(1 To MAX_BYTE) As BloodRec
 Public AnimInstance(1 To MAX_BYTE) As AnimInstanceRec
 Public MenuButton(1 To MAX_MENUBUTTONS) As ButtonRec
-Public MainButton(1 To MAX_MAINBUTTONS) As ButtonRec
 Public Party As PartyRec
 
 ' options
@@ -43,7 +42,7 @@ Private Type OptionsRec
     Port As Long
     MenuMusic As String
     Music As Byte
-    sound As Byte
+    Sound As Byte
     Debug As Byte
 End Type
 
@@ -86,7 +85,7 @@ Private Type PlayerRec
     Class As Long
     Sprite As Long
     Level As Byte
-    EXP As Long
+    Exp As Long
     Access As Byte
     PK As Byte
     ' Vitals
@@ -299,7 +298,7 @@ Private Type MapRec
     MaxY As Byte
     
     Tile() As TileRec
-    Npc(1 To MAX_MAP_NPCS) As Long
+    NPC(1 To MAX_MAP_NPCS) As Long
     NpcSpawnType(1 To MAX_MAP_NPCS) As Long
     EventCount As Long
     Events() As EventRec
@@ -321,7 +320,7 @@ End Type
 Private Type ItemRec
     Name As String * NAME_LENGTH
     Desc As String * 255
-    sound As String * NAME_LENGTH
+    Sound As String * NAME_LENGTH
     
     Pic As Long
     Type As Byte
@@ -361,21 +360,23 @@ End Type
 Private Type NpcRec
     Name As String * NAME_LENGTH
     AttackSay As String * 100
-    sound As String * NAME_LENGTH
+    Sound As String * NAME_LENGTH
     
-    Sprite As Long
+    Sprite As Integer
     SpawnSecs As Long
     Behaviour As Byte
     Range As Byte
-    DropChance As Long
-    DropItem As Long
-    DropItemValue As Long
-    Stat(1 To Stats.Stat_Count - 1) As Byte
+    DropChance As Integer
+    DropItem As Integer
+    DropItemValue As Integer
+    Stat(1 To Stats.Stat_Count - 1) As Integer
     HP As Long
-    EXP As Long
+    Exp As Long
     Animation As Long
     Damage As Long
-    Level As Long
+    Level As Byte
+    Quest As Byte
+    QuestNum As Integer
 End Type
 
 Private Type MapNpcRec
@@ -412,7 +413,7 @@ End Type
 Private Type SpellRec
     Name As String * NAME_LENGTH
     Desc As String * 255
-    sound As String * NAME_LENGTH
+    Sound As String * NAME_LENGTH
     
     Type As Byte
     MPCost As Long
@@ -454,7 +455,7 @@ Private Type ResourceRec
     Name As String * NAME_LENGTH
     SuccessMessage As String * NAME_LENGTH
     EmptyMessage As String * NAME_LENGTH
-    sound As String * NAME_LENGTH
+    Sound As String * NAME_LENGTH
     
     ResourceType As Byte
     ResourceImage As Long
@@ -487,7 +488,7 @@ End Type
 
 Private Type AnimationRec
     Name As String * NAME_LENGTH
-    sound As String * NAME_LENGTH
+    Sound As String * NAME_LENGTH
     
     Sprite(0 To 1) As Long
     Frames(0 To 1) As Long
