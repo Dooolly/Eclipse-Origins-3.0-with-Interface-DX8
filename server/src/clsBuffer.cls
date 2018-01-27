@@ -141,6 +141,8 @@ Public Function ReadString(Optional MoveReadHead As Boolean = True) As String
 Dim sLength As Long
 Dim sBytes() As Byte
   
+    On Error GoTo erroroverflow
+  
     sLength = ReadLong(False)
     If sLength <= 0 Then
         If MoveReadHead Then ReadHead = ReadHead + 4
@@ -153,6 +155,11 @@ Dim sBytes() As Byte
     
     ReadString = StrConv(sBytes, vbUnicode)
     If MoveReadHead Then ReadHead = ReadHead + sLength + 4
+    
+    Exit Function
+    'Error handled
+erroroverflow:
+    ReadString = vbNullString
 End Function
 
 Public Function Count() As Long

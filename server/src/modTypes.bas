@@ -13,7 +13,7 @@ Public Bank(1 To MAX_PLAYERS) As BankRec
 Public TempPlayer(1 To MAX_PLAYERS) As TempPlayerRec
 Public Class() As ClassRec
 Public Item(1 To MAX_ITEMS) As ItemRec
-Public Npc(1 To MAX_NPCS) As NpcRec
+Public NPC(1 To MAX_NPCS) As NpcRec
 Public MapItem(1 To MAX_MAPS, 1 To MAX_MAP_ITEMS) As MapItemRec
 Public MapNpc(1 To MAX_MAPS) As MapDataRec
 Public Shop(1 To MAX_SHOPS) As ShopRec
@@ -162,6 +162,9 @@ Private Type PlayerRec
     
     ' Energia
     Energy As Byte
+    
+    ' Alatar
+    PlayerQuest(1 To MAX_QUESTS) As PlayerQuestRec
 End Type
 
 Public Type SpellBufferRec
@@ -427,7 +430,7 @@ Private Type MapRec
     MaxY As Byte
     
     Tile() As TileRec
-    Npc(1 To MAX_MAP_NPCS) As Long
+    NPC(1 To MAX_MAP_NPCS) As Long
     NpcSpawnType(1 To MAX_MAP_NPCS) As Long
     EventCount As Long
     Events() As EventRec
@@ -497,19 +500,21 @@ Private Type NpcRec
     AttackSay As String * 100
     Sound As String * NAME_LENGTH
     
-    Sprite As Long
+    Sprite As Integer
     SpawnSecs As Long
     Behaviour As Byte
     Range As Byte
-    DropChance As Long
-    DropItem As Long
-    DropItemValue As Long
-    Stat(1 To Stats.Stat_Count - 1) As Byte
+    DropChance As Integer
+    DropItem As Integer
+    DropItemValue As Integer
+    Stat(1 To Stats.Stat_Count - 1) As Integer
     HP As Long
     Exp As Long
     Animation As Long
     Damage As Long
-    Level As Long
+    Level As Byte
+    Quest As Byte
+    QuestNum As Integer
 End Type
 
 Private Type MapNpcRec
@@ -580,7 +585,7 @@ Private Type TempTileRec
 End Type
 
 Private Type MapDataRec
-    Npc() As MapNpcRec
+    NPC() As MapNpcRec
 End Type
 
 Private Type MapResourceRec

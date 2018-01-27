@@ -37,7 +37,6 @@ Public Enum ServerPackets
     SSpawnItem
     SItemEditor
     SUpdateItem
-    SREditor
     SSpawnNpc
     SNpcDead
     SNpcEditor
@@ -97,6 +96,10 @@ Public Enum ServerPackets
     SChatBubble
     SSpecialEffect
     SMoney
+    SQuestEditor
+    SUpdateQuest
+    SPlayerQuest
+    SQuestMessage
     ' Make sure SMSG_COUNT is below everything else
     SMSG_COUNT
 End Enum
@@ -195,6 +198,12 @@ Public Enum ClientPackets
     CEvent
     CSwitchesAndVariables
     CRequestSwitchesAndVariables
+    CSaveQuest
+    CRequestQuests
+    CPlayerHandleQuest
+    CQuestLogUpdate
+    
+    CRequestEditor
     ' Make sure CMSG_COUNT is below everything else
     CMSG_COUNT
 End Enum

@@ -20,23 +20,24 @@ Public Sub InitServer()
     Randomize ', seed
 
     ' Check if the directory is there, if its not make it
-    ChkDir App.Path & "\Data\", "accounts"
-    ChkDir App.Path & "\Data\", "animations"
-    ChkDir App.Path & "\Data\", "banks"
-    ChkDir App.Path & "\Data\", "items"
-    ChkDir App.Path & "\Data\", "logs"
-    ChkDir App.Path & "\Data\", "maps"
-    ChkDir App.Path & "\Data\", "npcs"
-    ChkDir App.Path & "\Data\", "resources"
-    ChkDir App.Path & "\Data\", "shops"
-    ChkDir App.Path & "\Data\", "spells"
+    ChkDir App.path & "\Data\", "accounts"
+    ChkDir App.path & "\Data\", "animations"
+    ChkDir App.path & "\Data\", "banks"
+    ChkDir App.path & "\Data\", "items"
+    ChkDir App.path & "\Data\", "logs"
+    ChkDir App.path & "\Data\", "maps"
+    ChkDir App.path & "\Data\", "npcs"
+    ChkDir App.path & "\Data\", "resources"
+    ChkDir App.path & "\Data\", "shops"
+    ChkDir App.path & "\Data\", "spells"
+    ChkDir App.path & "\Data\", "quests"
     
 
     ' set quote character
     vbQuote = ChrW$(34) ' "
     
     ' load options, set if they dont exist
-    If Not FileExist(App.Path & "\data\options.ini", True) Then
+    If Not FileExist(App.path & "\data\options.ini", True) Then
         Options.Game_Name = "Eclipse Origins"
         Options.Port = 7001
         Options.MOTD = "Welcome to Eclipse Origins."
@@ -75,7 +76,7 @@ Public Sub InitServer()
     ' Check if the master charlist file exists for checking duplicate names, and if it doesnt make it
     If Not FileExist("data\accounts\charlist.txt") Then
         F = FreeFile
-        Open App.Path & "\data\accounts\charlist.txt" For Output As #F
+        Open App.path & "\data\accounts\charlist.txt" For Output As #F
         Close #F
     End If
 
@@ -115,49 +116,53 @@ Public Sub SetStatus(ByVal Status As String)
 End Sub
 
 Public Sub ClearGameData()
-    Call SetStatus("Clearing temp tile fields...")
+    Call SetStatus("Iniciando campos temporários do mapa...")
     Call ClearTempTiles
-    Call SetStatus("Clearing maps...")
+    Call SetStatus("Iniciando mapas...")
     Call ClearMaps
-    Call SetStatus("Clearing map items...")
+    Call SetStatus("Iniciando itens dos mapas...")
     Call ClearMapItems
-    Call SetStatus("Clearing map npcs...")
+    Call SetStatus("Iniciando npcs nos mapas...")
     Call ClearMapNpcs
-    Call SetStatus("Clearing npcs...")
+    Call SetStatus("Iniciando npcs...")
     Call ClearNpcs
-    Call SetStatus("Clearing Resources...")
+    Call SetStatus("Iniciando recursos...")
     Call ClearResources
-    Call SetStatus("Clearing items...")
+    Call SetStatus("Iniciando items...")
     Call ClearItems
-    Call SetStatus("Clearing shops...")
+    Call SetStatus("Iniciando lojas...")
     Call ClearShops
-    Call SetStatus("Clearing spells...")
+    Call SetStatus("Iniciando habilidades...")
     Call ClearSpells
-    Call SetStatus("Clearing animations...")
+    Call SetStatus("Iniciando animações...")
     Call ClearAnimations
+    Call SetStatus("Iniciando missões...")
+    Call ClearQuests
 End Sub
 
 Private Sub LoadGameData()
-    Call SetStatus("Loading classes...")
+    Call SetStatus("Carregando classes...")
     Call LoadClasses
-    Call SetStatus("Loading maps...")
+    Call SetStatus("Carregando mapas...")
     Call LoadMaps
-    Call SetStatus("Loading items...")
+    Call SetStatus("Carregando items...")
     Call LoadItems
-    Call SetStatus("Loading npcs...")
+    Call SetStatus("Carregando npcs...")
     Call LoadNpcs
-    Call SetStatus("Loading Resources...")
+    Call SetStatus("Carregando recursos...")
     Call LoadResources
-    Call SetStatus("Loading shops...")
+    Call SetStatus("Carregando lojas...")
     Call LoadShops
-    Call SetStatus("Loading spells...")
+    Call SetStatus("Carregando habilidades...")
     Call LoadSpells
-    Call SetStatus("Loading animations...")
+    Call SetStatus("Carregando animações...")
     Call LoadAnimations
-    Call SetStatus("Loading switches...")
+    Call SetStatus("Carregando interruptores...")
     Call LoadSwitches
-    Call SetStatus("Loading variables...")
+    Call SetStatus("Carregando variaveis...")
     Call LoadVariables
+    Call SetStatus("Carregando missões...")
+    Call LoadQuests
 End Sub
 
 Public Sub TextAdd(Msg As String)

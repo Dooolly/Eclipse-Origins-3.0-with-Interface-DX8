@@ -98,6 +98,12 @@ Public Sub InitMessages()
     HandleDataSub(CEvent) = GetAddress(AddressOf HandleEvent)
     HandleDataSub(CRequestSwitchesAndVariables) = GetAddress(AddressOf HandleRequestSwitchesAndVariables)
     HandleDataSub(CSwitchesAndVariables) = GetAddress(AddressOf HandleSwitchesAndVariables)
+    HandleDataSub(CSaveQuest) = GetAddress(AddressOf HandleSaveQuest)
+    HandleDataSub(CRequestQuests) = GetAddress(AddressOf HandleRequestQuests)
+    HandleDataSub(CPlayerHandleQuest) = GetAddress(AddressOf HandlePlayerHandleQuest)
+    HandleDataSub(CQuestLogUpdate) = GetAddress(AddressOf HandleQuestLogUpdate)
+    
+    HandleDataSub(CRequestEditor) = GetAddress(AddressOf HandleRequestEditor)
 End Sub
 
 Sub HandleData(ByVal Index As Long, ByRef Data() As Byte)
@@ -1001,7 +1007,7 @@ Sub HandleMapData(ByVal Index As Long, ByRef Data() As Byte, ByVal StartAddr As 
     Next
 
     For x = 1 To MAX_MAP_NPCS
-        Map(mapnum).Npc(x) = Buffer.ReadLong
+        Map(mapnum).NPC(x) = Buffer.ReadLong
         Map(mapnum).NpcSpawnType(x) = Buffer.ReadLong
         Call ClearMapNpc(x, mapnum)
     Next
@@ -1213,13 +1219,13 @@ End Sub
 ' ::::::::::::::::::::::::::::::::::::::::::::
 Sub HandleMapDropItem(ByVal Index As Long, ByRef Data() As Byte, ByVal StartAddr As Long, ByVal ExtraVar As Long)
     Dim invNum As Long
-    Dim amount As Long
+    Dim Amount As Long
     Dim Buffer As clsBuffer
     Set Buffer = New clsBuffer
     
     Buffer.WriteBytes Data()
     invNum = Buffer.ReadLong 'CLng(Parse(1))
-    amount = Buffer.ReadLong 'CLng(Parse(2))
+    Amount = Buffer.ReadLong 'CLng(Parse(2))
     Set Buffer = Nothing
     
     If TempPlayer(Index).InBank Or TempPlayer(Index).InShop Then Exit Sub
@@ -1230,11 +1236,11 @@ Sub HandleMapDropItem(ByVal Index As Long, ByRef Data() As Byte, ByVal StartAddr
     If GetPlayerInvItemNum(Index, invNum) < 1 Or GetPlayerInvItemNum(Index, invNum) > MAX_ITEMS Then Exit Sub
     
     If Item(GetPlayerInvItemNum(Index, invNum)).Type = ITEM_TYPE_CURRENCY Then
-        If amount < 1 Or amount > GetPlayerInvItemValue(Index, invNum) Then Exit Sub
+        If Amount < 1 Or Amount > GetPlayerInvItemValue(Index, invNum) Then Exit Sub
     End If
     
     ' everything worked out fine
-    Call PlayerMapDropItem(Index, invNum, amount)
+    Call PlayerMapDropItem(Index, invNum, Amount)
 End Sub
 
 ' ::::::::::::::::::::::::
@@ -1597,10 +1603,10 @@ Private Sub HandleSaveNpc(ByVal Index As Long, ByRef Data() As Byte, ByVal Start
         Exit Sub
     End If
 
-    NPCSize = LenB(Npc(npcNum))
+    NPCSize = LenB(NPC(npcNum))
     ReDim NPCData(NPCSize - 1)
     NPCData = Buffer.ReadBytes(NPCSize)
-    CopyMemory ByVal VarPtr(Npc(npcNum)), ByVal VarPtr(NPCData(0)), NPCSize
+    CopyMemory ByVal VarPtr(NPC(npcNum)), ByVal VarPtr(NPCData(0)), NPCSize
     ' Save it
     Call SendUpdateNpcToAll(npcNum)
     Call SaveNpc(npcNum)
@@ -1884,9 +1890,9 @@ Sub HandleSearch(ByVal Index As Long, ByRef Data() As Byte, ByVal StartAddr As L
 
     ' Check for an npc
     For i = 1 To MAX_MAP_NPCS
-        If MapNpc(GetPlayerMap(Index)).Npc(i).Num > 0 Then
-            If MapNpc(GetPlayerMap(Index)).Npc(i).x = x Then
-                If MapNpc(GetPlayerMap(Index)).Npc(i).y = y Then
+        If MapNpc(GetPlayerMap(Index)).NPC(i).Num > 0 Then
+            If MapNpc(GetPlayerMap(Index)).NPC(i).x = x Then
+                If MapNpc(GetPlayerMap(Index)).NPC(i).y = y Then
                     If TempPlayer(Index).target = i And TempPlayer(Index).targetType = TARGET_TYPE_NPC Then
                         ' Change target
                         TempPlayer(Index).target = 0
@@ -2139,7 +2145,7 @@ Sub HandleSellItem(ByVal Index As Long, ByRef Data() As Byte, ByVal StartAddr As
     Dim itemnum As Long
     Dim price As Long
     Dim multiplier As Double
-    Dim amount As Long
+    Dim Amount As Long
     
     Set Buffer = New clsBuffer
     Buffer.WriteBytes Data()
@@ -2196,15 +2202,15 @@ End Sub
 Sub HandleWithdrawItem(ByVal Index As Long, ByRef Data() As Byte, ByVal StartAddr As Long, ByVal ExtraVar As Long)
     Dim Buffer As clsBuffer
     Dim BankSlot As Long
-    Dim amount As Long
+    Dim Amount As Long
     
     Set Buffer = New clsBuffer
     Buffer.WriteBytes Data()
     
     BankSlot = Buffer.ReadLong
-    amount = Buffer.ReadLong
+    Amount = Buffer.ReadLong
     
-    TakeBankItem Index, BankSlot, amount
+    TakeBankItem Index, BankSlot, Amount
     
     Set Buffer = Nothing
 End Sub
@@ -2212,15 +2218,15 @@ End Sub
 Sub HandleDepositItem(ByVal Index As Long, ByRef Data() As Byte, ByVal StartAddr As Long, ByVal ExtraVar As Long)
     Dim Buffer As clsBuffer
     Dim invSlot As Long
-    Dim amount As Long
+    Dim Amount As Long
     
     Set Buffer = New clsBuffer
     Buffer.WriteBytes Data()
     
     invSlot = Buffer.ReadLong
-    amount = Buffer.ReadLong
+    Amount = Buffer.ReadLong
     
-    GiveBankItem Index, invSlot, amount
+    GiveBankItem Index, invSlot, Amount
     
     Set Buffer = Nothing
 End Sub
@@ -2460,7 +2466,7 @@ End Sub
 Sub HandleTradeItem(ByVal Index As Long, ByRef Data() As Byte, ByVal StartAddr As Long, ByVal ExtraVar As Long)
     Dim Buffer As clsBuffer
     Dim invSlot As Long
-    Dim amount As Long
+    Dim Amount As Long
     Dim EmptySlot As Long
     Dim itemnum As Long
     Dim i As Long
@@ -2469,7 +2475,7 @@ Sub HandleTradeItem(ByVal Index As Long, ByRef Data() As Byte, ByVal StartAddr A
     Buffer.WriteBytes Data()
     
     invSlot = Buffer.ReadLong
-    amount = Buffer.ReadLong
+    Amount = Buffer.ReadLong
     
     Set Buffer = Nothing
     
@@ -2479,7 +2485,7 @@ Sub HandleTradeItem(ByVal Index As Long, ByRef Data() As Byte, ByVal StartAddr A
     If itemnum <= 0 Or itemnum > MAX_ITEMS Then Exit Sub
     
     ' make sure they have the amount they offer
-    If amount < 0 Or amount > GetPlayerInvItemValue(Index, invSlot) Then
+    If Amount < 0 Or Amount > GetPlayerInvItemValue(Index, invSlot) Then
         Exit Sub
     End If
 
@@ -2488,7 +2494,7 @@ Sub HandleTradeItem(ByVal Index As Long, ByRef Data() As Byte, ByVal StartAddr A
         For i = 1 To MAX_INV
             If TempPlayer(Index).TradeOffer(i).Num = invSlot Then
                 ' add amount
-                TempPlayer(Index).TradeOffer(i).Value = TempPlayer(Index).TradeOffer(i).Value + amount
+                TempPlayer(Index).TradeOffer(i).Value = TempPlayer(Index).TradeOffer(i).Value + Amount
                 ' clamp to limits
                 If TempPlayer(Index).TradeOffer(i).Value > GetPlayerInvItemValue(Index, invSlot) Then
                     TempPlayer(Index).TradeOffer(i).Value = GetPlayerInvItemValue(Index, invSlot)
@@ -2524,7 +2530,7 @@ Sub HandleTradeItem(ByVal Index As Long, ByRef Data() As Byte, ByVal StartAddr A
         End If
     Next
     TempPlayer(Index).TradeOffer(EmptySlot).Num = invSlot
-    TempPlayer(Index).TradeOffer(EmptySlot).Value = amount
+    TempPlayer(Index).TradeOffer(EmptySlot).Value = Amount
     
     ' cancel any trade agreement and send new data
     TempPlayer(Index).AcceptTrade = False
@@ -2828,4 +2834,146 @@ Private Sub HandlePlusSkill(ByVal Index As Long, ByRef Data() As Byte, ByVal Sta
     Else
         PlayerMsg Index, "Esse mágia já está em seu level máximo", Orange
     End If
+End Sub
+
+' Solicitar editores
+Sub HandleRequestEditor(ByVal Index As Long, ByRef Data() As Byte, ByVal StartAddr As Long, ByVal ExtraVar As Long)
+    Dim Buffer As clsBuffer
+
+    ' Prevent hacking
+    If GetPlayerAccess(Index) < ADMIN_DEVELOPER Then
+        Exit Sub
+    End If
+
+    ' Obter dados
+    Set Buffer = New clsBuffer
+    Call Buffer.WriteBytes(Data())
+
+    ' Selecionar editor
+    Select Case Buffer.ReadInteger
+        Case 0 ' Editor de missões
+            Set Buffer = New clsBuffer
+            Buffer.WriteLong SQuestEditor
+            SendDataTo Index, Buffer.ToArray()
+    End Select
+    
+    ' Limpar
+    Set Buffer = Nothing
+End Sub
+
+Sub HandleSaveQuest(ByVal Index As Long, ByRef Data() As Byte, ByVal StartAddr As Long, ByVal ExtraVar As Long)
+    Dim n As Long
+    Dim Buffer As clsBuffer
+    Dim QuestSize As Long
+    Dim QuestData() As Byte
+    Set Buffer = New clsBuffer
+    Buffer.WriteBytes Data()
+
+    ' Prevent hacking
+    If GetPlayerAccess(Index) < ADMIN_DEVELOPER Then
+        Exit Sub
+    End If
+
+    n = Buffer.ReadLong 'CLng(Parse(1))
+
+    If n < 0 Or n > MAX_QUESTS Then
+        Exit Sub
+    End If
+    
+    ' Update the Quest
+    QuestSize = LenB(Quest(n))
+    ReDim QuestData(QuestSize - 1)
+    QuestData = Buffer.ReadBytes(QuestSize)
+    CopyMemory ByVal VarPtr(Quest(n)), ByVal VarPtr(QuestData(0)), QuestSize
+    Set Buffer = Nothing
+    
+    ' Save it
+    Call SendUpdateQuestToAll(n)
+    Call SaveQuest(n)
+    Call AddLog(GetPlayerName(Index) & " saved Quest #" & n & ".", ADMIN_LOG)
+End Sub
+
+Sub HandleRequestQuests(ByVal Index As Long, ByRef Data() As Byte, ByVal StartAddr As Long, ByVal ExtraVar As Long)
+    SendQuests Index
+End Sub
+
+Sub HandlePlayerHandleQuest(ByVal Index As Long, ByRef Data() As Byte, ByVal StartAddr As Long, ByVal ExtraVar As Long)
+    Dim Buffer As clsBuffer
+    Dim QuestNum As Long, Order As Long, i As Long, n As Long
+    Dim RemoveStartItems As Boolean
+    
+    Set Buffer = New clsBuffer
+    Buffer.WriteBytes Data()
+    QuestNum = Buffer.ReadLong
+    Order = Buffer.ReadLong '1 = accept quest, 2 = cancel quest
+    
+    If Order = 1 Then
+        RemoveStartItems = False
+        'Alatar v1.2
+        For i = 1 To MAX_QUESTS_ITEMS
+            If Quest(QuestNum).GiveItem(i).Item > 0 Then
+                If FindOpenInvSlot(Index, Quest(QuestNum).RewardItem(i).Item) = 0 Then
+                    PlayerMsg Index, "You have no inventory space. Please delete something to take the quest.", BrightRed
+                    RemoveStartItems = True
+                    Exit For
+                Else
+                    If Item(Quest(QuestNum).GiveItem(i).Item).Type = ITEM_TYPE_CURRENCY Then
+                        GiveInvItem Index, Quest(QuestNum).GiveItem(i).Item, Quest(QuestNum).GiveItem(i).Value
+                    Else
+                        For n = 1 To Quest(QuestNum).GiveItem(i).Value
+                            If FindOpenInvSlot(Index, Quest(QuestNum).GiveItem(i).Item) = 0 Then
+                                PlayerMsg Index, "You have no inventory space. Please delete something to take the quest.", BrightRed
+                                RemoveStartItems = True
+                                Exit For
+                            Else
+                                GiveInvItem Index, Quest(QuestNum).GiveItem(i).Item, 1
+                            End If
+                        Next
+                    End If
+                End If
+            End If
+        Next
+        
+        If RemoveStartItems = False Then 'this means everything went ok
+            Player(Index).PlayerQuest(QuestNum).Status = QUEST_STARTED '1
+            Player(Index).PlayerQuest(QuestNum).ActualTask = 1
+            Player(Index).PlayerQuest(QuestNum).CurrentCount = 0
+            PlayerMsg Index, "New quest accepted: " & Trim$(Quest(QuestNum).Name) & "!", BrightGreen
+        End If
+        '/alatar v1.2
+        
+    ElseIf Order = 2 Then
+        Player(Index).PlayerQuest(QuestNum).Status = QUEST_NOT_STARTED '2
+        Player(Index).PlayerQuest(QuestNum).ActualTask = 1
+        Player(Index).PlayerQuest(QuestNum).CurrentCount = 0
+        RemoveStartItems = True 'avoid exploits
+        PlayerMsg Index, Trim$(Quest(QuestNum).Name) & " has been canceled!", BrightGreen
+    End If
+    
+    If RemoveStartItems = True Then
+        For i = 1 To MAX_QUESTS_ITEMS
+            If Quest(QuestNum).GiveItem(i).Item > 0 Then
+                If HasItem(Index, Quest(QuestNum).GiveItem(i).Item) > 0 Then
+                    If Item(Quest(QuestNum).GiveItem(i).Item).Type = ITEM_TYPE_CURRENCY Then
+                        TakeInvItem Index, Quest(QuestNum).GiveItem(i).Item, Quest(QuestNum).GiveItem(i).Value
+                    Else
+                        For n = 1 To Quest(QuestNum).GiveItem(i).Value
+                            TakeInvItem Index, Quest(QuestNum).GiveItem(i).Item, 1
+                        Next
+                    End If
+                End If
+            End If
+        Next
+    End If
+    
+    
+    SavePlayer Index
+    SendPlayerData Index
+    SendPlayerQuests Index
+    
+    Set Buffer = Nothing
+End Sub
+
+Sub HandleQuestLogUpdate(ByVal Index As Long, ByRef Data() As Byte, ByVal StartAddr As Long, ByVal ExtraVar As Long)
+    SendPlayerQuests Index
 End Sub
