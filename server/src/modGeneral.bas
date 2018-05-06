@@ -134,8 +134,6 @@ Public Sub ClearGameData()
     Call ClearShops
     Call SetStatus("Iniciando habilidades...")
     Call ClearSpells
-    Call SetStatus("Iniciando animações...")
-    Call ClearAnimations
     Call SetStatus("Iniciando missões...")
     Call ClearQuests
 End Sub
@@ -155,8 +153,6 @@ Private Sub LoadGameData()
     Call LoadShops
     Call SetStatus("Carregando habilidades...")
     Call LoadSpells
-    Call SetStatus("Carregando animações...")
-    Call LoadAnimations
     Call SetStatus("Carregando interruptores...")
     Call LoadSwitches
     Call SetStatus("Carregando variaveis...")

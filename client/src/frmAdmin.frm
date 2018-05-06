@@ -22,6 +22,14 @@ Begin VB.Form frmAdmin
       TabIndex        =   0
       Top             =   120
       Width           =   2175
+      Begin VB.CommandButton cmbAnims 
+         Caption         =   "Animações"
+         Height          =   255
+         Left            =   120
+         TabIndex        =   2
+         Top             =   600
+         Width           =   1935
+      End
       Begin VB.CommandButton cmdEditor 
          Caption         =   "Missões"
          Height          =   255
@@ -45,6 +53,38 @@ Attribute VB_Exposed = False
 ' of this license document, but changing it is not allowed.
 
 Option Explicit
+
+Private Sub cmbAnims_Click()
+    Dim i As Integer
+    
+    ' If debug mode, handle error then exit out
+    If Options.Debug = 1 Then On Error GoTo errorhandler
+
+    If GetPlayerAccess(MyIndex) < ADMIN_DEVELOPER Then
+        Exit Sub
+    End If
+
+    With frmEditor_Animation
+        Editor = EDITOR_ANIMATION
+        .lstIndex.Clear
+
+        ' Add the names
+        For i = 1 To MAX_ANIMATIONS
+            .lstIndex.AddItem i & ": " & Trim$(Animation(i).Name)
+        Next
+
+        .Show
+        .lstIndex.ListIndex = 0
+        AnimationEditorInit
+    End With
+    
+    ' Error handler
+    Exit Sub
+errorhandler:
+    HandleError "cmdAAnim_Click", "frmMain", Err.Number, Err.Description, Err.Source, Err.HelpContext
+    Err.Clear
+    Exit Sub
+End Sub
 
 Private Sub cmdEditor_Click(Index As Integer)
     ' If debug mode, handle error then exit out

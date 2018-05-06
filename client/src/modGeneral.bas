@@ -46,6 +46,7 @@ Public Sub Main()
     ChkDir App.Path & "\data files\graphics\gui\menu\", "buttons"
     ChkDir App.Path & "\data files\graphics\gui\main\", "buttons"
     ChkDir App.Path & "\data files\graphics\gui\main\", "bars"
+    ChkDir App.Path & "\data files\", "anims"
     ChkDir App.Path & "\data files\", "logs"
     ChkDir App.Path & "\data files\", "maps"
     ChkDir App.Path & "\data files\", "music"
@@ -63,6 +64,10 @@ Public Sub Main()
     ' Iniciar directx
     Call SetStatus("Inicializando directX...")
     Call InitDX8
+    
+    ' Carregar animações
+    Call SetStatus("Carregando animações...")
+    Call LoadAnimsData
     
     ' Carregar fontes
     Call SetStatus("Carregando fontes...")
@@ -508,25 +513,25 @@ Public Sub cacheButtons()
     
     ' menu - login
     With MenuButton(1)
-        .fileName = "login"
+        .filename = "login"
         .State = 0 ' normal
     End With
     
     ' menu - register
     With MenuButton(2)
-        .fileName = "register"
+        .filename = "register"
         .State = 0 ' normal
     End With
     
     ' menu - credits
     With MenuButton(3)
-        .fileName = "credits"
+        .filename = "credits"
         .State = 0 ' normal
     End With
     
     ' menu - exit
     With MenuButton(4)
-        .fileName = "exit"
+        .filename = "exit"
         .State = 0 ' normal
     End With
     
@@ -582,7 +587,7 @@ Dim bSuffix As String
     End Select
     
     ' render the button
-    frmMenu.imgButton(buttonNum).Picture = LoadPicture(App.Path & MENUBUTTON_PATH & MenuButton(buttonNum).fileName & bSuffix & ".jpg")
+    frmMenu.imgButton(buttonNum).Picture = LoadPicture(App.Path & MENUBUTTON_PATH & MenuButton(buttonNum).filename & bSuffix & ".jpg")
     
     ' Error handler
     Exit Sub

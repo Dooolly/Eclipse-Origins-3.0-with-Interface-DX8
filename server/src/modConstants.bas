@@ -27,7 +27,6 @@ Public Const MAX_HOTBAR_NUM As Byte = 3 ' ######
 Public Const MAX_PLAYERS As Long = 70
 Public Const MAX_ITEMS As Long = 255
 Public Const MAX_NPCS As Long = 255
-Public Const MAX_ANIMATIONS As Long = 255
 Public Const MAX_INV As Long = 35
 Public Const MAX_MAP_ITEMS As Long = 255
 Public Const MAX_MAP_NPCS As Long = 30

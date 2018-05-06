@@ -472,7 +472,7 @@ Dim Buffer As clsBuffer
         Buffer.WriteLong Map.Red
         Buffer.WriteLong Map.Green
         Buffer.WriteLong Map.Blue
-        Buffer.WriteLong Map.alpha
+        Buffer.WriteLong Map.Alpha
         
         Buffer.WriteByte .MaxX
         Buffer.WriteByte .MaxY
@@ -504,7 +504,7 @@ Dim Buffer As clsBuffer
     With Map
 
         For X = 1 To MAX_MAP_NPCS
-            Buffer.WriteLong .Npc(X)
+            Buffer.WriteLong .NPC(X)
             Buffer.WriteLong .NpcSpawnType(X)
         Next
 
@@ -843,51 +843,6 @@ errorhandler:
     Exit Sub
 End Sub
 
-Public Sub SendRequestEditAnimation()
-Dim Buffer As clsBuffer
-
-    ' If debug mode, handle error then exit out
-    If Options.Debug = 1 Then On Error GoTo errorhandler
-    
-    Set Buffer = New clsBuffer
-    Buffer.WriteLong CRequestEditAnimation
-    SendData Buffer.ToArray()
-    Set Buffer = Nothing
-    
-    ' Error handler
-    Exit Sub
-errorhandler:
-    HandleError "SendRequestEditAnimation", "modClientTCP", Err.Number, Err.Description, Err.Source, Err.HelpContext
-    Err.Clear
-    Exit Sub
-End Sub
-
-Public Sub SendSaveAnimation(ByVal Animationnum As Long)
-Dim Buffer As clsBuffer
-Dim AnimationSize As Long
-Dim AnimationData() As Byte
-
-    ' If debug mode, handle error then exit out
-    If Options.Debug = 1 Then On Error GoTo errorhandler
-    
-    Set Buffer = New clsBuffer
-    AnimationSize = LenB(Animation(Animationnum))
-    ReDim AnimationData(AnimationSize - 1)
-    CopyMemory AnimationData(0), ByVal VarPtr(Animation(Animationnum)), AnimationSize
-    Buffer.WriteLong CSaveAnimation
-    Buffer.WriteLong Animationnum
-    Buffer.WriteBytes AnimationData
-    SendData Buffer.ToArray()
-    Set Buffer = Nothing
-    
-    ' Error handler
-    Exit Sub
-errorhandler:
-    HandleError "SendSaveAnimation", "modClientTCP", Err.Number, Err.Description, Err.Source, Err.HelpContext
-    Err.Clear
-    Exit Sub
-End Sub
-
 Public Sub SendRequestEditNpc()
 Dim Buffer As clsBuffer
 
@@ -916,9 +871,9 @@ Dim NpcData() As Byte
     If Options.Debug = 1 Then On Error GoTo errorhandler
     
     Set Buffer = New clsBuffer
-    NpcSize = LenB(Npc(npcNum))
+    NpcSize = LenB(NPC(npcNum))
     ReDim NpcData(NpcSize - 1)
-    CopyMemory NpcData(0), ByVal VarPtr(Npc(npcNum)), NpcSize
+    CopyMemory NpcData(0), ByVal VarPtr(NPC(npcNum)), NpcSize
     Buffer.WriteLong CSaveNpc
     Buffer.WriteLong npcNum
     Buffer.WriteBytes NpcData
@@ -1333,25 +1288,6 @@ Dim Buffer As clsBuffer
     Exit Sub
 errorhandler:
     HandleError "SendRequestItems", "modClientTCP", Err.Number, Err.Description, Err.Source, Err.HelpContext
-    Err.Clear
-    Exit Sub
-End Sub
-
-Sub SendRequestAnimations()
-Dim Buffer As clsBuffer
-
-    ' If debug mode, handle error then exit out
-    If Options.Debug = 1 Then On Error GoTo errorhandler
-    
-    Set Buffer = New clsBuffer
-    Buffer.WriteLong CRequestAnimations
-    SendData Buffer.ToArray()
-    Set Buffer = Nothing
-    
-    ' Error handler
-    Exit Sub
-errorhandler:
-    HandleError "SendRequestAnimations", "modClientTCP", Err.Number, Err.Description, Err.Source, Err.HelpContext
     Err.Clear
     Exit Sub
 End Sub

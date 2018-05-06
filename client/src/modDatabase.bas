@@ -6,12 +6,12 @@ Private Declare Function WritePrivateProfileString Lib "kernel32" Alias "WritePr
 Private Declare Function GetPrivateProfileString Lib "kernel32" Alias "GetPrivateProfileStringA" (ByVal lpApplicationname As String, ByVal lpKeyname As Any, ByVal lpdefault As String, ByVal lpreturnedstring As String, ByVal nsize As Long, ByVal lpFileName As String) As Long
 
 Public Sub HandleError(ByVal procName As String, ByVal contName As String, ByVal erNumber, ByVal erDesc, ByVal erSource, ByVal erHelpContext)
-Dim fileName As String
+Dim filename As String
     ' If debug mode, handle error then exit out
     If Options.Debug = 1 Then On Error GoTo errorhandler
 
-    fileName = App.Path & "\data files\logs\errors.txt"
-    Open fileName For Append As #1
+    filename = App.Path & "\data files\logs\errors.txt"
+    Open filename For Append As #1
         Print #1, "The following error occured at '" & procName & "' in '" & contName & "'."
         Print #1, "Run-time error '" & erNumber & "': " & erDesc & "."
         Print #1, ""
@@ -39,18 +39,18 @@ errorhandler:
     Exit Sub
 End Sub
 
-Public Function FileExist(ByVal fileName As String, Optional RAW As Boolean = False) As Boolean
+Public Function FileExist(ByVal filename As String, Optional RAW As Boolean = False) As Boolean
     ' If debug mode, handle error then exit out
     If Options.Debug = 1 Then On Error GoTo errorhandler
 
     If Not RAW Then
-        If LenB(Dir(App.Path & "\" & fileName)) > 0 Then
+        If LenB(Dir(App.Path & "\" & filename)) > 0 Then
             FileExist = True
         End If
 
     Else
 
-        If LenB(Dir(fileName)) > 0 Then
+        If LenB(Dir(filename)) > 0 Then
             FileExist = True
         End If
     End If
@@ -100,23 +100,23 @@ errorhandler:
 End Sub
 
 Public Sub SaveOptions()
-Dim fileName As String
+Dim filename As String
 
     ' If debug mode, handle error then exit out
     If Options.Debug = 1 Then On Error GoTo errorhandler
 
-    fileName = App.Path & "\Data Files\config.ini"
+    filename = App.Path & "\Data Files\config.ini"
     
-    Call PutVar(fileName, "Options", "Game_Name", Trim$(Options.Game_Name))
-    Call PutVar(fileName, "Options", "Username", Trim$(Options.Username))
-    Call PutVar(fileName, "Options", "Password", Trim$(Options.Password))
-    Call PutVar(fileName, "Options", "SavePass", str(Options.SavePass))
-    Call PutVar(fileName, "Options", "IP", Options.IP)
-    Call PutVar(fileName, "Options", "Port", str(Options.Port))
-    Call PutVar(fileName, "Options", "MenuMusic", Trim$(Options.MenuMusic))
-    Call PutVar(fileName, "Options", "Music", str(Options.Music))
-    Call PutVar(fileName, "Options", "Sound", str(Options.sound))
-    Call PutVar(fileName, "Options", "Debug", str(Options.Debug))
+    Call PutVar(filename, "Options", "Game_Name", Trim$(Options.Game_Name))
+    Call PutVar(filename, "Options", "Username", Trim$(Options.Username))
+    Call PutVar(filename, "Options", "Password", Trim$(Options.Password))
+    Call PutVar(filename, "Options", "SavePass", str(Options.SavePass))
+    Call PutVar(filename, "Options", "IP", Options.IP)
+    Call PutVar(filename, "Options", "Port", str(Options.Port))
+    Call PutVar(filename, "Options", "MenuMusic", Trim$(Options.MenuMusic))
+    Call PutVar(filename, "Options", "Music", str(Options.Music))
+    Call PutVar(filename, "Options", "Sound", str(Options.sound))
+    Call PutVar(filename, "Options", "Debug", str(Options.Debug))
     
     ' Error handler
     Exit Sub
@@ -127,14 +127,14 @@ errorhandler:
 End Sub
 
 Public Sub LoadOptions()
-Dim fileName As String
+Dim filename As String
 
     ' If debug mode, handle error then exit out
     If Options.Debug = 1 Then On Error GoTo errorhandler
 
-    fileName = App.Path & "\Data Files\config.ini"
+    filename = App.Path & "\Data Files\config.ini"
     
-    If Not FileExist(fileName, True) Then
+    If Not FileExist(filename, True) Then
         Options.Game_Name = "Eclipse Origins"
         Options.Password = vbNullString
         Options.SavePass = 0
@@ -147,16 +147,16 @@ Dim fileName As String
         Options.Debug = 0
         SaveOptions
     Else
-        Options.Game_Name = GetVar(fileName, "Options", "Game_Name")
-        Options.Username = GetVar(fileName, "Options", "Username")
-        Options.Password = GetVar(fileName, "Options", "Password")
-        Options.SavePass = Val(GetVar(fileName, "Options", "SavePass"))
-        Options.IP = GetVar(fileName, "Options", "IP")
-        Options.Port = Val(GetVar(fileName, "Options", "Port"))
-        Options.MenuMusic = GetVar(fileName, "Options", "MenuMusic")
-        Options.Music = GetVar(fileName, "Options", "Music")
-        Options.sound = GetVar(fileName, "Options", "Sound")
-        Options.Debug = GetVar(fileName, "Options", "Debug")
+        Options.Game_Name = GetVar(filename, "Options", "Game_Name")
+        Options.Username = GetVar(filename, "Options", "Username")
+        Options.Password = GetVar(filename, "Options", "Password")
+        Options.SavePass = Val(GetVar(filename, "Options", "SavePass"))
+        Options.IP = GetVar(filename, "Options", "IP")
+        Options.Port = Val(GetVar(filename, "Options", "Port"))
+        Options.MenuMusic = GetVar(filename, "Options", "MenuMusic")
+        Options.Music = GetVar(filename, "Options", "Music")
+        Options.sound = GetVar(filename, "Options", "Sound")
+        Options.Debug = GetVar(filename, "Options", "Debug")
     End If
     
     ' show in GUI
@@ -181,61 +181,61 @@ errorhandler:
 End Sub
 
 Public Sub SaveMap(ByVal MapNum As Long)
-Dim fileName As String
-Dim f As Long
+Dim filename As String
+Dim F As Long
 Dim X As Long
 Dim Y As Long, i As Long, Z As Long, w As Long
 
     ' If debug mode, handle error then exit out
     If Options.Debug = 1 Then On Error GoTo errorhandler
 
-    fileName = App.Path & MAP_PATH & "map" & MapNum & MAP_EXT
+    filename = App.Path & MAP_PATH & "map" & MapNum & MAP_EXT
 
-    f = FreeFile
-    Open fileName For Binary As #f
-    Put #f, , Map.Name
-    Put #f, , Map.Music
-    Put #f, , Map.BGS
-    Put #f, , Map.Revision
-    Put #f, , Map.Moral
-    Put #f, , Map.Up
-    Put #f, , Map.Down
-    Put #f, , Map.Left
-    Put #f, , Map.Right
-    Put #f, , Map.BootMap
-    Put #f, , Map.BootX
-    Put #f, , Map.BootY
+    F = FreeFile
+    Open filename For Binary As #F
+    Put #F, , Map.Name
+    Put #F, , Map.Music
+    Put #F, , Map.BGS
+    Put #F, , Map.Revision
+    Put #F, , Map.Moral
+    Put #F, , Map.Up
+    Put #F, , Map.Down
+    Put #F, , Map.Left
+    Put #F, , Map.Right
+    Put #F, , Map.BootMap
+    Put #F, , Map.BootX
+    Put #F, , Map.BootY
     
-    Put #f, , Map.Weather
-    Put #f, , Map.WeatherIntensity
+    Put #F, , Map.Weather
+    Put #F, , Map.WeatherIntensity
     
-    Put #f, , Map.Fog
-    Put #f, , Map.FogSpeed
-    Put #f, , Map.FogOpacity
+    Put #F, , Map.Fog
+    Put #F, , Map.FogSpeed
+    Put #F, , Map.FogOpacity
     
-    Put #f, , Map.Red
-    Put #f, , Map.Green
-    Put #f, , Map.Blue
-    Put #f, , Map.alpha
+    Put #F, , Map.Red
+    Put #F, , Map.Green
+    Put #F, , Map.Blue
+    Put #F, , Map.Alpha
     
-    Put #f, , Map.MaxX
-    Put #f, , Map.MaxY
+    Put #F, , Map.MaxX
+    Put #F, , Map.MaxY
 
     For X = 0 To Map.MaxX
         For Y = 0 To Map.MaxY
-            Put #f, , Map.Tile(X, Y)
+            Put #F, , Map.Tile(X, Y)
         Next
 
         DoEvents
     Next
 
     For X = 1 To MAX_MAP_NPCS
-        Put #f, , Map.Npc(X)
-        Put #f, , Map.NpcSpawnType(X)
+        Put #F, , Map.NPC(X)
+        Put #F, , Map.NpcSpawnType(X)
     Next
     
 
-    Close #f
+    Close #F
     
     
     
@@ -248,60 +248,60 @@ errorhandler:
 End Sub
 
 Public Sub LoadMap(ByVal MapNum As Long)
-Dim fileName As String
-Dim f As Long
+Dim filename As String
+Dim F As Long
 Dim X As Long
 Dim Y As Long, i As Long, Z As Long, w As Long, p As Long
 
     ' If debug mode, handle error then exit out
     If Options.Debug = 1 Then On Error GoTo errorhandler
 
-    fileName = App.Path & MAP_PATH & "map" & MapNum & MAP_EXT
+    filename = App.Path & MAP_PATH & "map" & MapNum & MAP_EXT
     ClearMap
-    f = FreeFile
-    Open fileName For Binary As #f
-    Get #f, , Map.Name
-    Get #f, , Map.Music
-    Get #f, , Map.BGS
-    Get #f, , Map.Revision
-    Get #f, , Map.Moral
-    Get #f, , Map.Up
-    Get #f, , Map.Down
-    Get #f, , Map.Left
-    Get #f, , Map.Right
-    Get #f, , Map.BootMap
-    Get #f, , Map.BootX
-    Get #f, , Map.BootY
+    F = FreeFile
+    Open filename For Binary As #F
+    Get #F, , Map.Name
+    Get #F, , Map.Music
+    Get #F, , Map.BGS
+    Get #F, , Map.Revision
+    Get #F, , Map.Moral
+    Get #F, , Map.Up
+    Get #F, , Map.Down
+    Get #F, , Map.Left
+    Get #F, , Map.Right
+    Get #F, , Map.BootMap
+    Get #F, , Map.BootX
+    Get #F, , Map.BootY
     
-    Get #f, , Map.Weather
-    Get #f, , Map.WeatherIntensity
+    Get #F, , Map.Weather
+    Get #F, , Map.WeatherIntensity
         
-    Get #f, , Map.Fog
-    Get #f, , Map.FogSpeed
-    Get #f, , Map.FogOpacity
+    Get #F, , Map.Fog
+    Get #F, , Map.FogSpeed
+    Get #F, , Map.FogOpacity
         
-    Get #f, , Map.Red
-    Get #f, , Map.Green
-    Get #f, , Map.Blue
-    Get #f, , Map.alpha
+    Get #F, , Map.Red
+    Get #F, , Map.Green
+    Get #F, , Map.Blue
+    Get #F, , Map.Alpha
     
-    Get #f, , Map.MaxX
-    Get #f, , Map.MaxY
+    Get #F, , Map.MaxX
+    Get #F, , Map.MaxY
     ' have to set the tile()
     ReDim Map.Tile(0 To Map.MaxX, 0 To Map.MaxY)
 
     For X = 0 To Map.MaxX
         For Y = 0 To Map.MaxY
-            Get #f, , Map.Tile(X, Y)
+            Get #F, , Map.Tile(X, Y)
         Next
     Next
 
     For X = 1 To MAX_MAP_NPCS
-        Get #f, , Map.Npc(X)
-        Get #f, , Map.NpcSpawnType(X)
+        Get #F, , Map.NPC(X)
+        Get #F, , Map.NpcSpawnType(X)
     Next
 
-    Close #f
+    Close #F
     ClearTempTile
     
     ' Error handler
@@ -747,9 +747,9 @@ Sub ClearNPC(ByVal Index As Long)
     ' If debug mode, handle error then exit out
     If Options.Debug = 1 Then On Error GoTo errorhandler
 
-    Call ZeroMemory(ByVal VarPtr(Npc(Index)), LenB(Npc(Index)))
-    Npc(Index).Name = vbNullString
-    Npc(Index).sound = "None."
+    Call ZeroMemory(ByVal VarPtr(NPC(Index)), LenB(NPC(Index)))
+    NPC(Index).Name = vbNullString
+    NPC(Index).sound = "None."
     
     ' Error handler
     Exit Sub
@@ -1532,4 +1532,63 @@ errorhandler:
     HandleError "SetPlayerEquipment", "modDatabase", Err.Number, Err.Description, Err.Source, Err.HelpContext
     Err.Clear
     Exit Sub
+End Sub
+
+' ########################################################################
+' Animation Only Client
+' ########################################################################
+
+Public Sub SaveAnimData(ByVal AnimID As Integer)
+    Dim F As Long
+    
+    F = FreeFile
+    Open App.Path & "\data files\anims\anim_" & AnimID & ".dat" For Binary As #F
+        Put #F, , Animation(AnimID)
+    Close #F
+End Sub
+
+Public Sub SaveAnimsData()
+    Dim i As Integer
+
+    For i = 1 To MAX_ANIMATIONS
+        Call SaveAnimData(i)
+    Next
+End Sub
+
+Public Sub LoadAnimsData()
+    Dim i As Integer
+    Dim F As Long
+    
+    Call CheckAnimData
+
+    For i = 1 To MAX_ANIMATIONS
+        F = FreeFile
+        Open App.Path & "\data files\anims\anim_" & i & ".dat" For Binary As #F
+            Get #F, , Animation(i)
+        Close #F
+    Next
+End Sub
+
+Private Sub CheckAnimData()
+    Dim i As Integer
+
+    For i = 1 To MAX_ANIMATIONS
+        If Not FileExist("\data files\anims\anim_" & i & ".dat") Then
+            Call SaveAnimData(i)
+        End If
+    Next
+End Sub
+
+Public Sub ClearAnimData(ByVal Index As Integer)
+    Call ZeroMemory(ByVal VarPtr(Animation(Index)), LenB(Animation(Index)))
+    Animation(Index).Name = vbNullString
+    Animation(Index).sound = "None."
+End Sub
+
+Public Sub ClearAnimsData()
+    Dim i As Integer
+
+    For i = 1 To MAX_ANIMATIONS
+        Call ClearAnimation(i)
+    Next
 End Sub

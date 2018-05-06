@@ -19,7 +19,6 @@ Public MapNpc(1 To MAX_MAPS) As MapDataRec
 Public Shop(1 To MAX_SHOPS) As ShopRec
 Public Spell(1 To MAX_SPELLS) As SpellRec
 Public Resource(1 To MAX_RESOURCES) As ResourceRec
-Public Animation(1 To MAX_ANIMATIONS) As AnimationRec
 Public Party(1 To MAX_PARTYS) As PartyRec
 Public Options As OptionsRec
 Public Switches(1 To MAX_SWITCHES) As String
@@ -38,8 +37,8 @@ Private Type MoveRouteRec
 End Type
 
 Private Type GlobalEventRec
-    x As Long
-    y As Long
+    X As Long
+    Y As Long
     Dir As Long
     active As Long
     
@@ -153,8 +152,8 @@ Private Type PlayerRec
     
     ' Position
     Map As Long
-    x As Byte
-    y As Byte
+    X As Byte
+    Y As Byte
     Dir As Byte
     
     Switches(0 To MAX_SWITCHES) As Byte
@@ -267,8 +266,8 @@ Private Type EventPageRec
     Position As Byte
     
     'For EventMap
-    x As Long
-    y As Long
+    X As Long
+    Y As Long
 End Type
 
 Private Type EventRec
@@ -276,8 +275,8 @@ Private Type EventRec
     Global As Byte
     PageCount As Long
     Pages() As EventPageRec
-    x As Long
-    y As Long
+    X As Long
+    Y As Long
     'Self Switches re-set on restart.
     SelfSwitches(0 To 4) As Long
 End Type
@@ -285,14 +284,14 @@ End Type
 Public Type GlobalMapEvents
     eventID As Long
     pageID As Long
-    x As Long
-    y As Long
+    X As Long
+    Y As Long
 End Type
 
 Private Type MapEventRec
     Dir As Long
-    x As Long
-    y As Long
+    X As Long
+    Y As Long
     
     WalkingAnim As Long
     FixedDir As Long
@@ -381,8 +380,8 @@ Public Type TempPlayerRec
 End Type
 
 Private Type TileDataRec
-    x As Long
-    y As Long
+    X As Long
+    Y As Long
     Tileset As Long
 End Type
 
@@ -486,8 +485,8 @@ End Type
 Private Type MapItemRec
     Num As Long
     Value As Long
-    x As Byte
-    y As Byte
+    X As Byte
+    Y As Byte
     ' ownership + despawn
     playerName As String
     playerTimer As Long
@@ -522,8 +521,8 @@ Private Type MapNpcRec
     target As Long
     targetType As Byte
     Vital(1 To Vitals.Vital_Count - 1) As Long
-    x As Byte
-    y As Byte
+    X As Byte
+    Y As Byte
     Dir As Byte
     ' For server use only
     SpawnWait As Long
@@ -565,8 +564,8 @@ Private Type SpellRec
     CDTime As Long
     Icon As Long
     Map As Long
-    x As Long
-    y As Long
+    X As Long
+    Y As Long
     Dir As Byte
     Vital As Long
     Duration As Long
@@ -591,8 +590,8 @@ End Type
 Private Type MapResourceRec
     ResourceState As Byte
     ResourceTimer As Long
-    x As Long
-    y As Long
+    X As Long
+    Y As Long
     cur_health As Long
 End Type
 
@@ -629,8 +628,8 @@ Private Type AnimationRec
 End Type
 
 Public Type Vector
-    x As Long
-    y As Long
+    X As Long
+    Y As Long
 End Type
 
 Public Type MapBlockRec

@@ -74,7 +74,6 @@ Public Sub InitMessages()
     HandleDataSub(SActionMsg) = GetAddress(AddressOf HandleActionMsg)
     HandleDataSub(SPlayerEXP) = GetAddress(AddressOf HandlePlayerExp)
     HandleDataSub(SBlood) = GetAddress(AddressOf HandleBlood)
-    HandleDataSub(SAnimationEditor) = GetAddress(AddressOf HandleAnimationEditor)
     HandleDataSub(SUpdateAnimation) = GetAddress(AddressOf HandleUpdateAnimation)
     HandleDataSub(SAnimation) = GetAddress(AddressOf HandleAnimation)
     HandleDataSub(SMapNpcVitals) = GetAddress(AddressOf HandleMapNpcVitals)
@@ -1403,34 +1402,6 @@ errorhandler:
     Exit Sub
 End Sub
 
-Private Sub HandleAnimationEditor()
-Dim i As Long
-
-    ' If debug mode, handle error then exit out
-    If Options.Debug = 1 Then On Error GoTo errorhandler
-    
-    With frmEditor_Animation
-        Editor = EDITOR_ANIMATION
-        .lstIndex.Clear
-
-        ' Add the names
-        For i = 1 To MAX_ANIMATIONS
-            .lstIndex.AddItem i & ": " & Trim$(Animation(i).Name)
-        Next
-
-        .Show
-        .lstIndex.ListIndex = 0
-        AnimationEditorInit
-    End With
-
-    ' Error handler
-    Exit Sub
-errorhandler:
-    HandleError "HandleAnimationEditor", "modHandleData", Err.Number, Err.Description, Err.Source, Err.HelpContext
-    Err.Clear
-    Exit Sub
-End Sub
-
 Private Sub HandleUpdateItem(ByVal Index As Long, ByRef Data() As Byte, ByVal StartAddr As Long, ByVal ExtraVar As Long)
 Dim n As Long
 Dim Buffer As clsBuffer
@@ -2037,11 +2008,11 @@ Dim Buffer As clsBuffer
     If AnimationIndex >= MAX_BYTE Then AnimationIndex = 1
     
     With AnimInstance(AnimationIndex)
-        .Animation = Buffer.ReadLong
-        .X = Buffer.ReadLong
-        .Y = Buffer.ReadLong
+        .Animation = Buffer.ReadInteger
+        .X = Buffer.ReadInteger
+        .Y = Buffer.ReadInteger
         .LockType = Buffer.ReadByte
-        .lockindex = Buffer.ReadLong
+        .lockindex = Buffer.ReadInteger
         .Used(0) = True
         .Used(1) = True
     End With

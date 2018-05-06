@@ -381,11 +381,6 @@ Dim Buffer As clsBuffer
                     If GetPlayerAccess(MyIndex) < ADMIN_DEVELOPER Then GoTo Continue
 
                     SendRequestEditItem
-                ' Editing animation request
-                Case "/editanimation"
-                    If GetPlayerAccess(MyIndex) < ADMIN_DEVELOPER Then GoTo Continue
-
-                    SendRequestEditAnimation
                     ' Editing npc request
                 Case "/editnpc"
                     If GetPlayerAccess(MyIndex) < ADMIN_DEVELOPER Then GoTo Continue

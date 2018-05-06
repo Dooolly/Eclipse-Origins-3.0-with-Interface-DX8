@@ -1845,25 +1845,6 @@ Private MouseY As Long
 Private PresentX As Long
 Private PresentY As Long
 
-Private Sub cmdAAnim_Click()
-    ' If debug mode, handle error then exit out
-    If Options.Debug = 1 Then On Error GoTo errorhandler
-
-    If GetPlayerAccess(MyIndex) < ADMIN_DEVELOPER Then
-        
-        Exit Sub
-    End If
-
-    SendRequestEditAnimation
-    
-    ' Error handler
-    Exit Sub
-errorhandler:
-    HandleError "cmdAAnim_Click", "frmMain", Err.Number, Err.Description, Err.Source, Err.HelpContext
-    Err.Clear
-    Exit Sub
-End Sub
-
 Private Sub Form_DblClick()
 ' If debug mode, handle error then exit out
     If Options.Debug = 1 Then On Error GoTo errorhandler
@@ -2312,7 +2293,7 @@ Private Sub optSOff_Click()
     If Options.Debug = 1 Then On Error GoTo errorhandler
     
     StopAllSounds
-    Options.Sound = 0
+    Options.sound = 0
     ' save to config.ini
     SaveOptions
     
@@ -2328,7 +2309,7 @@ Private Sub optSOn_Click()
     ' If debug mode, handle error then exit out
     If Options.Debug = 1 Then On Error GoTo errorhandler
 
-    Options.Sound = 1
+    Options.sound = 1
     ' save to config.ini
     SaveOptions
     

@@ -118,7 +118,7 @@ Dim i As Long
         .ScrlR.Value = Map.Red
         .ScrlG.Value = Map.Green
         .ScrlB.Value = Map.Blue
-        .scrlA.Value = Map.alpha
+        .scrlA.Value = Map.Alpha
 
         ' show the map npcs
         .lstNpcs.Clear
@@ -705,7 +705,7 @@ Dim SoundSet As Boolean
         ' find the sound we have set
         If frmEditor_Item.cmbSound.ListCount >= 0 Then
             For i = 0 To frmEditor_Item.cmbSound.ListCount
-                If frmEditor_Item.cmbSound.List(i) = Trim$(.Sound) Then
+                If frmEditor_Item.cmbSound.List(i) = Trim$(.sound) Then
                     frmEditor_Item.cmbSound.ListIndex = i
                     SoundSet = True
                 End If
@@ -873,7 +873,7 @@ Dim SoundSet As Boolean
         ' find the sound we have set
         If frmEditor_Animation.cmbSound.ListCount >= 0 Then
             For i = 0 To frmEditor_Animation.cmbSound.ListCount
-                If frmEditor_Animation.cmbSound.List(i) = Trim$(.Sound) Then
+                If frmEditor_Animation.cmbSound.List(i) = Trim$(.sound) Then
                     frmEditor_Animation.cmbSound.ListIndex = i
                     SoundSet = True
                 End If
@@ -908,14 +908,14 @@ errorhandler:
 End Sub
 
 Public Sub AnimationEditorOk()
-Dim i As Long
+    Dim i As Integer
 
     ' If debug mode, handle error then exit out
     If Options.Debug = 1 Then On Error GoTo errorhandler
 
     For i = 1 To MAX_ANIMATIONS
         If Animation_Changed(i) Then
-            Call SendSaveAnimation(i)
+            Call SaveAnimData(i)
         End If
     Next
     
@@ -939,7 +939,8 @@ Public Sub AnimationEditorCancel()
     Unload frmEditor_Animation
     ClearChanged_Animation
     ClearAnimations
-    SendRequestAnimations
+    Call ClearAnimsData
+    Call LoadAnimsData
     
     ' Error handler
     Exit Sub
@@ -1000,7 +1001,7 @@ Dim SoundSet As Boolean
         .scrlNum.Value = NPC(EditorIndex).DropItem
         .scrlValue.Value = NPC(EditorIndex).DropItemValue
         .txtHP.Text = NPC(EditorIndex).HP
-        .txtEXP.Text = NPC(EditorIndex).Exp
+        .txtEXP.Text = NPC(EditorIndex).EXP
         .txtLevel.Text = NPC(EditorIndex).Level
         .txtDamage.Text = NPC(EditorIndex).Damage
         .scrlAnimation.Value = NPC(EditorIndex).Animation
@@ -1011,7 +1012,7 @@ Dim SoundSet As Boolean
         ' find the sound we have set
         If .cmbSound.ListCount >= 0 Then
             For i = 0 To .cmbSound.ListCount
-                If .cmbSound.List(i) = Trim$(NPC(EditorIndex).Sound) Then
+                If .cmbSound.List(i) = Trim$(NPC(EditorIndex).sound) Then
                     .cmbSound.ListIndex = i
                     SoundSet = True
                 End If
@@ -1135,7 +1136,7 @@ Dim SoundSet As Boolean
         ' find the sound we have set
         If .cmbSound.ListCount >= 0 Then
             For i = 0 To .cmbSound.ListCount
-                If .cmbSound.List(i) = Trim$(Resource(EditorIndex).Sound) Then
+                If .cmbSound.List(i) = Trim$(Resource(EditorIndex).sound) Then
                     .cmbSound.ListIndex = i
                     SoundSet = True
                 End If
@@ -1415,7 +1416,7 @@ Dim SoundSet As Boolean
         ' find the sound we have set
         If .cmbSound.ListCount >= 0 Then
             For i = 0 To .cmbSound.ListCount
-                If .cmbSound.List(i) = Trim$(Spell(EditorIndex).Sound) Then
+                If .cmbSound.List(i) = Trim$(Spell(EditorIndex).sound) Then
                     .cmbSound.ListIndex = i
                     SoundSet = True
                 End If

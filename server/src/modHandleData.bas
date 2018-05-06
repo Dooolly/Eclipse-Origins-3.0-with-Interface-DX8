@@ -64,9 +64,6 @@ Public Sub InitMessages()
     HandleDataSub(CRequestNPCS) = GetAddress(AddressOf HandleRequestNPCS)
     HandleDataSub(CRequestResources) = GetAddress(AddressOf HandleRequestResources)
     HandleDataSub(CSpawnItem) = GetAddress(AddressOf HandleSpawnItem)
-    HandleDataSub(CRequestEditAnimation) = GetAddress(AddressOf HandleRequestEditAnimation)
-    HandleDataSub(CSaveAnimation) = GetAddress(AddressOf HandleSaveAnimation)
-    HandleDataSub(CRequestAnimations) = GetAddress(AddressOf HandleRequestAnimations)
     HandleDataSub(CRequestSpells) = GetAddress(AddressOf HandleRequestSpells)
     HandleDataSub(CRequestShops) = GetAddress(AddressOf HandleRequestShops)
     HandleDataSub(CRequestLevelUp) = GetAddress(AddressOf HandleRequestLevelUp)
@@ -666,7 +663,7 @@ Sub HandleAttack(ByVal Index As Long, ByRef Data() As Byte, ByVal StartAddr As L
     Dim n As Long
     Dim Damage As Long
     Dim TempIndex As Long
-    Dim x As Long, y As Long
+    Dim X As Long, Y As Long
     
     ' can't attack whilst casting
     If TempPlayer(Index).spellBuffer.Spell > 0 Then Exit Sub
@@ -697,26 +694,26 @@ Sub HandleAttack(ByVal Index As Long, ByRef Data() As Byte, ByVal StartAddr As L
         Case DIR_UP
 
             If GetPlayerY(Index) = 0 Then Exit Sub
-            x = GetPlayerX(Index)
-            y = GetPlayerY(Index) - 1
+            X = GetPlayerX(Index)
+            Y = GetPlayerY(Index) - 1
         Case DIR_DOWN
 
             If GetPlayerY(Index) = Map(GetPlayerMap(Index)).MaxY Then Exit Sub
-            x = GetPlayerX(Index)
-            y = GetPlayerY(Index) + 1
+            X = GetPlayerX(Index)
+            Y = GetPlayerY(Index) + 1
         Case DIR_LEFT
 
             If GetPlayerX(Index) = 0 Then Exit Sub
-            x = GetPlayerX(Index) - 1
-            y = GetPlayerY(Index)
+            X = GetPlayerX(Index) - 1
+            Y = GetPlayerY(Index)
         Case DIR_RIGHT
 
             If GetPlayerX(Index) = Map(GetPlayerMap(Index)).MaxX Then Exit Sub
-            x = GetPlayerX(Index) + 1
-            y = GetPlayerY(Index)
+            X = GetPlayerX(Index) + 1
+            Y = GetPlayerY(Index)
     End Select
     
-    CheckResource Index, x, y
+    CheckResource Index, X, Y
 End Sub
 
 ' ::::::::::::::::::::::
@@ -942,9 +939,9 @@ End Sub
 ' :::::::::::::::::::::
 Sub HandleMapData(ByVal Index As Long, ByRef Data() As Byte, ByVal StartAddr As Long, ByVal ExtraVar As Long)
     Dim i As Long
-    Dim mapnum As Long
-    Dim x As Long
-    Dim y As Long, z As Long, w As Long
+    Dim mapNum As Long
+    Dim X As Long
+    Dim Y As Long, z As Long, w As Long
     Dim Buffer As clsBuffer
     Set Buffer = New clsBuffer
     Buffer.WriteBytes Data()
@@ -954,81 +951,81 @@ Sub HandleMapData(ByVal Index As Long, ByRef Data() As Byte, ByVal StartAddr As 
         Exit Sub
     End If
 
-    mapnum = GetPlayerMap(Index)
-    i = Map(mapnum).Revision + 1
-    Call ClearMap(mapnum)
+    mapNum = GetPlayerMap(Index)
+    i = Map(mapNum).Revision + 1
+    Call ClearMap(mapNum)
     
-    Map(mapnum).Name = Buffer.ReadString
-    Map(mapnum).Music = Buffer.ReadString
-    Map(mapnum).BGS = Buffer.ReadString
-    Map(mapnum).Revision = i
-    Map(mapnum).Moral = Buffer.ReadByte
-    Map(mapnum).Up = Buffer.ReadLong
-    Map(mapnum).Down = Buffer.ReadLong
-    Map(mapnum).Left = Buffer.ReadLong
-    Map(mapnum).Right = Buffer.ReadLong
-    Map(mapnum).BootMap = Buffer.ReadLong
-    Map(mapnum).BootX = Buffer.ReadByte
-    Map(mapnum).BootY = Buffer.ReadByte
+    Map(mapNum).Name = Buffer.ReadString
+    Map(mapNum).Music = Buffer.ReadString
+    Map(mapNum).BGS = Buffer.ReadString
+    Map(mapNum).Revision = i
+    Map(mapNum).Moral = Buffer.ReadByte
+    Map(mapNum).Up = Buffer.ReadLong
+    Map(mapNum).Down = Buffer.ReadLong
+    Map(mapNum).Left = Buffer.ReadLong
+    Map(mapNum).Right = Buffer.ReadLong
+    Map(mapNum).BootMap = Buffer.ReadLong
+    Map(mapNum).BootX = Buffer.ReadByte
+    Map(mapNum).BootY = Buffer.ReadByte
     
-    Map(mapnum).Weather = Buffer.ReadLong
-    Map(mapnum).WeatherIntensity = Buffer.ReadLong
+    Map(mapNum).Weather = Buffer.ReadLong
+    Map(mapNum).WeatherIntensity = Buffer.ReadLong
     
-    Map(mapnum).Fog = Buffer.ReadLong
-    Map(mapnum).FogSpeed = Buffer.ReadLong
-    Map(mapnum).FogOpacity = Buffer.ReadLong
+    Map(mapNum).Fog = Buffer.ReadLong
+    Map(mapNum).FogSpeed = Buffer.ReadLong
+    Map(mapNum).FogOpacity = Buffer.ReadLong
     
-    Map(mapnum).Red = Buffer.ReadLong
-    Map(mapnum).Green = Buffer.ReadLong
-    Map(mapnum).Blue = Buffer.ReadLong
-    Map(mapnum).Alpha = Buffer.ReadLong
+    Map(mapNum).Red = Buffer.ReadLong
+    Map(mapNum).Green = Buffer.ReadLong
+    Map(mapNum).Blue = Buffer.ReadLong
+    Map(mapNum).Alpha = Buffer.ReadLong
     
-    Map(mapnum).MaxX = Buffer.ReadByte
-    Map(mapnum).MaxY = Buffer.ReadByte
-    ReDim Map(mapnum).Tile(0 To Map(mapnum).MaxX, 0 To Map(mapnum).MaxY)
+    Map(mapNum).MaxX = Buffer.ReadByte
+    Map(mapNum).MaxY = Buffer.ReadByte
+    ReDim Map(mapNum).Tile(0 To Map(mapNum).MaxX, 0 To Map(mapNum).MaxY)
 
-    For x = 0 To Map(mapnum).MaxX
-        For y = 0 To Map(mapnum).MaxY
+    For X = 0 To Map(mapNum).MaxX
+        For Y = 0 To Map(mapNum).MaxY
             For i = 1 To MapLayer.Layer_Count - 1
-                Map(mapnum).Tile(x, y).Layer(i).x = Buffer.ReadLong
-                Map(mapnum).Tile(x, y).Layer(i).y = Buffer.ReadLong
-                Map(mapnum).Tile(x, y).Layer(i).Tileset = Buffer.ReadLong
+                Map(mapNum).Tile(X, Y).Layer(i).X = Buffer.ReadLong
+                Map(mapNum).Tile(X, Y).Layer(i).Y = Buffer.ReadLong
+                Map(mapNum).Tile(X, Y).Layer(i).Tileset = Buffer.ReadLong
             Next
             For z = 1 To MapLayer.Layer_Count - 1
-                Map(mapnum).Tile(x, y).Autotile(z) = Buffer.ReadLong
+                Map(mapNum).Tile(X, Y).Autotile(z) = Buffer.ReadLong
             Next
-            Map(mapnum).Tile(x, y).Type = Buffer.ReadByte
-            Map(mapnum).Tile(x, y).Data1 = Buffer.ReadLong
-            Map(mapnum).Tile(x, y).Data2 = Buffer.ReadLong
-            Map(mapnum).Tile(x, y).Data3 = Buffer.ReadLong
-            Map(mapnum).Tile(x, y).Data4 = Buffer.ReadString
-            Map(mapnum).Tile(x, y).DirBlock = Buffer.ReadByte
+            Map(mapNum).Tile(X, Y).Type = Buffer.ReadByte
+            Map(mapNum).Tile(X, Y).Data1 = Buffer.ReadLong
+            Map(mapNum).Tile(X, Y).Data2 = Buffer.ReadLong
+            Map(mapNum).Tile(X, Y).Data3 = Buffer.ReadLong
+            Map(mapNum).Tile(X, Y).Data4 = Buffer.ReadString
+            Map(mapNum).Tile(X, Y).DirBlock = Buffer.ReadByte
         Next
     Next
 
-    For x = 1 To MAX_MAP_NPCS
-        Map(mapnum).NPC(x) = Buffer.ReadLong
-        Map(mapnum).NpcSpawnType(x) = Buffer.ReadLong
-        Call ClearMapNpc(x, mapnum)
+    For X = 1 To MAX_MAP_NPCS
+        Map(mapNum).NPC(X) = Buffer.ReadLong
+        Map(mapNum).NpcSpawnType(X) = Buffer.ReadLong
+        Call ClearMapNpc(X, mapNum)
     Next
     
     'Event Data!
-    Map(mapnum).EventCount = Buffer.ReadLong
+    Map(mapNum).EventCount = Buffer.ReadLong
         
-    If Map(mapnum).EventCount > 0 Then
-        ReDim Map(mapnum).Events(0 To Map(mapnum).EventCount)
-        For i = 1 To Map(mapnum).EventCount
-            With Map(mapnum).Events(i)
+    If Map(mapNum).EventCount > 0 Then
+        ReDim Map(mapNum).Events(0 To Map(mapNum).EventCount)
+        For i = 1 To Map(mapNum).EventCount
+            With Map(mapNum).Events(i)
                 .Name = Buffer.ReadString
                 .Global = Buffer.ReadLong
-                .x = Buffer.ReadLong
-                .y = Buffer.ReadLong
+                .X = Buffer.ReadLong
+                .Y = Buffer.ReadLong
                 .PageCount = Buffer.ReadLong
             End With
-            If Map(mapnum).Events(i).PageCount > 0 Then
-                ReDim Map(mapnum).Events(i).Pages(0 To Map(mapnum).Events(i).PageCount)
-                For x = 1 To Map(mapnum).Events(i).PageCount
-                    With Map(mapnum).Events(i).Pages(x)
+            If Map(mapNum).Events(i).PageCount > 0 Then
+                ReDim Map(mapNum).Events(i).Pages(0 To Map(mapNum).Events(i).PageCount)
+                For X = 1 To Map(mapNum).Events(i).PageCount
+                    With Map(mapNum).Events(i).Pages(X)
                         .chkVariable = Buffer.ReadLong
                         .VariableIndex = Buffer.ReadLong
                         .VariableCondition = Buffer.ReadLong
@@ -1062,15 +1059,15 @@ Sub HandleMapData(ByVal Index As Long, ByRef Data() As Byte, ByVal StartAddr As 
                         .RepeatMoveRoute = Buffer.ReadLong
                             
                         If .MoveRouteCount > 0 Then
-                            ReDim Map(mapnum).Events(i).Pages(x).MoveRoute(0 To .MoveRouteCount)
-                            For y = 1 To .MoveRouteCount
-                                .MoveRoute(y).Index = Buffer.ReadLong
-                                .MoveRoute(y).Data1 = Buffer.ReadLong
-                                .MoveRoute(y).Data2 = Buffer.ReadLong
-                                .MoveRoute(y).Data3 = Buffer.ReadLong
-                                .MoveRoute(y).Data4 = Buffer.ReadLong
-                                .MoveRoute(y).data5 = Buffer.ReadLong
-                                .MoveRoute(y).data6 = Buffer.ReadLong
+                            ReDim Map(mapNum).Events(i).Pages(X).MoveRoute(0 To .MoveRouteCount)
+                            For Y = 1 To .MoveRouteCount
+                                .MoveRoute(Y).Index = Buffer.ReadLong
+                                .MoveRoute(Y).Data1 = Buffer.ReadLong
+                                .MoveRoute(Y).Data2 = Buffer.ReadLong
+                                .MoveRoute(Y).Data3 = Buffer.ReadLong
+                                .MoveRoute(Y).Data4 = Buffer.ReadLong
+                                .MoveRoute(Y).data5 = Buffer.ReadLong
+                                .MoveRoute(Y).data6 = Buffer.ReadLong
                             Next
                         End If
                             
@@ -1084,15 +1081,15 @@ Sub HandleMapData(ByVal Index As Long, ByRef Data() As Byte, ByVal StartAddr As 
                         .Position = Buffer.ReadLong
                     End With
                         
-                    If Map(mapnum).Events(i).Pages(x).CommandListCount > 0 Then
-                        ReDim Map(mapnum).Events(i).Pages(x).CommandList(0 To Map(mapnum).Events(i).Pages(x).CommandListCount)
-                        For y = 1 To Map(mapnum).Events(i).Pages(x).CommandListCount
-                            Map(mapnum).Events(i).Pages(x).CommandList(y).CommandCount = Buffer.ReadLong
-                            Map(mapnum).Events(i).Pages(x).CommandList(y).ParentList = Buffer.ReadLong
-                            If Map(mapnum).Events(i).Pages(x).CommandList(y).CommandCount > 0 Then
-                                ReDim Map(mapnum).Events(i).Pages(x).CommandList(y).Commands(1 To Map(mapnum).Events(i).Pages(x).CommandList(y).CommandCount)
-                                For z = 1 To Map(mapnum).Events(i).Pages(x).CommandList(y).CommandCount
-                                    With Map(mapnum).Events(i).Pages(x).CommandList(y).Commands(z)
+                    If Map(mapNum).Events(i).Pages(X).CommandListCount > 0 Then
+                        ReDim Map(mapNum).Events(i).Pages(X).CommandList(0 To Map(mapNum).Events(i).Pages(X).CommandListCount)
+                        For Y = 1 To Map(mapNum).Events(i).Pages(X).CommandListCount
+                            Map(mapNum).Events(i).Pages(X).CommandList(Y).CommandCount = Buffer.ReadLong
+                            Map(mapNum).Events(i).Pages(X).CommandList(Y).ParentList = Buffer.ReadLong
+                            If Map(mapNum).Events(i).Pages(X).CommandList(Y).CommandCount > 0 Then
+                                ReDim Map(mapNum).Events(i).Pages(X).CommandList(Y).Commands(1 To Map(mapNum).Events(i).Pages(X).CommandList(Y).CommandCount)
+                                For z = 1 To Map(mapNum).Events(i).Pages(X).CommandList(Y).CommandCount
+                                    With Map(mapNum).Events(i).Pages(X).CommandList(Y).Commands(z)
                                         .Index = Buffer.ReadLong
                                         .Text1 = Buffer.ReadString
                                         .Text2 = Buffer.ReadString
@@ -1137,38 +1134,38 @@ Sub HandleMapData(ByVal Index As Long, ByRef Data() As Byte, ByVal StartAddr As 
     
     'End Event Data
 
-    Call SendMapNpcsToMap(mapnum)
-    Call SpawnMapNpcs(mapnum)
-    Call SpawnGlobalEvents(mapnum)
+    Call SendMapNpcsToMap(mapNum)
+    Call SpawnMapNpcs(mapNum)
+    Call SpawnGlobalEvents(mapNum)
     
     For i = 1 To Player_HighIndex
-        If Player(i).Map = mapnum Then
-            SpawnMapEventsFor i, mapnum
+        If Player(i).Map = mapNum Then
+            SpawnMapEventsFor i, mapNum
         End If
     Next
 
     ' Clear out it all
     For i = 1 To MAX_MAP_ITEMS
-        Call SpawnItemSlot(i, 0, 0, GetPlayerMap(Index), MapItem(GetPlayerMap(Index), i).x, MapItem(GetPlayerMap(Index), i).y)
+        Call SpawnItemSlot(i, 0, 0, GetPlayerMap(Index), MapItem(GetPlayerMap(Index), i).X, MapItem(GetPlayerMap(Index), i).Y)
         Call ClearMapItem(i, GetPlayerMap(Index))
     Next
 
     ' Respawn
     Call SpawnMapItems(GetPlayerMap(Index))
     ' Save the map
-    Call SaveMap(mapnum)
-    Call MapCache_Create(mapnum)
-    Call ClearTempTile(mapnum)
-    Call CacheResources(mapnum)
+    Call SaveMap(mapNum)
+    Call MapCache_Create(mapNum)
+    Call ClearTempTile(mapNum)
+    Call CacheResources(mapNum)
 
     ' Refresh map for everyone online
     For i = 1 To Player_HighIndex
-        If IsPlaying(i) And GetPlayerMap(i) = mapnum Then
-            Call PlayerWarp(i, mapnum, GetPlayerX(i), GetPlayerY(i))
+        If IsPlaying(i) And GetPlayerMap(i) = mapNum Then
+            Call PlayerWarp(i, mapNum, GetPlayerX(i), GetPlayerY(i))
         End If
     Next i
     
-    Call CacheMapBlocks(mapnum)
+    Call CacheMapBlocks(mapNum)
 
     Set Buffer = Nothing
 End Sub
@@ -1256,7 +1253,7 @@ Sub HandleMapRespawn(ByVal Index As Long, ByRef Data() As Byte, ByVal StartAddr 
 
     ' Clear out it all
     For i = 1 To MAX_MAP_ITEMS
-        Call SpawnItemSlot(i, 0, 0, GetPlayerMap(Index), MapItem(GetPlayerMap(Index), i).x, MapItem(GetPlayerMap(Index), i).y)
+        Call SpawnItemSlot(i, 0, 0, GetPlayerMap(Index), MapItem(GetPlayerMap(Index), i).X, MapItem(GetPlayerMap(Index), i).Y)
         Call ClearMapItem(i, GetPlayerMap(Index))
     Next
 
@@ -1509,58 +1506,6 @@ Sub HandleSaveItem(ByVal Index As Long, ByRef Data() As Byte, ByVal StartAddr As
     Call SendUpdateItemToAll(n)
     Call SaveItem(n)
     Call AddLog(GetPlayerName(Index) & " saved item #" & n & ".", ADMIN_LOG)
-End Sub
-
-' ::::::::::::::::::::::::::::::
-' :: Request edit Animation packet ::
-' ::::::::::::::::::::::::::::::
-Sub HandleRequestEditAnimation(ByVal Index As Long, ByRef Data() As Byte, ByVal StartAddr As Long, ByVal ExtraVar As Long)
-    Dim Buffer As clsBuffer
-
-    ' Prevent hacking
-    If GetPlayerAccess(Index) < ADMIN_DEVELOPER Then
-        Exit Sub
-    End If
-
-    Set Buffer = New clsBuffer
-    Buffer.WriteLong SAnimationEditor
-    SendDataTo Index, Buffer.ToArray()
-    Set Buffer = Nothing
-End Sub
-
-' ::::::::::::::::::::::
-' :: Save Animation packet ::
-' ::::::::::::::::::::::
-Sub HandleSaveAnimation(ByVal Index As Long, ByRef Data() As Byte, ByVal StartAddr As Long, ByVal ExtraVar As Long)
-    Dim n As Long
-    Dim Buffer As clsBuffer
-    Dim AnimationSize As Long
-    Dim AnimationData() As Byte
-    Set Buffer = New clsBuffer
-    Buffer.WriteBytes Data()
-
-    ' Prevent hacking
-    If GetPlayerAccess(Index) < ADMIN_DEVELOPER Then
-        Exit Sub
-    End If
-
-    n = Buffer.ReadLong 'CLng(Parse(1))
-
-    If n < 0 Or n > MAX_ANIMATIONS Then
-        Exit Sub
-    End If
-
-    ' Update the Animation
-    AnimationSize = LenB(Animation(n))
-    ReDim AnimationData(AnimationSize - 1)
-    AnimationData = Buffer.ReadBytes(AnimationSize)
-    CopyMemory ByVal VarPtr(Animation(n)), ByVal VarPtr(AnimationData(0)), AnimationSize
-    Set Buffer = Nothing
-    
-    ' Save it
-    Call SendUpdateAnimationToAll(n)
-    Call SaveAnimation(n)
-    Call AddLog(GetPlayerName(Index) & " saved Animation #" & n & ".", ADMIN_LOG)
 End Sub
 
 ' :::::::::::::::::::::::::::::
@@ -1847,18 +1792,18 @@ End Sub
 ' :: Search packet ::
 ' :::::::::::::::::::
 Sub HandleSearch(ByVal Index As Long, ByRef Data() As Byte, ByVal StartAddr As Long, ByVal ExtraVar As Long)
-    Dim x As Long
-    Dim y As Long
+    Dim X As Long
+    Dim Y As Long
     Dim i As Long
     Dim Buffer As clsBuffer
     Set Buffer = New clsBuffer
     Buffer.WriteBytes Data()
-    x = Buffer.ReadLong 'CLng(Parse(1))
-    y = Buffer.ReadLong 'CLng(Parse(2))
+    X = Buffer.ReadLong 'CLng(Parse(1))
+    Y = Buffer.ReadLong 'CLng(Parse(2))
     Set Buffer = Nothing
 
     ' Prevent subscript out of range
-    If x < 0 Or x > Map(GetPlayerMap(Index)).MaxX Or y < 0 Or y > Map(GetPlayerMap(Index)).MaxY Then
+    If X < 0 Or X > Map(GetPlayerMap(Index)).MaxX Or Y < 0 Or Y > Map(GetPlayerMap(Index)).MaxY Then
         Exit Sub
     End If
 
@@ -1867,8 +1812,8 @@ Sub HandleSearch(ByVal Index As Long, ByRef Data() As Byte, ByVal StartAddr As L
 
         If IsPlaying(i) Then
             If GetPlayerMap(Index) = GetPlayerMap(i) Then
-                If GetPlayerX(i) = x Then
-                    If GetPlayerY(i) = y Then
+                If GetPlayerX(i) = X Then
+                    If GetPlayerY(i) = Y Then
                         ' Change target
                         If TempPlayer(Index).targetType = TARGET_TYPE_PLAYER And TempPlayer(Index).target = i Then
                             TempPlayer(Index).target = 0
@@ -1891,8 +1836,8 @@ Sub HandleSearch(ByVal Index As Long, ByRef Data() As Byte, ByVal StartAddr As L
     ' Check for an npc
     For i = 1 To MAX_MAP_NPCS
         If MapNpc(GetPlayerMap(Index)).NPC(i).Num > 0 Then
-            If MapNpc(GetPlayerMap(Index)).NPC(i).x = x Then
-                If MapNpc(GetPlayerMap(Index)).NPC(i).y = y Then
+            If MapNpc(GetPlayerMap(Index)).NPC(i).X = X Then
+                If MapNpc(GetPlayerMap(Index)).NPC(i).Y = Y Then
                     If TempPlayer(Index).target = i And TempPlayer(Index).targetType = TARGET_TYPE_NPC Then
                         ' Change target
                         TempPlayer(Index).target = 0
@@ -2016,10 +1961,6 @@ End Sub
 
 Sub HandleRequestItems(ByVal Index As Long, ByRef Data() As Byte, ByVal StartAddr As Long, ByVal ExtraVar As Long)
     SendItems Index
-End Sub
-
-Sub HandleRequestAnimations(ByVal Index As Long, ByRef Data() As Byte, ByVal StartAddr As Long, ByVal ExtraVar As Long)
-    SendAnimations Index
 End Sub
 
 Sub HandleRequestNPCS(ByVal Index As Long, ByRef Data() As Byte, ByVal StartAddr As Long, ByVal ExtraVar As Long)
@@ -2247,19 +2188,19 @@ End Sub
 
 Sub HandleAdminWarp(ByVal Index As Long, ByRef Data() As Byte, ByVal StartAddr As Long, ByVal ExtraVar As Long)
     Dim Buffer As clsBuffer
-    Dim x As Long
-    Dim y As Long
+    Dim X As Long
+    Dim Y As Long
     
     Set Buffer = New clsBuffer
     Buffer.WriteBytes Data()
     
-    x = Buffer.ReadLong
-    y = Buffer.ReadLong
+    X = Buffer.ReadLong
+    Y = Buffer.ReadLong
     
     If GetPlayerAccess(Index) >= ADMIN_MAPPER Then
         'PlayerWarp index, GetPlayerMap(index), x, y
-        SetPlayerX Index, x
-        SetPlayerY Index, y
+        SetPlayerX Index, X
+        SetPlayerY Index, Y
         SendPlayerXYToMap Index
     End If
     
@@ -2287,10 +2228,10 @@ Dim tradeTarget As Long, sX As Long, sY As Long, tX As Long, tY As Long
     If Not Player(tradeTarget).Map = Player(Index).Map Then Exit Sub
     
     ' make sure they're stood next to each other
-    tX = Player(tradeTarget).x
-    tY = Player(tradeTarget).y
-    sX = Player(Index).x
-    sY = Player(Index).y
+    tX = Player(tradeTarget).X
+    tY = Player(tradeTarget).Y
+    sX = Player(Index).X
+    sY = Player(Index).Y
     
     ' within range?
     If tX < sX - 1 Or tX > sX + 1 Then
@@ -2727,30 +2668,30 @@ Sub HandleEvent(ByVal Index As Long, ByRef Data() As Byte, ByVal StartAddr As Lo
     Dim n As Long
     Dim Damage As Long
     Dim TempIndex As Long
-    Dim x As Long, y As Long, begineventprocessing As Boolean, z As Long, Buffer As clsBuffer
+    Dim X As Long, Y As Long, begineventprocessing As Boolean, z As Long, Buffer As clsBuffer
 
     ' Check tradeskills
     Select Case GetPlayerDir(Index)
         Case DIR_UP
 
             If GetPlayerY(Index) = 0 Then Exit Sub
-            x = GetPlayerX(Index)
-            y = GetPlayerY(Index) - 1
+            X = GetPlayerX(Index)
+            Y = GetPlayerY(Index) - 1
         Case DIR_DOWN
 
             If GetPlayerY(Index) = Map(GetPlayerMap(Index)).MaxY Then Exit Sub
-            x = GetPlayerX(Index)
-            y = GetPlayerY(Index) + 1
+            X = GetPlayerX(Index)
+            Y = GetPlayerY(Index) + 1
         Case DIR_LEFT
 
             If GetPlayerX(Index) = 0 Then Exit Sub
-            x = GetPlayerX(Index) - 1
-            y = GetPlayerY(Index)
+            X = GetPlayerX(Index) - 1
+            Y = GetPlayerY(Index)
         Case DIR_RIGHT
 
             If GetPlayerX(Index) = Map(GetPlayerMap(Index)).MaxX Then Exit Sub
-            x = GetPlayerX(Index) + 1
-            y = GetPlayerY(Index)
+            X = GetPlayerX(Index) + 1
+            Y = GetPlayerY(Index)
     End Select
     
     Set Buffer = New clsBuffer

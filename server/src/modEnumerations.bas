@@ -57,7 +57,6 @@ Public Enum ServerPackets
     SActionMsg
     SPlayerEXP
     SBlood
-    SAnimationEditor
     SUpdateAnimation
     SAnimation
     SMapNpcVitals
@@ -164,9 +163,6 @@ Public Enum ClientPackets
     CRequestNPCS
     CRequestResources
     CSpawnItem
-    CRequestEditAnimation
-    CSaveAnimation
-    CRequestAnimations
     CRequestSpells
     CRequestShops
     CRequestLevelUp
