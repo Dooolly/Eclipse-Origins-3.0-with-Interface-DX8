@@ -5,7 +5,7 @@ Option Explicit
 Public Declare Sub Sleep Lib "kernel32" (ByVal dwMilliseconds As Long)
 
 Sub ServerLoop()
-    Dim i As Long, x As Long
+    Dim i As Long, X As Long
     Dim Tick As Long, TickCPS As Long, CPS As Long, FrameTime As Long
     Dim tmr25 As Long, tmr500 As Long, tmr1000 As Long
     Dim LastUpdateSavePlayers, LastUpdateMapSpawnItems As Long, LastUpdatePlayerVitals As Long
@@ -46,9 +46,9 @@ Sub ServerLoop()
                         End If
                     End If
                     ' HoT and DoT logic
-                    For x = 1 To MAX_DOTS
-                        HandleDoT_Player i, x
-                        HandleHoT_Player i, x
+                    For X = 1 To MAX_DOTS
+                        HandleDoT_Player i, X
+                        HandleHoT_Player i, X
                     Next
                 End If
                 
@@ -109,25 +109,25 @@ Sub ServerLoop()
 End Sub
 
 Private Sub UpdateMapSpawnItems()
-    Dim x As Long
-    Dim y As Long
+    Dim X As Long
+    Dim Y As Long
 
     ' ///////////////////////////////////////////
     ' // This is used for respawning map items //
     ' ///////////////////////////////////////////
-    For y = 1 To MAX_MAPS
+    For Y = 1 To MAX_MAPS
 
         ' Make sure no one is on the map when it respawns
-        If Not PlayersOnMap(y) Then
+        If Not PlayersOnMap(Y) Then
 
             ' Clear out unnecessary junk
-            For x = 1 To MAX_MAP_ITEMS
-                Call ClearMapItem(x, y)
+            For X = 1 To MAX_MAP_ITEMS
+                Call ClearMapItem(X, Y)
             Next
 
             ' Spawn the items
-            Call SpawnMapItems(y)
-            Call SendMapItemsToAll(y)
+            Call SpawnMapItems(Y)
+            Call SendMapItemsToAll(Y)
         End If
 
         DoEvents
@@ -136,31 +136,31 @@ Private Sub UpdateMapSpawnItems()
 End Sub
 
 Private Sub UpdateMapLogic()
-    Dim i As Long, x As Long, mapnum As Long, n As Long, x1 As Long, y1 As Long
+    Dim i As Long, X As Long, mapNum As Long, n As Long, x1 As Long, y1 As Long
     Dim TickCount As Long, Damage As Long, DistanceX As Long, DistanceY As Long, npcNum As Long
     Dim target As Long, targetType As Byte, didwalk As Boolean, Buffer As clsBuffer, Resource_index As Long
     Dim targetX As Long, targetY As Long, target_verify As Boolean
 
-    For mapnum = 1 To MAX_MAPS
+    For mapNum = 1 To MAX_MAPS
         ' items appearing to everyone
         For i = 1 To MAX_MAP_ITEMS
-            If MapItem(mapnum, i).Num > 0 Then
-                If MapItem(mapnum, i).playerName <> vbNullString Then
+            If MapItem(mapNum, i).Num > 0 Then
+                If MapItem(mapNum, i).playerName <> vbNullString Then
                     ' make item public?
-                    If MapItem(mapnum, i).playerTimer < GetTickCount Then
+                    If MapItem(mapNum, i).playerTimer < GetTickCount Then
                         ' make it public
-                        MapItem(mapnum, i).playerName = vbNullString
-                        MapItem(mapnum, i).playerTimer = 0
+                        MapItem(mapNum, i).playerName = vbNullString
+                        MapItem(mapNum, i).playerTimer = 0
                         ' send updates to everyone
-                        SendMapItemsToAll mapnum
+                        SendMapItemsToAll mapNum
                     End If
                     ' despawn item?
-                    If MapItem(mapnum, i).canDespawn Then
-                        If MapItem(mapnum, i).despawnTimer < GetTickCount Then
+                    If MapItem(mapNum, i).canDespawn Then
+                        If MapItem(mapNum, i).despawnTimer < GetTickCount Then
                             ' despawn it
-                            ClearMapItem i, mapnum
+                            ClearMapItem i, mapNum
                             ' send updates to everyone
-                            SendMapItemsToAll mapnum
+                            SendMapItemsToAll mapNum
                         End If
                     End If
                 End If
@@ -168,12 +168,12 @@ Private Sub UpdateMapLogic()
         Next
         
         '  Close the doors
-        If TickCount > temptile(mapnum).DoorTimer + 5000 Then
-            For x1 = 0 To Map(mapnum).MaxX
-                For y1 = 0 To Map(mapnum).MaxY
-                    If Map(mapnum).Tile(x1, y1).Type = TILE_TYPE_KEY And temptile(mapnum).DoorOpen(x1, y1) = YES Then
-                        temptile(mapnum).DoorOpen(x1, y1) = NO
-                        SendMapKeyToMap mapnum, x1, y1, 0
+        If TickCount > temptile(mapNum).DoorTimer + 5000 Then
+            For x1 = 0 To Map(mapNum).MaxX
+                For y1 = 0 To Map(mapNum).MaxY
+                    If Map(mapNum).Tile(x1, y1).Type = TILE_TYPE_KEY And temptile(mapNum).DoorOpen(x1, y1) = YES Then
+                        temptile(mapNum).DoorOpen(x1, y1) = NO
+                        SendMapKeyToMap mapNum, x1, y1, 0
                     End If
                 Next
             Next
@@ -181,57 +181,57 @@ Private Sub UpdateMapLogic()
         
         ' check for DoTs + hots
         For i = 1 To MAX_MAP_NPCS
-            If MapNpc(mapnum).Npc(i).Num > 0 Then
-                For x = 1 To MAX_DOTS
-                    HandleDoT_Npc mapnum, i, x
-                    HandleHoT_Npc mapnum, i, x
+            If MapNpc(mapNum).NPC(i).Num > 0 Then
+                For X = 1 To MAX_DOTS
+                    HandleDoT_Npc mapNum, i, X
+                    HandleHoT_Npc mapNum, i, X
                 Next
             End If
         Next
 
         ' Respawning Resources
-        If ResourceCache(mapnum).Resource_Count > 0 Then
-            For i = 0 To ResourceCache(mapnum).Resource_Count
-                Resource_index = Map(mapnum).Tile(ResourceCache(mapnum).ResourceData(i).x, ResourceCache(mapnum).ResourceData(i).y).Data1
+        If ResourceCache(mapNum).Resource_Count > 0 Then
+            For i = 0 To ResourceCache(mapNum).Resource_Count
+                Resource_index = Map(mapNum).Tile(ResourceCache(mapNum).ResourceData(i).X, ResourceCache(mapNum).ResourceData(i).Y).Data1
 
                 If Resource_index > 0 Then
-                    If ResourceCache(mapnum).ResourceData(i).ResourceState = 1 Or ResourceCache(mapnum).ResourceData(i).cur_health < 1 Then  ' dead or fucked up
-                        If ResourceCache(mapnum).ResourceData(i).ResourceTimer + (Resource(Resource_index).RespawnTime * 1000) < GetTickCount Then
-                            ResourceCache(mapnum).ResourceData(i).ResourceTimer = GetTickCount
-                            ResourceCache(mapnum).ResourceData(i).ResourceState = 0 ' normal
+                    If ResourceCache(mapNum).ResourceData(i).ResourceState = 1 Or ResourceCache(mapNum).ResourceData(i).cur_health < 1 Then  ' dead or fucked up
+                        If ResourceCache(mapNum).ResourceData(i).ResourceTimer + (Resource(Resource_index).RespawnTime * 1000) < GetTickCount Then
+                            ResourceCache(mapNum).ResourceData(i).ResourceTimer = GetTickCount
+                            ResourceCache(mapNum).ResourceData(i).ResourceState = 0 ' normal
                             ' re-set health to resource root
-                            ResourceCache(mapnum).ResourceData(i).cur_health = Resource(Resource_index).health
-                            SendResourceCacheToMap mapnum, i
+                            ResourceCache(mapNum).ResourceData(i).cur_health = Resource(Resource_index).health
+                            SendResourceCacheToMap mapNum, i
                         End If
                     End If
                 End If
             Next
         End If
 
-        If PlayersOnMap(mapnum) = YES Then
+        If PlayersOnMap(mapNum) = YES Then
             TickCount = GetTickCount
             
-            For x = 1 To MAX_MAP_NPCS
-                npcNum = MapNpc(mapnum).Npc(x).Num
+            For X = 1 To MAX_MAP_NPCS
+                npcNum = MapNpc(mapNum).NPC(X).Num
 
                 ' /////////////////////////////////////////
                 ' // This is used for ATTACKING ON SIGHT //
                 ' /////////////////////////////////////////
                 ' Make sure theres a npc with the map
-                If Map(mapnum).Npc(x) > 0 And MapNpc(mapnum).Npc(x).Num > 0 Then
+                If Map(mapNum).NPC(X) > 0 And MapNpc(mapNum).NPC(X).Num > 0 Then
 
                     ' If the npc is a attack on sight, search for a player on the map
-                    If Npc(npcNum).Behaviour = NPC_BEHAVIOUR_ATTACKONSIGHT Or Npc(npcNum).Behaviour = NPC_BEHAVIOUR_GUARD Then
+                    If NPC(npcNum).Behaviour = NPC_BEHAVIOUR_ATTACKONSIGHT Or NPC(npcNum).Behaviour = NPC_BEHAVIOUR_GUARD Then
                     
                         ' make sure it's not stunned
-                        If Not MapNpc(mapnum).Npc(x).StunDuration > 0 Then
+                        If Not MapNpc(mapNum).NPC(X).StunDuration > 0 Then
     
                             For i = 1 To Player_HighIndex
                                 If IsPlaying(i) Then
-                                    If GetPlayerMap(i) = mapnum And MapNpc(mapnum).Npc(x).target = 0 And GetPlayerAccess(i) <= ADMIN_MONITOR Then
-                                        n = Npc(npcNum).Range
-                                        DistanceX = MapNpc(mapnum).Npc(x).x - GetPlayerX(i)
-                                        DistanceY = MapNpc(mapnum).Npc(x).y - GetPlayerY(i)
+                                    If GetPlayerMap(i) = mapNum And MapNpc(mapNum).NPC(X).target = 0 And GetPlayerAccess(i) <= ADMIN_MONITOR Then
+                                        n = NPC(npcNum).Range
+                                        DistanceX = MapNpc(mapNum).NPC(X).X - GetPlayerX(i)
+                                        DistanceY = MapNpc(mapNum).NPC(X).Y - GetPlayerY(i)
     
                                         ' Make sure we get a positive value
                                         If DistanceX < 0 Then DistanceX = DistanceX * -1
@@ -239,12 +239,12 @@ Private Sub UpdateMapLogic()
     
                                         ' Are they in range?  if so GET'M!
                                         If DistanceX <= n And DistanceY <= n Then
-                                            If Npc(npcNum).Behaviour = NPC_BEHAVIOUR_ATTACKONSIGHT Or GetPlayerPK(i) = YES Then
-                                                If Len(Trim$(Npc(npcNum).AttackSay)) > 0 Then
-                                                    Call PlayerMsg(i, Trim$(Npc(npcNum).Name) & " says: " & Trim$(Npc(npcNum).AttackSay), SayColor)
+                                            If NPC(npcNum).Behaviour = NPC_BEHAVIOUR_ATTACKONSIGHT Or GetPlayerPK(i) = YES Then
+                                                If Len(Trim$(NPC(npcNum).AttackSay)) > 0 Then
+                                                    Call PlayerMsg(i, Trim$(NPC(npcNum).Name) & " says: " & Trim$(NPC(npcNum).AttackSay), SayColor)
                                                 End If
-                                                MapNpc(mapnum).Npc(x).targetType = 1 ' player
-                                                MapNpc(mapnum).Npc(x).target = i
+                                                MapNpc(mapNum).NPC(X).targetType = 1 ' player
+                                                MapNpc(mapNum).NPC(X).target = i
                                             End If
                                         End If
                                     End If
@@ -260,20 +260,20 @@ Private Sub UpdateMapLogic()
                 ' // This is used for NPC walking/targetting //
                 ' /////////////////////////////////////////////
                 ' Make sure theres a npc with the map
-                If Map(mapnum).Npc(x) > 0 And MapNpc(mapnum).Npc(x).Num > 0 Then
-                    If MapNpc(mapnum).Npc(x).StunDuration > 0 Then
+                If Map(mapNum).NPC(X) > 0 And MapNpc(mapNum).NPC(X).Num > 0 Then
+                    If MapNpc(mapNum).NPC(X).StunDuration > 0 Then
                         ' check if we can unstun them
-                        If GetTickCount > MapNpc(mapnum).Npc(x).StunTimer + (MapNpc(mapnum).Npc(x).StunDuration * 1000) Then
-                            MapNpc(mapnum).Npc(x).StunDuration = 0
-                            MapNpc(mapnum).Npc(x).StunTimer = 0
+                        If GetTickCount > MapNpc(mapNum).NPC(X).StunTimer + (MapNpc(mapNum).NPC(X).StunDuration * 1000) Then
+                            MapNpc(mapNum).NPC(X).StunDuration = 0
+                            MapNpc(mapNum).NPC(X).StunTimer = 0
                         End If
                     Else
                             
-                        target = MapNpc(mapnum).Npc(x).target
-                        targetType = MapNpc(mapnum).Npc(x).targetType
+                        target = MapNpc(mapNum).NPC(X).target
+                        targetType = MapNpc(mapNum).NPC(X).targetType
     
                         ' Check to see if its time for the npc to walk
-                        If Npc(npcNum).Behaviour <> NPC_BEHAVIOUR_SHOPKEEPER Then
+                        If NPC(npcNum).Behaviour <> NPC_BEHAVIOUR_SHOPKEEPER Then
                         
                             If targetType = 1 Then ' player
     
@@ -281,14 +281,14 @@ Private Sub UpdateMapLogic()
                                 If target > 0 Then
         
                                     ' Check if the player is even playing, if so follow'm
-                                    If IsPlaying(target) And GetPlayerMap(target) = mapnum Then
+                                    If IsPlaying(target) And GetPlayerMap(target) = mapNum Then
                                         didwalk = False
                                         target_verify = True
                                         targetY = GetPlayerY(target)
                                         targetX = GetPlayerX(target)
                                     Else
-                                        MapNpc(mapnum).Npc(x).targetType = 0 ' clear
-                                        MapNpc(mapnum).Npc(x).target = 0
+                                        MapNpc(mapNum).NPC(X).targetType = 0 ' clear
+                                        MapNpc(mapNum).NPC(X).target = 0
                                     End If
                                 End If
                             
@@ -296,21 +296,21 @@ Private Sub UpdateMapLogic()
                                 
                                 If target > 0 Then
                                     
-                                    If MapNpc(mapnum).Npc(target).Num > 0 Then
+                                    If MapNpc(mapNum).NPC(target).Num > 0 Then
                                         didwalk = False
                                         target_verify = True
-                                        targetY = MapNpc(mapnum).Npc(target).y
-                                        targetX = MapNpc(mapnum).Npc(target).x
+                                        targetY = MapNpc(mapNum).NPC(target).Y
+                                        targetX = MapNpc(mapNum).NPC(target).X
                                     Else
-                                        MapNpc(mapnum).Npc(x).targetType = 0 ' clear
-                                        MapNpc(mapnum).Npc(x).target = 0
+                                        MapNpc(mapNum).NPC(X).targetType = 0 ' clear
+                                        MapNpc(mapNum).NPC(X).target = 0
                                     End If
                                 End If
                             End If
                             
                             If target_verify Then
                                 'Gonna make the npcs smarter.. Implementing a pathfinding algorithm.. we shall see what happens.
-                                If IsOneBlockAway(targetX, targetY, CLng(MapNpc(mapnum).Npc(x).x), CLng(MapNpc(mapnum).Npc(x).y)) = False Then
+                                If IsOneBlockAway(targetX, targetY, CLng(MapNpc(mapNum).NPC(X).X), CLng(MapNpc(mapNum).NPC(X).Y)) = False Then
                                     If PathfindingType = 1 Then
                                         i = Int(Rnd * 5)
             
@@ -319,33 +319,33 @@ Private Sub UpdateMapLogic()
                                             Case 0
             
                                                 ' Up
-                                                If MapNpc(mapnum).Npc(x).y > targetY And Not didwalk Then
-                                                    If CanNpcMove(mapnum, x, DIR_UP) Then
-                                                        Call NpcMove(mapnum, x, DIR_UP, MOVING_WALKING)
+                                                If MapNpc(mapNum).NPC(X).Y > targetY And Not didwalk Then
+                                                    If CanNpcMove(mapNum, X, DIR_UP) Then
+                                                        Call NpcMove(mapNum, X, DIR_UP, MOVING_WALKING)
                                                         didwalk = True
                                                     End If
                                                 End If
             
                                                 ' Down
-                                                If MapNpc(mapnum).Npc(x).y < targetY And Not didwalk Then
-                                                    If CanNpcMove(mapnum, x, DIR_DOWN) Then
-                                                        Call NpcMove(mapnum, x, DIR_DOWN, MOVING_WALKING)
+                                                If MapNpc(mapNum).NPC(X).Y < targetY And Not didwalk Then
+                                                    If CanNpcMove(mapNum, X, DIR_DOWN) Then
+                                                        Call NpcMove(mapNum, X, DIR_DOWN, MOVING_WALKING)
                                                         didwalk = True
                                                     End If
                                                 End If
             
                                                 ' Left
-                                                If MapNpc(mapnum).Npc(x).x > targetX And Not didwalk Then
-                                                    If CanNpcMove(mapnum, x, DIR_LEFT) Then
-                                                        Call NpcMove(mapnum, x, DIR_LEFT, MOVING_WALKING)
+                                                If MapNpc(mapNum).NPC(X).X > targetX And Not didwalk Then
+                                                    If CanNpcMove(mapNum, X, DIR_LEFT) Then
+                                                        Call NpcMove(mapNum, X, DIR_LEFT, MOVING_WALKING)
                                                         didwalk = True
                                                     End If
                                                 End If
             
                                                 ' Right
-                                                If MapNpc(mapnum).Npc(x).x < targetX And Not didwalk Then
-                                                    If CanNpcMove(mapnum, x, DIR_RIGHT) Then
-                                                        Call NpcMove(mapnum, x, DIR_RIGHT, MOVING_WALKING)
+                                                If MapNpc(mapNum).NPC(X).X < targetX And Not didwalk Then
+                                                    If CanNpcMove(mapNum, X, DIR_RIGHT) Then
+                                                        Call NpcMove(mapNum, X, DIR_RIGHT, MOVING_WALKING)
                                                         didwalk = True
                                                     End If
                                                 End If
@@ -353,33 +353,33 @@ Private Sub UpdateMapLogic()
                                             Case 1
             
                                                 ' Right
-                                                If MapNpc(mapnum).Npc(x).x < targetX And Not didwalk Then
-                                                    If CanNpcMove(mapnum, x, DIR_RIGHT) Then
-                                                        Call NpcMove(mapnum, x, DIR_RIGHT, MOVING_WALKING)
+                                                If MapNpc(mapNum).NPC(X).X < targetX And Not didwalk Then
+                                                    If CanNpcMove(mapNum, X, DIR_RIGHT) Then
+                                                        Call NpcMove(mapNum, X, DIR_RIGHT, MOVING_WALKING)
                                                         didwalk = True
                                                     End If
                                                 End If
             
                                                 ' Left
-                                                If MapNpc(mapnum).Npc(x).x > targetX And Not didwalk Then
-                                                    If CanNpcMove(mapnum, x, DIR_LEFT) Then
-                                                        Call NpcMove(mapnum, x, DIR_LEFT, MOVING_WALKING)
+                                                If MapNpc(mapNum).NPC(X).X > targetX And Not didwalk Then
+                                                    If CanNpcMove(mapNum, X, DIR_LEFT) Then
+                                                        Call NpcMove(mapNum, X, DIR_LEFT, MOVING_WALKING)
                                                         didwalk = True
                                                     End If
                                                 End If
             
                                                 ' Down
-                                                If MapNpc(mapnum).Npc(x).y < targetY And Not didwalk Then
-                                                    If CanNpcMove(mapnum, x, DIR_DOWN) Then
-                                                        Call NpcMove(mapnum, x, DIR_DOWN, MOVING_WALKING)
+                                                If MapNpc(mapNum).NPC(X).Y < targetY And Not didwalk Then
+                                                    If CanNpcMove(mapNum, X, DIR_DOWN) Then
+                                                        Call NpcMove(mapNum, X, DIR_DOWN, MOVING_WALKING)
                                                         didwalk = True
                                                     End If
                                                 End If
             
                                                 ' Up
-                                                If MapNpc(mapnum).Npc(x).y > targetY And Not didwalk Then
-                                                    If CanNpcMove(mapnum, x, DIR_UP) Then
-                                                        Call NpcMove(mapnum, x, DIR_UP, MOVING_WALKING)
+                                                If MapNpc(mapNum).NPC(X).Y > targetY And Not didwalk Then
+                                                    If CanNpcMove(mapNum, X, DIR_UP) Then
+                                                        Call NpcMove(mapNum, X, DIR_UP, MOVING_WALKING)
                                                         didwalk = True
                                                     End If
                                                 End If
@@ -387,33 +387,33 @@ Private Sub UpdateMapLogic()
                                             Case 2
             
                                                 ' Down
-                                                If MapNpc(mapnum).Npc(x).y < targetY And Not didwalk Then
-                                                    If CanNpcMove(mapnum, x, DIR_DOWN) Then
-                                                        Call NpcMove(mapnum, x, DIR_DOWN, MOVING_WALKING)
+                                                If MapNpc(mapNum).NPC(X).Y < targetY And Not didwalk Then
+                                                    If CanNpcMove(mapNum, X, DIR_DOWN) Then
+                                                        Call NpcMove(mapNum, X, DIR_DOWN, MOVING_WALKING)
                                                         didwalk = True
                                                     End If
                                                 End If
             
                                                 ' Up
-                                                If MapNpc(mapnum).Npc(x).y > targetY And Not didwalk Then
-                                                    If CanNpcMove(mapnum, x, DIR_UP) Then
-                                                        Call NpcMove(mapnum, x, DIR_UP, MOVING_WALKING)
+                                                If MapNpc(mapNum).NPC(X).Y > targetY And Not didwalk Then
+                                                    If CanNpcMove(mapNum, X, DIR_UP) Then
+                                                        Call NpcMove(mapNum, X, DIR_UP, MOVING_WALKING)
                                                         didwalk = True
                                                     End If
                                                 End If
             
                                                 ' Right
-                                                If MapNpc(mapnum).Npc(x).x < targetX And Not didwalk Then
-                                                    If CanNpcMove(mapnum, x, DIR_RIGHT) Then
-                                                        Call NpcMove(mapnum, x, DIR_RIGHT, MOVING_WALKING)
+                                                If MapNpc(mapNum).NPC(X).X < targetX And Not didwalk Then
+                                                    If CanNpcMove(mapNum, X, DIR_RIGHT) Then
+                                                        Call NpcMove(mapNum, X, DIR_RIGHT, MOVING_WALKING)
                                                         didwalk = True
                                                     End If
                                                 End If
             
                                                 ' Left
-                                                If MapNpc(mapnum).Npc(x).x > targetX And Not didwalk Then
-                                                    If CanNpcMove(mapnum, x, DIR_LEFT) Then
-                                                        Call NpcMove(mapnum, x, DIR_LEFT, MOVING_WALKING)
+                                                If MapNpc(mapNum).NPC(X).X > targetX And Not didwalk Then
+                                                    If CanNpcMove(mapNum, X, DIR_LEFT) Then
+                                                        Call NpcMove(mapNum, X, DIR_LEFT, MOVING_WALKING)
                                                         didwalk = True
                                                     End If
                                                 End If
@@ -421,33 +421,33 @@ Private Sub UpdateMapLogic()
                                             Case 3
             
                                                 ' Left
-                                                If MapNpc(mapnum).Npc(x).x > targetX And Not didwalk Then
-                                                    If CanNpcMove(mapnum, x, DIR_LEFT) Then
-                                                        Call NpcMove(mapnum, x, DIR_LEFT, MOVING_WALKING)
+                                                If MapNpc(mapNum).NPC(X).X > targetX And Not didwalk Then
+                                                    If CanNpcMove(mapNum, X, DIR_LEFT) Then
+                                                        Call NpcMove(mapNum, X, DIR_LEFT, MOVING_WALKING)
                                                         didwalk = True
                                                     End If
                                                 End If
             
                                                 ' Right
-                                                If MapNpc(mapnum).Npc(x).x < targetX And Not didwalk Then
-                                                    If CanNpcMove(mapnum, x, DIR_RIGHT) Then
-                                                        Call NpcMove(mapnum, x, DIR_RIGHT, MOVING_WALKING)
+                                                If MapNpc(mapNum).NPC(X).X < targetX And Not didwalk Then
+                                                    If CanNpcMove(mapNum, X, DIR_RIGHT) Then
+                                                        Call NpcMove(mapNum, X, DIR_RIGHT, MOVING_WALKING)
                                                         didwalk = True
                                                     End If
                                                 End If
             
                                                 ' Up
-                                                If MapNpc(mapnum).Npc(x).y > targetY And Not didwalk Then
-                                                    If CanNpcMove(mapnum, x, DIR_UP) Then
-                                                        Call NpcMove(mapnum, x, DIR_UP, MOVING_WALKING)
+                                                If MapNpc(mapNum).NPC(X).Y > targetY And Not didwalk Then
+                                                    If CanNpcMove(mapNum, X, DIR_UP) Then
+                                                        Call NpcMove(mapNum, X, DIR_UP, MOVING_WALKING)
                                                         didwalk = True
                                                     End If
                                                 End If
             
                                                 ' Down
-                                                If MapNpc(mapnum).Npc(x).y < targetY And Not didwalk Then
-                                                    If CanNpcMove(mapnum, x, DIR_DOWN) Then
-                                                        Call NpcMove(mapnum, x, DIR_DOWN, MOVING_WALKING)
+                                                If MapNpc(mapNum).NPC(X).Y < targetY And Not didwalk Then
+                                                    If CanNpcMove(mapNum, X, DIR_DOWN) Then
+                                                        Call NpcMove(mapNum, X, DIR_DOWN, MOVING_WALKING)
                                                         didwalk = True
                                                     End If
                                                 End If
@@ -456,33 +456,33 @@ Private Sub UpdateMapLogic()
             
                                         ' Check if we can't move and if Target is behind something and if we can just switch dirs
                                         If Not didwalk Then
-                                            If MapNpc(mapnum).Npc(x).x - 1 = targetX And MapNpc(mapnum).Npc(x).y = targetY Then
-                                                If MapNpc(mapnum).Npc(x).Dir <> DIR_LEFT Then
-                                                    Call NpcDir(mapnum, x, DIR_LEFT)
+                                            If MapNpc(mapNum).NPC(X).X - 1 = targetX And MapNpc(mapNum).NPC(X).Y = targetY Then
+                                                If MapNpc(mapNum).NPC(X).Dir <> DIR_LEFT Then
+                                                    Call NpcDir(mapNum, X, DIR_LEFT)
                                                 End If
             
                                                 didwalk = True
                                             End If
             
-                                            If MapNpc(mapnum).Npc(x).x + 1 = targetX And MapNpc(mapnum).Npc(x).y = targetY Then
-                                                If MapNpc(mapnum).Npc(x).Dir <> DIR_RIGHT Then
-                                                    Call NpcDir(mapnum, x, DIR_RIGHT)
+                                            If MapNpc(mapNum).NPC(X).X + 1 = targetX And MapNpc(mapNum).NPC(X).Y = targetY Then
+                                                If MapNpc(mapNum).NPC(X).Dir <> DIR_RIGHT Then
+                                                    Call NpcDir(mapNum, X, DIR_RIGHT)
                                                 End If
             
                                                 didwalk = True
                                             End If
             
-                                            If MapNpc(mapnum).Npc(x).x = targetX And MapNpc(mapnum).Npc(x).y - 1 = targetY Then
-                                                If MapNpc(mapnum).Npc(x).Dir <> DIR_UP Then
-                                                    Call NpcDir(mapnum, x, DIR_UP)
+                                            If MapNpc(mapNum).NPC(X).X = targetX And MapNpc(mapNum).NPC(X).Y - 1 = targetY Then
+                                                If MapNpc(mapNum).NPC(X).Dir <> DIR_UP Then
+                                                    Call NpcDir(mapNum, X, DIR_UP)
                                                 End If
             
                                                 didwalk = True
                                             End If
             
-                                            If MapNpc(mapnum).Npc(x).x = targetX And MapNpc(mapnum).Npc(x).y + 1 = targetY Then
-                                                If MapNpc(mapnum).Npc(x).Dir <> DIR_DOWN Then
-                                                    Call NpcDir(mapnum, x, DIR_DOWN)
+                                            If MapNpc(mapNum).NPC(X).X = targetX And MapNpc(mapNum).NPC(X).Y + 1 = targetY Then
+                                                If MapNpc(mapNum).NPC(X).Dir <> DIR_DOWN Then
+                                                    Call NpcDir(mapNum, X, DIR_DOWN)
                                                 End If
             
                                                 didwalk = True
@@ -495,31 +495,31 @@ Private Sub UpdateMapLogic()
                                                 If i = 1 Then
                                                     i = Int(Rnd * 4)
             
-                                                    If CanNpcMove(mapnum, x, i) Then
-                                                        Call NpcMove(mapnum, x, i, MOVING_WALKING)
+                                                    If CanNpcMove(mapNum, X, i) Then
+                                                        Call NpcMove(mapNum, X, i, MOVING_WALKING)
                                                     End If
                                                 End If
                                             End If
                                         End If
                                     Else
-                                        i = FindNpcPath(mapnum, x, targetX, targetY)
+                                        i = FindNpcPath(mapNum, X, targetX, targetY)
                                         If i < 4 Then 'Returned an answer. Move the NPC
-                                            If CanNpcMove(mapnum, x, i) Then
-                                                NpcMove mapnum, x, i, MOVING_WALKING
+                                            If CanNpcMove(mapNum, X, i) Then
+                                                NpcMove mapNum, X, i, MOVING_WALKING
                                             End If
                                         Else 'No good path found. Move randomly
                                             i = Int(Rnd * 4)
                                             If i = 1 Then
                                                 i = Int(Rnd * 4)
                 
-                                                If CanNpcMove(mapnum, x, i) Then
-                                                    Call NpcMove(mapnum, x, i, MOVING_WALKING)
+                                                If CanNpcMove(mapNum, X, i) Then
+                                                    Call NpcMove(mapNum, X, i, MOVING_WALKING)
                                                 End If
                                             End If
                                         End If
                                     End If
                                 Else
-                                    Call NpcDir(mapnum, x, GetNpcDir(targetX, targetY, CLng(MapNpc(mapnum).Npc(x).x), CLng(MapNpc(mapnum).Npc(x).y)))
+                                    Call NpcDir(mapNum, X, GetNpcDir(targetX, targetY, CLng(MapNpc(mapNum).NPC(X).X), CLng(MapNpc(mapNum).NPC(X).Y)))
                                 End If
                             Else
                                 i = Int(Rnd * 4)
@@ -527,8 +527,8 @@ Private Sub UpdateMapLogic()
                                 If i = 1 Then
                                     i = Int(Rnd * 4)
     
-                                    If CanNpcMove(mapnum, x, i) Then
-                                        Call NpcMove(mapnum, x, i, MOVING_WALKING)
+                                    If CanNpcMove(mapNum, X, i) Then
+                                        Call NpcMove(mapNum, X, i, MOVING_WALKING)
                                     End If
                                 End If
                             End If
@@ -540,9 +540,9 @@ Private Sub UpdateMapLogic()
                 ' // This is used for npcs to attack targets //
                 ' /////////////////////////////////////////////
                 ' Make sure theres a npc with the map
-                If Map(mapnum).Npc(x) > 0 And MapNpc(mapnum).Npc(x).Num > 0 Then
-                    target = MapNpc(mapnum).Npc(x).target
-                    targetType = MapNpc(mapnum).Npc(x).targetType
+                If Map(mapNum).NPC(X) > 0 And MapNpc(mapNum).NPC(X).Num > 0 Then
+                    target = MapNpc(mapNum).NPC(X).target
+                    targetType = MapNpc(mapNum).NPC(X).targetType
 
                     ' Check if the npc can attack the targeted player player
                     If target > 0 Then
@@ -550,12 +550,12 @@ Private Sub UpdateMapLogic()
                         If targetType = 1 Then ' player
 
                             ' Is the target playing and on the same map?
-                            If IsPlaying(target) And GetPlayerMap(target) = mapnum Then
-                                TryNpcAttackPlayer x, target
+                            If IsPlaying(target) And GetPlayerMap(target) = mapNum Then
+                                TryNpcAttackPlayer X, target
                             Else
                                 ' Player left map or game, set target to 0
-                                MapNpc(mapnum).Npc(x).target = 0
-                                MapNpc(mapnum).Npc(x).targetType = 0 ' clear
+                                MapNpc(mapNum).NPC(X).target = 0
+                                MapNpc(mapNum).NPC(X).targetType = 0 ' clear
                             End If
                         Else
                             ' lol no npc combat :(
@@ -567,14 +567,14 @@ Private Sub UpdateMapLogic()
                 ' // This is used for regenerating NPC's HP //
                 ' ////////////////////////////////////////////
                 ' Check to see if we want to regen some of the npc's hp
-                If Not MapNpc(mapnum).Npc(x).stopRegen Then
-                    If MapNpc(mapnum).Npc(x).Num > 0 And TickCount > GiveNPCHPTimer + 10000 Then
-                        If MapNpc(mapnum).Npc(x).Vital(Vitals.HP) > 0 Then
-                            MapNpc(mapnum).Npc(x).Vital(Vitals.HP) = MapNpc(mapnum).Npc(x).Vital(Vitals.HP) + GetNpcVitalRegen(npcNum, Vitals.HP)
+                If Not MapNpc(mapNum).NPC(X).stopRegen Then
+                    If MapNpc(mapNum).NPC(X).Num > 0 And TickCount > GiveNPCHPTimer + 10000 Then
+                        If MapNpc(mapNum).NPC(X).Vital(Vitals.HP) > 0 Then
+                            MapNpc(mapNum).NPC(X).Vital(Vitals.HP) = MapNpc(mapNum).NPC(X).Vital(Vitals.HP) + GetNpcVitalRegen(npcNum, Vitals.HP)
     
                             ' Check if they have more then they should and if so just set it to max
-                            If MapNpc(mapnum).Npc(x).Vital(Vitals.HP) > GetNpcMaxVital(npcNum, Vitals.HP) Then
-                                MapNpc(mapnum).Npc(x).Vital(Vitals.HP) = GetNpcMaxVital(npcNum, Vitals.HP)
+                            If MapNpc(mapNum).NPC(X).Vital(Vitals.HP) > GetNpcMaxVital(npcNum, Vitals.HP) Then
+                                MapNpc(mapNum).NPC(X).Vital(Vitals.HP) = GetNpcMaxVital(npcNum, Vitals.HP)
                             End If
                         End If
                     End If
@@ -595,9 +595,9 @@ Private Sub UpdateMapLogic()
                 ' // This is used for spawning an NPC //
                 ' //////////////////////////////////////
                 ' Check if we are supposed to spawn an npc or not
-                If MapNpc(mapnum).Npc(x).Num = 0 And Map(mapnum).Npc(x) > 0 Then
-                    If TickCount > MapNpc(mapnum).Npc(x).SpawnWait + (Npc(Map(mapnum).Npc(x)).SpawnSecs * 1000) Then
-                        Call SpawnNpc(x, mapnum)
+                If MapNpc(mapNum).NPC(X).Num = 0 And Map(mapNum).NPC(X) > 0 Then
+                    If TickCount > MapNpc(mapNum).NPC(X).SpawnWait + (NPC(Map(mapNum).NPC(X)).SpawnSecs * 1000) Then
+                        Call SpawnNpc(X, mapNum)
                     End If
                 End If
 
@@ -682,22 +682,22 @@ Private Sub HandleShutdown()
 
 End Sub
 
-Function CanEventMoveTowardsPlayer(playerID As Long, mapnum As Long, eventID As Long) As Long
-Dim i As Long, x As Long, y As Long, x1 As Long, y1 As Long, didwalk As Boolean, WalkThrough As Long
+Function CanEventMoveTowardsPlayer(playerID As Long, mapNum As Long, eventID As Long) As Long
+Dim i As Long, X As Long, Y As Long, x1 As Long, y1 As Long, didwalk As Boolean, WalkThrough As Long
 Dim tim As Long, sX As Long, sY As Long, pos() As Long, reachable As Boolean, j As Long, LastSum As Long, Sum As Long, FX As Long, FY As Long
 Dim path() As Vector, LastX As Long, LastY As Long, did As Boolean
     'This does not work for global events so this MUST be a player one....
     'This Event returns a direction, 4 is not a valid direction so we assume fail unless otherwise told.
     CanEventMoveTowardsPlayer = 4
     If playerID <= 0 Or playerID > Player_HighIndex Then Exit Function
-    If mapnum <= 0 Or mapnum > MAX_MAPS Then Exit Function
+    If mapNum <= 0 Or mapNum > MAX_MAPS Then Exit Function
     If eventID <= 0 Or eventID > TempPlayer(playerID).EventMap.CurrentEvents Then Exit Function
     
-    x = GetPlayerX(playerID)
-    y = GetPlayerY(playerID)
-    x1 = TempPlayer(playerID).EventMap.EventPages(eventID).x
-    y1 = TempPlayer(playerID).EventMap.EventPages(eventID).y
-    WalkThrough = Map(mapnum).Events(TempPlayer(playerID).EventMap.EventPages(eventID).eventID).Pages(TempPlayer(playerID).EventMap.EventPages(eventID).pageID).WalkThrough
+    X = GetPlayerX(playerID)
+    Y = GetPlayerY(playerID)
+    x1 = TempPlayer(playerID).EventMap.EventPages(eventID).X
+    y1 = TempPlayer(playerID).EventMap.EventPages(eventID).Y
+    WalkThrough = Map(mapNum).Events(TempPlayer(playerID).EventMap.EventPages(eventID).eventID).Pages(TempPlayer(playerID).EventMap.EventPages(eventID).pageID).WalkThrough
     'Add option for pathfinding to random guessing option.
     
     If PathfindingType = 1 Then
@@ -709,8 +709,8 @@ Dim path() As Vector, LastX As Long, LastY As Long, did As Boolean
             Case 0
         
                 ' Up
-                If y1 > y And Not didwalk Then
-                    If CanEventMove(playerID, mapnum, x1, y1, eventID, WalkThrough, DIR_UP, False) Then
+                If y1 > Y And Not didwalk Then
+                    If CanEventMove(playerID, mapNum, x1, y1, eventID, WalkThrough, DIR_UP, False) Then
                         CanEventMoveTowardsPlayer = DIR_UP
                         Exit Function
                         didwalk = True
@@ -718,8 +718,8 @@ Dim path() As Vector, LastX As Long, LastY As Long, did As Boolean
                 End If
         
                 ' Down
-                If y1 < y And Not didwalk Then
-                    If CanEventMove(playerID, mapnum, x1, y1, eventID, WalkThrough, DIR_DOWN, False) Then
+                If y1 < Y And Not didwalk Then
+                    If CanEventMove(playerID, mapNum, x1, y1, eventID, WalkThrough, DIR_DOWN, False) Then
                         CanEventMoveTowardsPlayer = DIR_DOWN
                         Exit Function
                         didwalk = True
@@ -727,8 +727,8 @@ Dim path() As Vector, LastX As Long, LastY As Long, did As Boolean
                 End If
         
                 ' Left
-                If x1 > x And Not didwalk Then
-                    If CanEventMove(playerID, mapnum, x1, y1, eventID, WalkThrough, DIR_LEFT, False) Then
+                If x1 > X And Not didwalk Then
+                    If CanEventMove(playerID, mapNum, x1, y1, eventID, WalkThrough, DIR_LEFT, False) Then
                         CanEventMoveTowardsPlayer = DIR_LEFT
                         Exit Function
                         didwalk = True
@@ -736,8 +736,8 @@ Dim path() As Vector, LastX As Long, LastY As Long, did As Boolean
                 End If
         
                 ' Right
-                If x1 < x And Not didwalk Then
-                    If CanEventMove(playerID, mapnum, x1, y1, eventID, WalkThrough, DIR_RIGHT, False) Then
+                If x1 < X And Not didwalk Then
+                    If CanEventMove(playerID, mapNum, x1, y1, eventID, WalkThrough, DIR_RIGHT, False) Then
                         CanEventMoveTowardsPlayer = DIR_RIGHT
                         Exit Function
                         didwalk = True
@@ -747,8 +747,8 @@ Dim path() As Vector, LastX As Long, LastY As Long, did As Boolean
             Case 1
             
                 ' Right
-                If x1 < x And Not didwalk Then
-                    If CanEventMove(playerID, mapnum, x1, y1, eventID, WalkThrough, DIR_RIGHT, False) Then
+                If x1 < X And Not didwalk Then
+                    If CanEventMove(playerID, mapNum, x1, y1, eventID, WalkThrough, DIR_RIGHT, False) Then
                         CanEventMoveTowardsPlayer = DIR_RIGHT
                         Exit Function
                         didwalk = True
@@ -756,8 +756,8 @@ Dim path() As Vector, LastX As Long, LastY As Long, did As Boolean
                 End If
                 
                 ' Left
-                If x1 > x And Not didwalk Then
-                    If CanEventMove(playerID, mapnum, x1, y1, eventID, WalkThrough, DIR_LEFT, False) Then
+                If x1 > X And Not didwalk Then
+                    If CanEventMove(playerID, mapNum, x1, y1, eventID, WalkThrough, DIR_LEFT, False) Then
                         CanEventMoveTowardsPlayer = DIR_LEFT
                         Exit Function
                         didwalk = True
@@ -765,8 +765,8 @@ Dim path() As Vector, LastX As Long, LastY As Long, did As Boolean
                 End If
                 
                 ' Down
-                If y1 < y And Not didwalk Then
-                    If CanEventMove(playerID, mapnum, x1, y1, eventID, WalkThrough, DIR_DOWN, False) Then
+                If y1 < Y And Not didwalk Then
+                    If CanEventMove(playerID, mapNum, x1, y1, eventID, WalkThrough, DIR_DOWN, False) Then
                         CanEventMoveTowardsPlayer = DIR_DOWN
                         Exit Function
                         didwalk = True
@@ -774,8 +774,8 @@ Dim path() As Vector, LastX As Long, LastY As Long, did As Boolean
                 End If
                 
                 ' Up
-                If y1 > y And Not didwalk Then
-                    If CanEventMove(playerID, mapnum, x1, y1, eventID, WalkThrough, DIR_UP, False) Then
+                If y1 > Y And Not didwalk Then
+                    If CanEventMove(playerID, mapNum, x1, y1, eventID, WalkThrough, DIR_UP, False) Then
                         CanEventMoveTowardsPlayer = DIR_UP
                         Exit Function
                         didwalk = True
@@ -785,8 +785,8 @@ Dim path() As Vector, LastX As Long, LastY As Long, did As Boolean
             Case 2
             
                 ' Down
-                If y1 < y And Not didwalk Then
-                    If CanEventMove(playerID, mapnum, x1, y1, eventID, WalkThrough, DIR_DOWN, False) Then
+                If y1 < Y And Not didwalk Then
+                    If CanEventMove(playerID, mapNum, x1, y1, eventID, WalkThrough, DIR_DOWN, False) Then
                         CanEventMoveTowardsPlayer = DIR_DOWN
                         Exit Function
                         didwalk = True
@@ -794,8 +794,8 @@ Dim path() As Vector, LastX As Long, LastY As Long, did As Boolean
                 End If
                 
                 ' Up
-                If y1 > y And Not didwalk Then
-                    If CanEventMove(playerID, mapnum, x1, y1, eventID, WalkThrough, DIR_UP, False) Then
+                If y1 > Y And Not didwalk Then
+                    If CanEventMove(playerID, mapNum, x1, y1, eventID, WalkThrough, DIR_UP, False) Then
                         CanEventMoveTowardsPlayer = DIR_UP
                         Exit Function
                         didwalk = True
@@ -803,8 +803,8 @@ Dim path() As Vector, LastX As Long, LastY As Long, did As Boolean
                 End If
                 
                 ' Right
-                If x1 < x And Not didwalk Then
-                    If CanEventMove(playerID, mapnum, x1, y1, eventID, WalkThrough, DIR_RIGHT, False) Then
+                If x1 < X And Not didwalk Then
+                    If CanEventMove(playerID, mapNum, x1, y1, eventID, WalkThrough, DIR_RIGHT, False) Then
                         CanEventMoveTowardsPlayer = DIR_RIGHT
                         Exit Function
                         didwalk = True
@@ -812,8 +812,8 @@ Dim path() As Vector, LastX As Long, LastY As Long, did As Boolean
                 End If
                 
                 ' Left
-                If x1 > x And Not didwalk Then
-                    If CanEventMove(playerID, mapnum, x1, y1, eventID, WalkThrough, DIR_LEFT, False) Then
+                If x1 > X And Not didwalk Then
+                    If CanEventMove(playerID, mapNum, x1, y1, eventID, WalkThrough, DIR_LEFT, False) Then
                         CanEventMoveTowardsPlayer = DIR_LEFT
                         Exit Function
                         didwalk = True
@@ -823,8 +823,8 @@ Dim path() As Vector, LastX As Long, LastY As Long, did As Boolean
             Case 3
             
                 ' Left
-                If x1 > x And Not didwalk Then
-                    If CanEventMove(playerID, mapnum, x1, y1, eventID, WalkThrough, DIR_LEFT, False) Then
+                If x1 > X And Not didwalk Then
+                    If CanEventMove(playerID, mapNum, x1, y1, eventID, WalkThrough, DIR_LEFT, False) Then
                         CanEventMoveTowardsPlayer = DIR_LEFT
                         Exit Function
                         didwalk = True
@@ -832,8 +832,8 @@ Dim path() As Vector, LastX As Long, LastY As Long, did As Boolean
                 End If
                 
                 ' Right
-                If x1 < x And Not didwalk Then
-                    If CanEventMove(playerID, mapnum, x1, y1, eventID, WalkThrough, DIR_RIGHT, False) Then
+                If x1 < X And Not didwalk Then
+                    If CanEventMove(playerID, mapNum, x1, y1, eventID, WalkThrough, DIR_RIGHT, False) Then
                         CanEventMoveTowardsPlayer = DIR_RIGHT
                         Exit Function
                         didwalk = True
@@ -841,8 +841,8 @@ Dim path() As Vector, LastX As Long, LastY As Long, did As Boolean
                 End If
                 
                 ' Up
-                If y1 > y And Not didwalk Then
-                    If CanEventMove(playerID, mapnum, x1, y1, eventID, WalkThrough, DIR_UP, False) Then
+                If y1 > Y And Not didwalk Then
+                    If CanEventMove(playerID, mapNum, x1, y1, eventID, WalkThrough, DIR_UP, False) Then
                         CanEventMoveTowardsPlayer = DIR_UP
                         Exit Function
                         didwalk = True
@@ -850,8 +850,8 @@ Dim path() As Vector, LastX As Long, LastY As Long, did As Boolean
                 End If
                 
                 ' Down
-                If y1 < y And Not didwalk Then
-                    If CanEventMove(playerID, mapnum, x1, y1, eventID, WalkThrough, DIR_DOWN, False) Then
+                If y1 < Y And Not didwalk Then
+                    If CanEventMove(playerID, mapNum, x1, y1, eventID, WalkThrough, DIR_DOWN, False) Then
                         CanEventMoveTowardsPlayer = DIR_DOWN
                         Exit Function
                         didwalk = True
@@ -864,19 +864,19 @@ Dim path() As Vector, LastX As Long, LastY As Long, did As Boolean
         tim = 0
         sX = x1
         sY = y1
-        FX = x
-        FY = y
+        FX = X
+        FY = Y
         
-        ReDim pos(0 To Map(mapnum).MaxX, 0 To Map(mapnum).MaxY)
+        ReDim pos(0 To Map(mapNum).MaxX, 0 To Map(mapNum).MaxY)
         
         'CacheMapBlocks mapnum
         
-        pos = MapBlocks(mapnum).Blocks
+        pos = MapBlocks(mapNum).Blocks
         
         For i = 1 To TempPlayer(playerID).EventMap.CurrentEvents
             If TempPlayer(playerID).EventMap.EventPages(i).Visible Then
                 If TempPlayer(playerID).EventMap.EventPages(i).WalkThrough = 1 Then
-                    pos(TempPlayer(playerID).EventMap.EventPages(i).x, TempPlayer(playerID).EventMap.EventPages(i).y) = 9
+                    pos(TempPlayer(playerID).EventMap.EventPages(i).X, TempPlayer(playerID).EventMap.EventPages(i).Y) = 9
                 End If
             End If
         Next
@@ -892,15 +892,15 @@ Dim path() As Vector, LastX As Long, LastY As Long, did As Boolean
         'but faster ;-)
         Do While reachable = False
             'we loop through all squares
-            For j = 0 To Map(mapnum).MaxY
-                For i = 0 To Map(mapnum).MaxX
+            For j = 0 To Map(mapNum).MaxY
+                For i = 0 To Map(mapNum).MaxX
                     'If j = 10 And i = 0 Then MsgBox "hi!"
                     'If they are to be extended, the pointer TIM is on them
                     If pos(i, j) = 100 + tim Then
                     'The part is to be extended, so do it
                         'We have to make sure that there is a pos(i+1,j) BEFORE we actually use it,
                         'because then we get error... If the square is on side, we dont test for this one!
-                        If i < Map(mapnum).MaxX Then
+                        If i < Map(mapNum).MaxX Then
                             'If there isnt a wall, or any other... thing
                             If pos(i + 1, j) = 0 Then
                                 'Expand it, and make its pos equal to tim+1, so the next time we make this loop,
@@ -924,7 +924,7 @@ Dim path() As Vector, LastX As Long, LastY As Long, did As Boolean
                             End If
                         End If
                     
-                        If j < Map(mapnum).MaxY Then
+                        If j < Map(mapNum).MaxY Then
                             If pos(i, j + 1) = 0 Then
                                 pos(i, j + 1) = 100 + tim + 1
                             ElseIf pos(i, j + 1) = 2 Then
@@ -948,8 +948,8 @@ Dim path() As Vector, LastX As Long, LastY As Long, did As Boolean
             If reachable = False Then
                 'reset sum
                 Sum = 0
-                For j = 0 To Map(mapnum).MaxY
-                    For i = 0 To Map(mapnum).MaxX
+                For j = 0 To Map(mapNum).MaxY
+                    For i = 0 To Map(mapNum).MaxX
                     'we add up ALL the squares
                     Sum = Sum + pos(i, j)
                     Next i
@@ -989,7 +989,7 @@ Dim path() As Vector, LastX As Long, LastY As Long, did As Boolean
             did = False
             
             'If we arent on edge
-            If LastX < Map(mapnum).MaxX Then
+            If LastX < Map(mapNum).MaxX Then
                 'check the square on the right of the solution. Is it a tim-1 one? or just a blank one
                 If pos(LastX + 1, LastY) = 100 + tim Then
                     'if it, then make it yellow, and change did to true
@@ -1011,7 +1011,7 @@ Dim path() As Vector, LastX As Long, LastY As Long, did As Boolean
             
             'We check the one below it
             If did = False Then
-                If LastY < Map(mapnum).MaxY Then
+                If LastY < Map(mapNum).MaxY Then
                     If pos(LastX, LastY + 1) = 100 + tim Then
                         LastY = LastY + 1
                         did = True
@@ -1029,41 +1029,41 @@ Dim path() As Vector, LastX As Long, LastY As Long, did As Boolean
                 End If
             End If
             
-            path(tim).x = LastX
-            path(tim).y = LastY
+            path(tim).X = LastX
+            path(tim).Y = LastY
             
             'Now we loop back and decrease tim, and look for the next square with lower value
             DoEvents
         Loop
         
         'Ok we got a path. Now, lets look at the first step and see what direction we should take.
-        If path(1).x > LastX Then
+        If path(1).X > LastX Then
             CanEventMoveTowardsPlayer = DIR_RIGHT
-        ElseIf path(1).y > LastY Then
+        ElseIf path(1).Y > LastY Then
             CanEventMoveTowardsPlayer = DIR_DOWN
-        ElseIf path(1).y < LastY Then
+        ElseIf path(1).Y < LastY Then
             CanEventMoveTowardsPlayer = DIR_UP
-        ElseIf path(1).x < LastX Then
+        ElseIf path(1).X < LastX Then
             CanEventMoveTowardsPlayer = DIR_LEFT
         End If
         
     End If
 End Function
 
-Function CanEventMoveAwayFromPlayer(playerID As Long, mapnum As Long, eventID As Long) As Long
-Dim i As Long, x As Long, y As Long, x1 As Long, y1 As Long, didwalk As Boolean, WalkThrough As Long
+Function CanEventMoveAwayFromPlayer(playerID As Long, mapNum As Long, eventID As Long) As Long
+Dim i As Long, X As Long, Y As Long, x1 As Long, y1 As Long, didwalk As Boolean, WalkThrough As Long
     'This does not work for global events so this MUST be a player one....
     'This Event returns a direction, 5 is not a valid direction so we assume fail unless otherwise told.
     CanEventMoveAwayFromPlayer = 5
     If playerID <= 0 Or playerID > Player_HighIndex Then Exit Function
-    If mapnum <= 0 Or mapnum > MAX_MAPS Then Exit Function
+    If mapNum <= 0 Or mapNum > MAX_MAPS Then Exit Function
     If eventID <= 0 Or eventID > TempPlayer(playerID).EventMap.CurrentEvents Then Exit Function
     
-    x = GetPlayerX(playerID)
-    y = GetPlayerY(playerID)
-    x1 = TempPlayer(playerID).EventMap.EventPages(eventID).x
-    y1 = TempPlayer(playerID).EventMap.EventPages(eventID).y
-    WalkThrough = Map(mapnum).Events(TempPlayer(playerID).EventMap.EventPages(eventID).eventID).Pages(TempPlayer(playerID).EventMap.EventPages(eventID).pageID).WalkThrough
+    X = GetPlayerX(playerID)
+    Y = GetPlayerY(playerID)
+    x1 = TempPlayer(playerID).EventMap.EventPages(eventID).X
+    y1 = TempPlayer(playerID).EventMap.EventPages(eventID).Y
+    WalkThrough = Map(mapNum).Events(TempPlayer(playerID).EventMap.EventPages(eventID).eventID).Pages(TempPlayer(playerID).EventMap.EventPages(eventID).pageID).WalkThrough
     
     i = Int(Rnd * 5)
     didwalk = False
@@ -1073,8 +1073,8 @@ Dim i As Long, x As Long, y As Long, x1 As Long, y1 As Long, didwalk As Boolean,
         Case 0
     
             ' Up
-            If y1 > y And Not didwalk Then
-                If CanEventMove(playerID, mapnum, x1, y1, eventID, WalkThrough, DIR_DOWN, False) Then
+            If y1 > Y And Not didwalk Then
+                If CanEventMove(playerID, mapNum, x1, y1, eventID, WalkThrough, DIR_DOWN, False) Then
                     CanEventMoveAwayFromPlayer = DIR_DOWN
                     Exit Function
                     didwalk = True
@@ -1082,8 +1082,8 @@ Dim i As Long, x As Long, y As Long, x1 As Long, y1 As Long, didwalk As Boolean,
             End If
     
             ' Down
-            If y1 < y And Not didwalk Then
-                If CanEventMove(playerID, mapnum, x1, y1, eventID, WalkThrough, DIR_UP, False) Then
+            If y1 < Y And Not didwalk Then
+                If CanEventMove(playerID, mapNum, x1, y1, eventID, WalkThrough, DIR_UP, False) Then
                     CanEventMoveAwayFromPlayer = DIR_UP
                     Exit Function
                     didwalk = True
@@ -1091,8 +1091,8 @@ Dim i As Long, x As Long, y As Long, x1 As Long, y1 As Long, didwalk As Boolean,
             End If
     
             ' Left
-            If x1 > x And Not didwalk Then
-                If CanEventMove(playerID, mapnum, x1, y1, eventID, WalkThrough, DIR_RIGHT, False) Then
+            If x1 > X And Not didwalk Then
+                If CanEventMove(playerID, mapNum, x1, y1, eventID, WalkThrough, DIR_RIGHT, False) Then
                     CanEventMoveAwayFromPlayer = DIR_RIGHT
                     Exit Function
                     didwalk = True
@@ -1100,8 +1100,8 @@ Dim i As Long, x As Long, y As Long, x1 As Long, y1 As Long, didwalk As Boolean,
             End If
     
             ' Right
-            If x1 < x And Not didwalk Then
-                If CanEventMove(playerID, mapnum, x1, y1, eventID, WalkThrough, DIR_LEFT, False) Then
+            If x1 < X And Not didwalk Then
+                If CanEventMove(playerID, mapNum, x1, y1, eventID, WalkThrough, DIR_LEFT, False) Then
                     CanEventMoveAwayFromPlayer = DIR_LEFT
                     Exit Function
                     didwalk = True
@@ -1111,8 +1111,8 @@ Dim i As Long, x As Long, y As Long, x1 As Long, y1 As Long, didwalk As Boolean,
         Case 1
         
             ' Right
-            If x1 < x And Not didwalk Then
-                If CanEventMove(playerID, mapnum, x1, y1, eventID, WalkThrough, DIR_LEFT, False) Then
+            If x1 < X And Not didwalk Then
+                If CanEventMove(playerID, mapNum, x1, y1, eventID, WalkThrough, DIR_LEFT, False) Then
                     CanEventMoveAwayFromPlayer = DIR_LEFT
                     Exit Function
                     didwalk = True
@@ -1120,8 +1120,8 @@ Dim i As Long, x As Long, y As Long, x1 As Long, y1 As Long, didwalk As Boolean,
             End If
             
             ' Left
-            If x1 > x And Not didwalk Then
-                If CanEventMove(playerID, mapnum, x1, y1, eventID, WalkThrough, DIR_RIGHT, False) Then
+            If x1 > X And Not didwalk Then
+                If CanEventMove(playerID, mapNum, x1, y1, eventID, WalkThrough, DIR_RIGHT, False) Then
                     CanEventMoveAwayFromPlayer = DIR_RIGHT
                     Exit Function
                     didwalk = True
@@ -1129,8 +1129,8 @@ Dim i As Long, x As Long, y As Long, x1 As Long, y1 As Long, didwalk As Boolean,
             End If
             
             ' Down
-            If y1 < y And Not didwalk Then
-                If CanEventMove(playerID, mapnum, x1, y1, eventID, WalkThrough, DIR_UP, False) Then
+            If y1 < Y And Not didwalk Then
+                If CanEventMove(playerID, mapNum, x1, y1, eventID, WalkThrough, DIR_UP, False) Then
                     CanEventMoveAwayFromPlayer = DIR_UP
                     Exit Function
                     didwalk = True
@@ -1138,8 +1138,8 @@ Dim i As Long, x As Long, y As Long, x1 As Long, y1 As Long, didwalk As Boolean,
             End If
             
             ' Up
-            If y1 > y And Not didwalk Then
-                If CanEventMove(playerID, mapnum, x1, y1, eventID, WalkThrough, DIR_DOWN, False) Then
+            If y1 > Y And Not didwalk Then
+                If CanEventMove(playerID, mapNum, x1, y1, eventID, WalkThrough, DIR_DOWN, False) Then
                     CanEventMoveAwayFromPlayer = DIR_DOWN
                     Exit Function
                     didwalk = True
@@ -1149,8 +1149,8 @@ Dim i As Long, x As Long, y As Long, x1 As Long, y1 As Long, didwalk As Boolean,
         Case 2
         
             ' Down
-            If y1 < y And Not didwalk Then
-                If CanEventMove(playerID, mapnum, x1, y1, eventID, WalkThrough, DIR_UP, False) Then
+            If y1 < Y And Not didwalk Then
+                If CanEventMove(playerID, mapNum, x1, y1, eventID, WalkThrough, DIR_UP, False) Then
                     CanEventMoveAwayFromPlayer = DIR_UP
                     Exit Function
                     didwalk = True
@@ -1158,8 +1158,8 @@ Dim i As Long, x As Long, y As Long, x1 As Long, y1 As Long, didwalk As Boolean,
             End If
             
             ' Up
-            If y1 > y And Not didwalk Then
-                If CanEventMove(playerID, mapnum, x1, y1, eventID, WalkThrough, DIR_DOWN, False) Then
+            If y1 > Y And Not didwalk Then
+                If CanEventMove(playerID, mapNum, x1, y1, eventID, WalkThrough, DIR_DOWN, False) Then
                     CanEventMoveAwayFromPlayer = DIR_DOWN
                     Exit Function
                     didwalk = True
@@ -1167,8 +1167,8 @@ Dim i As Long, x As Long, y As Long, x1 As Long, y1 As Long, didwalk As Boolean,
             End If
             
             ' Right
-            If x1 < x And Not didwalk Then
-                If CanEventMove(playerID, mapnum, x1, y1, eventID, WalkThrough, DIR_LEFT, False) Then
+            If x1 < X And Not didwalk Then
+                If CanEventMove(playerID, mapNum, x1, y1, eventID, WalkThrough, DIR_LEFT, False) Then
                     CanEventMoveAwayFromPlayer = DIR_LEFT
                     Exit Function
                     didwalk = True
@@ -1176,8 +1176,8 @@ Dim i As Long, x As Long, y As Long, x1 As Long, y1 As Long, didwalk As Boolean,
             End If
             
             ' Left
-            If x1 > x And Not didwalk Then
-                If CanEventMove(playerID, mapnum, x1, y1, eventID, WalkThrough, DIR_RIGHT, False) Then
+            If x1 > X And Not didwalk Then
+                If CanEventMove(playerID, mapNum, x1, y1, eventID, WalkThrough, DIR_RIGHT, False) Then
                     CanEventMoveAwayFromPlayer = DIR_RIGHT
                     Exit Function
                     didwalk = True
@@ -1187,8 +1187,8 @@ Dim i As Long, x As Long, y As Long, x1 As Long, y1 As Long, didwalk As Boolean,
         Case 3
         
             ' Left
-            If x1 > x And Not didwalk Then
-                If CanEventMove(playerID, mapnum, x1, y1, eventID, WalkThrough, DIR_RIGHT, False) Then
+            If x1 > X And Not didwalk Then
+                If CanEventMove(playerID, mapNum, x1, y1, eventID, WalkThrough, DIR_RIGHT, False) Then
                     CanEventMoveAwayFromPlayer = DIR_RIGHT
                     Exit Function
                     didwalk = True
@@ -1196,8 +1196,8 @@ Dim i As Long, x As Long, y As Long, x1 As Long, y1 As Long, didwalk As Boolean,
             End If
             
             ' Right
-            If x1 < x And Not didwalk Then
-                If CanEventMove(playerID, mapnum, x1, y1, eventID, WalkThrough, DIR_LEFT, False) Then
+            If x1 < X And Not didwalk Then
+                If CanEventMove(playerID, mapNum, x1, y1, eventID, WalkThrough, DIR_LEFT, False) Then
                     CanEventMoveAwayFromPlayer = DIR_LEFT
                     Exit Function
                     didwalk = True
@@ -1205,8 +1205,8 @@ Dim i As Long, x As Long, y As Long, x1 As Long, y1 As Long, didwalk As Boolean,
             End If
             
             ' Up
-            If y1 > y And Not didwalk Then
-                If CanEventMove(playerID, mapnum, x1, y1, eventID, WalkThrough, DIR_DOWN, False) Then
+            If y1 > Y And Not didwalk Then
+                If CanEventMove(playerID, mapNum, x1, y1, eventID, WalkThrough, DIR_DOWN, False) Then
                     CanEventMoveAwayFromPlayer = DIR_DOWN
                     Exit Function
                     didwalk = True
@@ -1214,8 +1214,8 @@ Dim i As Long, x As Long, y As Long, x1 As Long, y1 As Long, didwalk As Boolean,
             End If
             
             ' Down
-            If y1 < y And Not didwalk Then
-                If CanEventMove(playerID, mapnum, x1, y1, eventID, WalkThrough, DIR_UP, False) Then
+            If y1 < Y And Not didwalk Then
+                If CanEventMove(playerID, mapNum, x1, y1, eventID, WalkThrough, DIR_UP, False) Then
                     CanEventMoveAwayFromPlayer = DIR_UP
                     Exit Function
                     didwalk = True
@@ -1227,42 +1227,42 @@ Dim i As Long, x As Long, y As Long, x1 As Long, y1 As Long, didwalk As Boolean,
         CanEventMoveAwayFromPlayer = Random(0, 3)
 End Function
 
-Function GetDirToPlayer(playerID As Long, mapnum As Long, eventID As Long) As Long
-Dim i As Long, x As Long, y As Long, x1 As Long, y1 As Long, didwalk As Boolean, WalkThrough As Long, distance As Long
+Function GetDirToPlayer(playerID As Long, mapNum As Long, eventID As Long) As Long
+Dim i As Long, X As Long, Y As Long, x1 As Long, y1 As Long, didwalk As Boolean, WalkThrough As Long, distance As Long
     'This does not work for global events so this MUST be a player one....
     'This Event returns a direction, 5 is not a valid direction so we assume fail unless otherwise told.
     If playerID <= 0 Or playerID > Player_HighIndex Then Exit Function
-    If mapnum <= 0 Or mapnum > MAX_MAPS Then Exit Function
+    If mapNum <= 0 Or mapNum > MAX_MAPS Then Exit Function
     If eventID <= 0 Or eventID > TempPlayer(playerID).EventMap.CurrentEvents Then Exit Function
     
-    x = GetPlayerX(playerID)
-    y = GetPlayerY(playerID)
-    x1 = TempPlayer(playerID).EventMap.EventPages(eventID).x
-    y1 = TempPlayer(playerID).EventMap.EventPages(eventID).y
+    X = GetPlayerX(playerID)
+    Y = GetPlayerY(playerID)
+    x1 = TempPlayer(playerID).EventMap.EventPages(eventID).X
+    y1 = TempPlayer(playerID).EventMap.EventPages(eventID).Y
     
     i = DIR_RIGHT
     
-    If x - x1 > 0 Then
-        If x - x1 > distance Then
+    If X - x1 > 0 Then
+        If X - x1 > distance Then
             i = DIR_RIGHT
-            distance = x - x1
+            distance = X - x1
         End If
-    ElseIf x - x1 < 0 Then
-        If ((x - x1) * -1) > distance Then
+    ElseIf X - x1 < 0 Then
+        If ((X - x1) * -1) > distance Then
             i = DIR_LEFT
-            distance = ((x - x1) * -1)
+            distance = ((X - x1) * -1)
         End If
     End If
     
-    If y - y1 > 0 Then
-        If y - y1 > distance Then
+    If Y - y1 > 0 Then
+        If Y - y1 > distance Then
             i = DIR_DOWN
-            distance = y - y1
+            distance = Y - y1
         End If
-    ElseIf y - y1 < 0 Then
-        If ((y - y1) * -1) > distance Then
+    ElseIf Y - y1 < 0 Then
+        If ((Y - y1) * -1) > distance Then
             i = DIR_UP
-            distance = ((y - y1) * -1)
+            distance = ((Y - y1) * -1)
         End If
     End If
     
@@ -1270,62 +1270,62 @@ Dim i As Long, x As Long, y As Long, x1 As Long, y1 As Long, didwalk As Boolean,
     
 End Function
 
-Function GetDirAwayFromPlayer(playerID As Long, mapnum As Long, eventID As Long) As Long
-Dim i As Long, x As Long, y As Long, x1 As Long, y1 As Long, didwalk As Boolean, WalkThrough As Long, distance As Long
+Function GetDirAwayFromPlayer(playerID As Long, mapNum As Long, eventID As Long) As Long
+Dim i As Long, X As Long, Y As Long, x1 As Long, y1 As Long, didwalk As Boolean, WalkThrough As Long, distance As Long
     'This does not work for global events so this MUST be a player one....
     'This Event returns a direction, 5 is not a valid direction so we assume fail unless otherwise told.
     If playerID <= 0 Or playerID > Player_HighIndex Then Exit Function
-    If mapnum <= 0 Or mapnum > MAX_MAPS Then Exit Function
+    If mapNum <= 0 Or mapNum > MAX_MAPS Then Exit Function
     If eventID <= 0 Or eventID > TempPlayer(playerID).EventMap.CurrentEvents Then Exit Function
     
-    x = GetPlayerX(playerID)
-    y = GetPlayerY(playerID)
-    x1 = TempPlayer(playerID).EventMap.EventPages(eventID).x
-    y1 = TempPlayer(playerID).EventMap.EventPages(eventID).y
+    X = GetPlayerX(playerID)
+    Y = GetPlayerY(playerID)
+    x1 = TempPlayer(playerID).EventMap.EventPages(eventID).X
+    y1 = TempPlayer(playerID).EventMap.EventPages(eventID).Y
     
     
     i = DIR_RIGHT
     
-    If x - x1 > 0 Then
-        If x - x1 > distance Then
+    If X - x1 > 0 Then
+        If X - x1 > distance Then
             i = DIR_LEFT
-            distance = x - x1
+            distance = X - x1
         End If
-    ElseIf x - x1 < 0 Then
-        If ((x - x1) * -1) > distance Then
+    ElseIf X - x1 < 0 Then
+        If ((X - x1) * -1) > distance Then
             i = DIR_RIGHT
-            distance = ((x - x1) * -1)
+            distance = ((X - x1) * -1)
         End If
     End If
     
-    If y - y1 > 0 Then
-        If y - y1 > distance Then
+    If Y - y1 > 0 Then
+        If Y - y1 > distance Then
             i = DIR_UP
-            distance = y - y1
+            distance = Y - y1
         End If
-    ElseIf y - y1 < 0 Then
-        If ((y - y1) * -1) > distance Then
+    ElseIf Y - y1 < 0 Then
+        If ((Y - y1) * -1) > distance Then
             i = DIR_DOWN
-            distance = ((y - y1) * -1)
+            distance = ((Y - y1) * -1)
         End If
     End If
     
     GetDirAwayFromPlayer = i
 End Function
 
-Function FindNpcPath(mapnum As Long, mapNpcNum As Long, targetX As Long, targetY As Long) As Long
-Dim tim As Long, sX As Long, sY As Long, pos() As Long, reachable As Boolean, x As Long, y As Long, j As Long, LastSum As Long, Sum As Long, FX As Long, FY As Long, i As Long
+Function FindNpcPath(mapNum As Long, mapNpcNum As Long, targetX As Long, targetY As Long) As Long
+Dim tim As Long, sX As Long, sY As Long, pos() As Long, reachable As Boolean, X As Long, Y As Long, j As Long, LastSum As Long, Sum As Long, FX As Long, FY As Long, i As Long
 Dim path() As Vector, LastX As Long, LastY As Long, did As Boolean
 
 'Initialization phase
 tim = 0
-sX = MapNpc(mapnum).Npc(mapNpcNum).x
-sY = MapNpc(mapnum).Npc(mapNpcNum).y
+sX = MapNpc(mapNum).NPC(mapNpcNum).X
+sY = MapNpc(mapNum).NPC(mapNpcNum).Y
 FX = targetX
 FY = targetY
 
-ReDim pos(0 To Map(mapnum).MaxX, 0 To Map(mapnum).MaxY)
-pos = MapBlocks(mapnum).Blocks
+ReDim pos(0 To Map(mapNum).MaxX, 0 To Map(mapNum).MaxY)
+pos = MapBlocks(mapNum).Blocks
 
 pos(sX, sY) = 100 + tim
 pos(FX, FY) = 2
@@ -1338,15 +1338,15 @@ reachable = False
 'but faster ;-)
 Do While reachable = False
     'we loop through all squares
-    For j = 0 To Map(mapnum).MaxY
-        For i = 0 To Map(mapnum).MaxX
+    For j = 0 To Map(mapNum).MaxY
+        For i = 0 To Map(mapNum).MaxX
             'If j = 10 And i = 0 Then MsgBox "hi!"
             'If they are to be extended, the pointer TIM is on them
             If pos(i, j) = 100 + tim Then
             'The part is to be extended, so do it
                 'We have to make sure that there is a pos(i+1,j) BEFORE we actually use it,
                 'because then we get error... If the square is on side, we dont test for this one!
-                If i < Map(mapnum).MaxX Then
+                If i < Map(mapNum).MaxX Then
                     'If there isnt a wall, or any other... thing
                     If pos(i + 1, j) = 0 Then
                         'Expand it, and make its pos equal to tim+1, so the next time we make this loop,
@@ -1370,7 +1370,7 @@ Do While reachable = False
                     End If
                 End If
             
-                If j < Map(mapnum).MaxY Then
+                If j < Map(mapNum).MaxY Then
                     If pos(i, j + 1) = 0 Then
                         pos(i, j + 1) = 100 + tim + 1
                     ElseIf pos(i, j + 1) = 2 Then
@@ -1394,8 +1394,8 @@ Do While reachable = False
     If reachable = False Then
         'reset sum
         Sum = 0
-        For j = 0 To Map(mapnum).MaxY
-            For i = 0 To Map(mapnum).MaxX
+        For j = 0 To Map(mapNum).MaxY
+            For i = 0 To Map(mapNum).MaxX
             'we add up ALL the squares
             Sum = Sum + pos(i, j)
             Next i
@@ -1435,7 +1435,7 @@ Do While LastX <> sX Or LastY <> sY
     did = False
     
     'If we arent on edge
-    If LastX < Map(mapnum).MaxX Then
+    If LastX < Map(mapNum).MaxX Then
         'check the square on the right of the solution. Is it a tim-1 one? or just a blank one
         If pos(LastX + 1, LastY) = 100 + tim Then
             'if it, then make it yellow, and change did to true
@@ -1457,7 +1457,7 @@ Do While LastX <> sX Or LastY <> sY
     
     'We check the one below it
     If did = False Then
-        If LastY < Map(mapnum).MaxY Then
+        If LastY < Map(mapNum).MaxY Then
             If pos(LastX, LastY + 1) = 100 + tim Then
                 LastY = LastY + 1
                 did = True
@@ -1475,43 +1475,43 @@ Do While LastX <> sX Or LastY <> sY
         End If
     End If
     
-    path(tim).x = LastX
-    path(tim).y = LastY
+    path(tim).X = LastX
+    path(tim).Y = LastY
     
     'Now we loop back and decrease tim, and look for the next square with lower value
     DoEvents
 Loop
 
 'Ok we got a path. Now, lets look at the first step and see what direction we should take.
-If path(1).x > LastX Then
+If path(1).X > LastX Then
     FindNpcPath = DIR_RIGHT
-ElseIf path(1).y > LastY Then
+ElseIf path(1).Y > LastY Then
     FindNpcPath = DIR_DOWN
-ElseIf path(1).y < LastY Then
+ElseIf path(1).Y < LastY Then
     FindNpcPath = DIR_UP
-ElseIf path(1).x < LastX Then
+ElseIf path(1).X < LastX Then
     FindNpcPath = DIR_LEFT
 End If
 
 End Function
 
-Public Sub CacheMapBlocks(mapnum As Long)
-Dim x As Long, y As Long
-    ReDim MapBlocks(mapnum).Blocks(0 To Map(mapnum).MaxX, 0 To Map(mapnum).MaxY)
-    For x = 0 To Map(mapnum).MaxX
-        For y = 0 To Map(mapnum).MaxY
-            If NpcTileIsOpen(mapnum, x, y) = False Then
-                MapBlocks(mapnum).Blocks(x, y) = 9
+Public Sub CacheMapBlocks(mapNum As Long)
+Dim X As Long, Y As Long
+    ReDim MapBlocks(mapNum).Blocks(0 To Map(mapNum).MaxX, 0 To Map(mapNum).MaxY)
+    For X = 0 To Map(mapNum).MaxX
+        For Y = 0 To Map(mapNum).MaxY
+            If NpcTileIsOpen(mapNum, X, Y) = False Then
+                MapBlocks(mapNum).Blocks(X, Y) = 9
             End If
         Next
     Next
 End Sub
 
-Public Sub UpdateMapBlock(mapnum, x, y, blocked As Boolean)
-    If blocked Then
-        MapBlocks(mapnum).Blocks(x, y) = 9
+Public Sub UpdateMapBlock(ByVal mapNum As Byte, ByVal X As Integer, ByVal Y As Integer, ByVal Blocked As Boolean)
+    If Blocked Then
+        MapBlocks(mapNum).Blocks(X, Y) = 9
     Else
-        MapBlocks(mapnum).Blocks(x, y) = 0
+        MapBlocks(mapNum).Blocks(X, Y) = 0
     End If
 End Sub
 
@@ -1533,32 +1533,32 @@ Function IsOneBlockAway(x1 As Long, y1 As Long, x2 As Long, y2 As Long) As Boole
     End If
 End Function
 
-Function GetNpcDir(x As Long, y As Long, x1 As Long, y1 As Long) As Long
+Function GetNpcDir(X As Long, Y As Long, x1 As Long, y1 As Long) As Long
     Dim i As Long, distance As Long
     
     i = DIR_RIGHT
     
-    If x - x1 > 0 Then
-        If x - x1 > distance Then
+    If X - x1 > 0 Then
+        If X - x1 > distance Then
             i = DIR_RIGHT
-            distance = x - x1
+            distance = X - x1
         End If
-    ElseIf x - x1 < 0 Then
-        If ((x - x1) * -1) > distance Then
+    ElseIf X - x1 < 0 Then
+        If ((X - x1) * -1) > distance Then
             i = DIR_LEFT
-            distance = ((x - x1) * -1)
+            distance = ((X - x1) * -1)
         End If
     End If
     
-    If y - y1 > 0 Then
-        If y - y1 > distance Then
+    If Y - y1 > 0 Then
+        If Y - y1 > distance Then
             i = DIR_DOWN
-            distance = y - y1
+            distance = Y - y1
         End If
-    ElseIf y - y1 < 0 Then
-        If ((y - y1) * -1) > distance Then
+    ElseIf Y - y1 < 0 Then
+        If ((Y - y1) * -1) > distance Then
             i = DIR_UP
-            distance = ((y - y1) * -1)
+            distance = ((Y - y1) * -1)
         End If
     End If
     

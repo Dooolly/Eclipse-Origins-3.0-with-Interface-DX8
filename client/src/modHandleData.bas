@@ -1057,7 +1057,7 @@ Dim MapNum As Long
     Map.Red = Buffer.ReadLong
     Map.Green = Buffer.ReadLong
     Map.Blue = Buffer.ReadLong
-    Map.alpha = Buffer.ReadLong
+    Map.Alpha = Buffer.ReadLong
     
     Map.MaxX = Buffer.ReadByte
     Map.MaxY = Buffer.ReadByte
@@ -1225,7 +1225,7 @@ Dim MusicFile As String
     CurrentTintR = Map.Red
     CurrentTintG = Map.Green
     CurrentTintB = Map.Blue
-    CurrentTintA = Map.alpha
+    CurrentTintA = Map.Alpha
 
     GettingMap = False
     CanMoveNow = True
@@ -3069,7 +3069,7 @@ errorhandler:
 End Sub
 
 Private Sub HandleChatBubble(ByVal Index As Long, ByRef Data() As Byte, ByVal StartAddr As Long, ByVal ExtraVar As Long)
-Dim Buffer As clsBuffer, targetType As Long, target As Long, Message As String, Colour As Long
+Dim Buffer As clsBuffer, targetType As Byte, target As Long, Message As String, Colour As Long
     
     ' If debug mode, handle error then exit out
     If Options.Debug = 1 Then On Error GoTo errorhandler
@@ -3077,13 +3077,14 @@ Dim Buffer As clsBuffer, targetType As Long, target As Long, Message As String, 
     Set Buffer = New clsBuffer
     Buffer.WriteBytes Data()
     
-    target = Buffer.ReadLong
-    targetType = Buffer.ReadLong
+    target = Buffer.ReadInteger
+    targetType = Buffer.ReadByte
     Message = Buffer.ReadString
     Colour = Buffer.ReadLong
     
     AddChatBubble target, targetType, Message, Colour
     Set Buffer = Nothing
+    
 errorhandler:
     HandleError "HandleChatBubble", "modHandleData", Err.Number, Err.Description, Err.Source, Err.HelpContext
     Err.Clear

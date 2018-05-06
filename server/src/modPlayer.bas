@@ -185,27 +185,27 @@ Function CanPlayerBlockHit(ByVal Index As Long) As Boolean
 
 End Function
 
-Sub PlayerWarp(ByVal Index As Integer, ByVal mapnum As Byte, ByVal x As Integer, ByVal y As Integer)
+Sub PlayerWarp(ByVal Index As Integer, ByVal mapNum As Byte, ByVal X As Integer, ByVal Y As Integer)
     Dim shopNum As Byte
     Dim OldMap As Byte
     Dim i As Integer
     Dim Buffer As clsBuffer
 
     ' Check for subscript out of range
-    If IsPlaying(Index) = False Or mapnum <= 0 Or mapnum > MAX_MAPS Then
+    If IsPlaying(Index) = False Or mapNum <= 0 Or mapNum > MAX_MAPS Then
         Exit Sub
     End If
 
     ' Check if you are out of bounds
-    If x > Map(mapnum).MaxX Then x = Map(mapnum).MaxX
-    If y > Map(mapnum).MaxY Then y = Map(mapnum).MaxY
-    If x < 0 Then x = 0
-    If y < 0 Then y = 0
+    If X > Map(mapNum).MaxX Then X = Map(mapNum).MaxX
+    If Y > Map(mapNum).MaxY Then Y = Map(mapNum).MaxY
+    If X < 0 Then X = 0
+    If Y < 0 Then Y = 0
     
     ' if same map then just send their co-ordinates
-    If mapnum = GetPlayerMap(Index) Then
+    If mapNum = GetPlayerMap(Index) Then
         SendPlayerXYToMap Index
-        Call CheckTasks(Index, QUEST_TYPE_GOREACH, mapnum)
+        Call CheckTasks(Index, QUEST_TYPE_GOREACH, mapNum)
     End If
     
     TempPlayer(Index).EventProcessingCount = 0
@@ -219,24 +219,24 @@ Sub PlayerWarp(ByVal Index As Integer, ByVal mapnum As Byte, ByVal x As Integer,
     ' Save old map to send erase player data to
     OldMap = GetPlayerMap(Index)
 
-    If OldMap <> mapnum Then
+    If OldMap <> mapNum Then
         Call SendLeaveMap(Index, OldMap)
     End If
     
     UpdateMapBlock OldMap, GetPlayerX(Index), GetPlayerY(Index), False
-    Call SetPlayerMap(Index, mapnum)
-    Call SetPlayerX(Index, x)
-    Call SetPlayerY(Index, y)
-    UpdateMapBlock mapnum, x, y, True
+    Call SetPlayerMap(Index, mapNum)
+    Call SetPlayerX(Index, X)
+    Call SetPlayerY(Index, Y)
+    UpdateMapBlock mapNum, X, Y, True
     
     ' send player's equipment to new map
     SendMapEquipment Index
     
     ' send equipment of all people on new map
-    If GetTotalMapPlayers(mapnum) > 0 Then
+    If GetTotalMapPlayers(mapNum) > 0 Then
         For i = 1 To Player_HighIndex
             If IsPlaying(i) Then
-                If GetPlayerMap(i) = mapnum Then
+                If GetPlayerMap(i) = mapNum Then
                     SendMapEquipmentTo i, Index
                 End If
             End If
@@ -259,22 +259,22 @@ Sub PlayerWarp(ByVal Index As Integer, ByVal mapnum As Byte, ByVal x As Integer,
     End If
 
     ' Sets it so we know to process npcs on the map
-    PlayersOnMap(mapnum) = YES
+    PlayersOnMap(mapNum) = YES
     TempPlayer(Index).GettingMap = YES
     Set Buffer = New clsBuffer
     Buffer.WriteLong SCheckForMap
-    Buffer.WriteLong mapnum
-    Buffer.WriteLong Map(mapnum).Revision
+    Buffer.WriteLong mapNum
+    Buffer.WriteLong Map(mapNum).Revision
     SendDataTo Index, Buffer.ToArray()
     Set Buffer = Nothing
     
     ' ALATAR
-    Call CheckTasks(Index, QUEST_TYPE_GOREACH, mapnum)
+    Call CheckTasks(Index, QUEST_TYPE_GOREACH, mapNum)
 End Sub
 
 Sub PlayerMove(ByVal Index As Long, ByVal Dir As Long, ByVal movement As Long, Optional ByVal sendToSelf As Boolean = False)
-    Dim Buffer As clsBuffer, mapnum As Long, i As Long
-    Dim x As Long, y As Long
+    Dim Buffer As clsBuffer, mapNum As Long, i As Long
+    Dim X As Long, Y As Long
     Dim Moved As Byte, MovedSoFar As Boolean
     Dim NewMapX As Byte, NewMapY As Byte
     Dim TileType As Long, VitalType As Long, Colour As Long, Amount As Long, begineventprocessing As Boolean
@@ -286,7 +286,7 @@ Sub PlayerMove(ByVal Index As Long, ByVal Dir As Long, ByVal movement As Long, O
 
     Call SetPlayerDir(Index, Dir)
     Moved = NO
-    mapnum = GetPlayerMap(Index)
+    mapNum = GetPlayerMap(Index)
     
     Select Case Dir
         Case DIR_UP
@@ -326,7 +326,7 @@ Sub PlayerMove(ByVal Index As Long, ByVal Dir As Long, ByVal movement As Long, O
         Case DIR_DOWN
 
             ' Check to make sure not outside of boundries
-            If GetPlayerY(Index) < Map(mapnum).MaxY Then
+            If GetPlayerY(Index) < Map(mapNum).MaxY Then
 
                 ' Check to make sure that the tile is walkable
                 If Not isDirBlocked(Map(GetPlayerMap(Index)).Tile(GetPlayerX(Index), GetPlayerY(Index)).DirBlock, DIR_DOWN + 1) Then
@@ -393,7 +393,7 @@ Sub PlayerMove(ByVal Index As Long, ByVal Dir As Long, ByVal movement As Long, O
         Case DIR_RIGHT
 
             ' Check to make sure not outside of boundries
-            If GetPlayerX(Index) < Map(mapnum).MaxX Then
+            If GetPlayerX(Index) < Map(mapNum).MaxX Then
 
                 ' Check to make sure that the tile is walkable
                 If Not isDirBlocked(Map(GetPlayerMap(Index)).Tile(GetPlayerX(Index), GetPlayerY(Index)).DirBlock, DIR_RIGHT + 1) Then
@@ -425,44 +425,44 @@ Sub PlayerMove(ByVal Index As Long, ByVal Dir As Long, ByVal movement As Long, O
     With Map(GetPlayerMap(Index)).Tile(GetPlayerX(Index), GetPlayerY(Index))
         ' Check to see if the tile is a warp tile, and if so warp them
         If .Type = TILE_TYPE_WARP Then
-            mapnum = .Data1
-            x = .Data2
-            y = .Data3
-            Call PlayerWarp(Index, mapnum, x, y)
+            mapNum = .Data1
+            X = .Data2
+            Y = .Data3
+            Call PlayerWarp(Index, mapNum, X, Y)
             Moved = YES
         End If
     
         ' Check to see if the tile is a door tile, and if so warp them
         If .Type = TILE_TYPE_DOOR Then
-            mapnum = .Data1
-            x = .Data2
-            y = .Data3
+            mapNum = .Data1
+            X = .Data2
+            Y = .Data3
             ' send the animation to the map
             SendDoorAnimation GetPlayerMap(Index), GetPlayerX(Index), GetPlayerY(Index)
-            Call PlayerWarp(Index, mapnum, x, y)
+            Call PlayerWarp(Index, mapNum, X, Y)
             Moved = YES
         End If
     
         ' Check for key trigger open
         If .Type = TILE_TYPE_KEYOPEN Then
-            x = .Data1
-            y = .Data2
+            X = .Data1
+            Y = .Data2
     
-            If Map(GetPlayerMap(Index)).Tile(x, y).Type = TILE_TYPE_KEY And temptile(GetPlayerMap(Index)).DoorOpen(x, y) = NO Then
-                temptile(GetPlayerMap(Index)).DoorOpen(x, y) = YES
+            If Map(GetPlayerMap(Index)).Tile(X, Y).Type = TILE_TYPE_KEY And temptile(GetPlayerMap(Index)).DoorOpen(X, Y) = NO Then
+                temptile(GetPlayerMap(Index)).DoorOpen(X, Y) = YES
                 temptile(GetPlayerMap(Index)).DoorTimer = GetTickCount
-                SendMapKey Index, x, y, 1
+                SendMapKey Index, X, Y, 1
                 Call MapMsg(GetPlayerMap(Index), "Essa porta está fechada!", White)
             End If
         End If
         
         ' Check for a shop, and if so open it
         If .Type = TILE_TYPE_SHOP Then
-            x = .Data1
-            If x > 0 Then ' shop exists?
-                If Len(Trim$(Shop(x).Name)) > 0 Then ' name exists?
-                    SendOpenShop Index, x
-                    TempPlayer(Index).InShop = x ' stops movement and the like
+            X = .Data1
+            If X > 0 Then ' shop exists?
+                If Len(Trim$(Shop(X).Name)) > 0 Then ' name exists?
+                    SendOpenShop Index, X
+                    TempPlayer(Index).InShop = X ' stops movement and the like
                 End If
             End If
         End If
@@ -523,16 +523,16 @@ Sub PlayerMove(ByVal Index As Long, ByVal Dir As Long, ByVal movement As Long, O
         PlayerWarp Index, GetPlayerMap(Index), GetPlayerX(Index), GetPlayerY(Index)
     End If
     
-    x = GetPlayerX(Index)
-    y = GetPlayerY(Index)
+    X = GetPlayerX(Index)
+    Y = GetPlayerY(Index)
     
     If Moved = YES Then
         If TempPlayer(Index).EventMap.CurrentEvents > 0 Then
             For i = 1 To TempPlayer(Index).EventMap.CurrentEvents
                 If Map(GetPlayerMap(Index)).Events(TempPlayer(Index).EventMap.EventPages(i).eventID).Global = 1 Then
-                    If Map(GetPlayerMap(Index)).Events(TempPlayer(Index).EventMap.EventPages(i).eventID).x = x And Map(GetPlayerMap(Index)).Events(TempPlayer(Index).EventMap.EventPages(i).eventID).y = y And Map(GetPlayerMap(Index)).Events(TempPlayer(Index).EventMap.EventPages(i).eventID).Pages(TempPlayer(Index).EventMap.EventPages(i).pageID).Trigger = 1 And TempPlayer(Index).EventMap.EventPages(i).Visible = 1 Then begineventprocessing = True
+                    If Map(GetPlayerMap(Index)).Events(TempPlayer(Index).EventMap.EventPages(i).eventID).X = X And Map(GetPlayerMap(Index)).Events(TempPlayer(Index).EventMap.EventPages(i).eventID).Y = Y And Map(GetPlayerMap(Index)).Events(TempPlayer(Index).EventMap.EventPages(i).eventID).Pages(TempPlayer(Index).EventMap.EventPages(i).pageID).Trigger = 1 And TempPlayer(Index).EventMap.EventPages(i).Visible = 1 Then begineventprocessing = True
                 Else
-                    If TempPlayer(Index).EventMap.EventPages(i).x = x And TempPlayer(Index).EventMap.EventPages(i).y = y And Map(GetPlayerMap(Index)).Events(TempPlayer(Index).EventMap.EventPages(i).eventID).Pages(TempPlayer(Index).EventMap.EventPages(i).pageID).Trigger = 1 And TempPlayer(Index).EventMap.EventPages(i).Visible = 1 Then begineventprocessing = True
+                    If TempPlayer(Index).EventMap.EventPages(i).X = X And TempPlayer(Index).EventMap.EventPages(i).Y = Y And Map(GetPlayerMap(Index)).Events(TempPlayer(Index).EventMap.EventPages(i).eventID).Pages(TempPlayer(Index).EventMap.EventPages(i).pageID).Trigger = 1 And TempPlayer(Index).EventMap.EventPages(i).Visible = 1 Then begineventprocessing = True
                 End If
                 If begineventprocessing = True Then
                     'Process this event, it is on-touch and everything checks out.
@@ -838,38 +838,38 @@ End Function
 Sub PlayerMapGetItem(ByVal Index As Long)
     Dim i As Long
     Dim n As Long
-    Dim mapnum As Long
+    Dim mapNum As Long
     Dim Msg As String
 
     If Not IsPlaying(Index) Then Exit Sub
-    mapnum = GetPlayerMap(Index)
+    mapNum = GetPlayerMap(Index)
 
     For i = 1 To MAX_MAP_ITEMS
         ' See if theres even an item here
-        If (MapItem(mapnum, i).Num > 0) And (MapItem(mapnum, i).Num <= MAX_ITEMS) Then
+        If (MapItem(mapNum, i).Num > 0) And (MapItem(mapNum, i).Num <= MAX_ITEMS) Then
             ' our drop?
             If CanPlayerPickupItem(Index, i) Then
                 ' Check if item is at the same location as the player
-                If (MapItem(mapnum, i).x = GetPlayerX(Index)) Then
-                    If (MapItem(mapnum, i).y = GetPlayerY(Index)) Then
+                If (MapItem(mapNum, i).X = GetPlayerX(Index)) Then
+                    If (MapItem(mapNum, i).Y = GetPlayerY(Index)) Then
                         ' Find open slot
-                        n = FindOpenInvSlot(Index, MapItem(mapnum, i).Num)
+                        n = FindOpenInvSlot(Index, MapItem(mapNum, i).Num)
     
                         ' Open slot available?
                         If n <> 0 Then
                             ' Set item in players inventor
-                            Call SetPlayerInvItemNum(Index, n, MapItem(mapnum, i).Num)
+                            Call SetPlayerInvItemNum(Index, n, MapItem(mapNum, i).Num)
     
                             If Item(GetPlayerInvItemNum(Index, n)).Type = ITEM_TYPE_CURRENCY Then
-                                Call SetPlayerInvItemValue(Index, n, GetPlayerInvItemValue(Index, n) + MapItem(mapnum, i).Value)
-                                Msg = MapItem(mapnum, i).Value & " " & Trim$(Item(GetPlayerInvItemNum(Index, n)).Name)
+                                Call SetPlayerInvItemValue(Index, n, GetPlayerInvItemValue(Index, n) + MapItem(mapNum, i).Value)
+                                Msg = MapItem(mapNum, i).Value & " " & Trim$(Item(GetPlayerInvItemNum(Index, n)).Name)
                             Else
                                 Call SetPlayerInvItemValue(Index, n, 0)
                                 Msg = Trim$(Item(GetPlayerInvItemNum(Index, n)).Name)
                             End If
     
                             ' Erase item from the map
-                            ClearMapItem i, mapnum
+                            ClearMapItem i, mapNum
                             
                             Call SendInventoryUpdate(Index, n)
                             Call SpawnItemSlot(i, 0, 0, GetPlayerMap(Index), 0, 0)
@@ -889,12 +889,12 @@ Sub PlayerMapGetItem(ByVal Index As Long)
 End Sub
 
 Function CanPlayerPickupItem(ByVal Index As Long, ByVal mapItemNum As Long)
-Dim mapnum As Long
+Dim mapNum As Long
 
-    mapnum = GetPlayerMap(Index)
+    mapNum = GetPlayerMap(Index)
     
     ' no lock or locked to player?
-    If MapItem(mapnum, mapItemNum).playerName = vbNullString Or MapItem(mapnum, mapItemNum).playerName = Trim$(GetPlayerName(Index)) Then
+    If MapItem(mapNum, mapItemNum).playerName = vbNullString Or MapItem(mapNum, mapItemNum).playerName = Trim$(GetPlayerName(Index)) Then
         CanPlayerPickupItem = True
         Exit Function
     End If
@@ -919,8 +919,8 @@ Sub PlayerMapDropItem(ByVal Index As Long, ByVal invNum As Long, ByVal Amount As
 
             If i <> 0 Then
                 MapItem(GetPlayerMap(Index), i).Num = GetPlayerInvItemNum(Index, invNum)
-                MapItem(GetPlayerMap(Index), i).x = GetPlayerX(Index)
-                MapItem(GetPlayerMap(Index), i).y = GetPlayerY(Index)
+                MapItem(GetPlayerMap(Index), i).X = GetPlayerX(Index)
+                MapItem(GetPlayerMap(Index), i).Y = GetPlayerY(Index)
                 MapItem(GetPlayerMap(Index), i).playerName = Trim$(GetPlayerName(Index))
                 MapItem(GetPlayerMap(Index), i).playerTimer = GetTickCount + ITEM_SPAWN_TIME
                 MapItem(GetPlayerMap(Index), i).canDespawn = True
@@ -1009,36 +1009,46 @@ Function GetPlayerPassword(ByVal Index As Long) As String
     GetPlayerPassword = Trim$(Player(Index).Password)
 End Function
 
-Sub SetPlayerPassword(ByVal Index As Long, ByVal Password As String)
+Sub SetPlayerPassword(ByVal Index As Integer, ByVal Password As String)
     Player(Index).Password = Password
 End Sub
 
-Function GetPlayerName(ByVal Index As Long) As String
+Function GetPlayerName(ByVal Index As Integer) As String
 
     If Index > MAX_PLAYERS Then Exit Function
     GetPlayerName = Trim$(Player(Index).Name)
 End Function
 
-Sub SetPlayerName(ByVal Index As Long, ByVal Name As String)
+Sub SetPlayerName(ByVal Index As Integer, ByVal Name As String)
     Player(Index).Name = Name
 End Sub
 
-Function GetPlayerClass(ByVal Index As Long) As Long
+Function GetPlayerClass(ByVal Index As Integer) As Long
     GetPlayerClass = Player(Index).Class
 End Function
 
-Sub SetPlayerClass(ByVal Index As Long, ByVal ClassNum As Long)
+Sub SetPlayerClass(ByVal Index As Integer, ByVal ClassNum As Byte)
     Player(Index).Class = ClassNum
 End Sub
 
-Function GetPlayerSprite(ByVal Index As Long) As Long
+Function GetPlayerSprite(ByVal Index As Integer) As Integer
 
     If Index > MAX_PLAYERS Then Exit Function
     GetPlayerSprite = Player(Index).Sprite
 End Function
 
-Sub SetPlayerSprite(ByVal Index As Long, ByVal Sprite As Long)
+Sub SetPlayerSprite(ByVal Index As Integer, ByVal Sprite As Integer)
     Player(Index).Sprite = Sprite
+End Sub
+
+Function GetPlayerMoney(ByVal Index As Integer) As Long
+    If Index > MAX_PLAYERS Then Exit Function
+    
+    GetPlayerMoney = Player(Index).Money
+End Function
+
+Sub SetPlayerMoney(ByVal Index As Integer, ByVal Money As Long)
+    Player(Index).Money = Money
 End Sub
 
 Function GetPlayerLevel(ByVal Index As Long) As Long
@@ -1108,20 +1118,20 @@ Sub SetPlayerVital(ByVal Index As Integer, ByVal Vital As Vitals, ByVal Value As
 End Sub
 
 Public Function GetPlayerStat(ByVal Index As Integer, ByVal Stat As Stats) As Integer
-    Dim x As Long, i As Long
+    Dim X As Long, i As Long
     If Index > MAX_PLAYERS Then Exit Function
     
-    x = Player(Index).Stat(Stat)
+    X = Player(Index).Stat(Stat)
     
     For i = 1 To Equipment.Equipment_Count - 1
         If GetPlayerEquipment(Index, i) > 0 Then
             If Item(GetPlayerEquipment(Index, i)).Add_Stat(Stat) > 0 Then
-                x = x + Item(GetPlayerEquipment(Index, i)).Add_Stat(Stat)
+                X = X + Item(GetPlayerEquipment(Index, i)).Add_Stat(Stat)
             End If
         End If
     Next
     
-    GetPlayerStat = x
+    GetPlayerStat = X
 End Function
 
 Public Function GetPlayerRawStat(ByVal Index As Integer, ByVal Stat As Stats) As Integer
@@ -1151,10 +1161,10 @@ Function GetPlayerMap(ByVal Index As Integer) As Integer
     GetPlayerMap = Player(Index).Map
 End Function
 
-Sub SetPlayerMap(ByVal Index As Integer, ByVal mapnum As Integer)
+Sub SetPlayerMap(ByVal Index As Integer, ByVal mapNum As Integer)
 
-    If mapnum > 0 And mapnum <= MAX_MAPS Then
-        Player(Index).Map = mapnum
+    If mapNum > 0 And mapNum <= MAX_MAPS Then
+        Player(Index).Map = mapNum
     End If
 
 End Sub
@@ -1162,21 +1172,21 @@ End Sub
 Function GetPlayerX(ByVal Index As Long) As Long
 
     If Index > MAX_PLAYERS Then Exit Function
-    GetPlayerX = Player(Index).x
+    GetPlayerX = Player(Index).X
 End Function
 
-Sub SetPlayerX(ByVal Index As Long, ByVal x As Long)
-    Player(Index).x = x
+Sub SetPlayerX(ByVal Index As Long, ByVal X As Long)
+    Player(Index).X = X
 End Sub
 
 Function GetPlayerY(ByVal Index As Long) As Long
 
     If Index > MAX_PLAYERS Then Exit Function
-    GetPlayerY = Player(Index).y
+    GetPlayerY = Player(Index).Y
 End Function
 
-Sub SetPlayerY(ByVal Index As Long, ByVal y As Long)
-    Player(Index).y = y
+Sub SetPlayerY(ByVal Index As Long, ByVal Y As Long)
+    Player(Index).Y = Y
 End Sub
 
 Function GetPlayerDir(ByVal Index As Long) As Long
@@ -1336,22 +1346,22 @@ Sub OnDeath(ByVal Index As Integer)
 
 End Sub
 
-Sub CheckResource(ByVal Index As Long, ByVal x As Long, ByVal y As Long)
+Sub CheckResource(ByVal Index As Long, ByVal X As Long, ByVal Y As Long)
     Dim Resource_num As Long
     Dim Resource_index As Long
     Dim rX As Long, rY As Long
     Dim i As Long
     Dim Damage As Long
     
-    If Map(GetPlayerMap(Index)).Tile(x, y).Type = TILE_TYPE_RESOURCE Then
+    If Map(GetPlayerMap(Index)).Tile(X, Y).Type = TILE_TYPE_RESOURCE Then
         Resource_num = 0
-        Resource_index = Map(GetPlayerMap(Index)).Tile(x, y).Data1
+        Resource_index = Map(GetPlayerMap(Index)).Tile(X, Y).Data1
 
         ' Get the cache number
         For i = 0 To ResourceCache(GetPlayerMap(Index)).Resource_Count
 
-            If ResourceCache(GetPlayerMap(Index)).ResourceData(i).x = x Then
-                If ResourceCache(GetPlayerMap(Index)).ResourceData(i).y = y Then
+            If ResourceCache(GetPlayerMap(Index)).ResourceData(i).X = X Then
+                If ResourceCache(GetPlayerMap(Index)).ResourceData(i).Y = Y Then
                     Resource_num = i
                 End If
             End If
@@ -1373,8 +1383,8 @@ Sub CheckResource(ByVal Index As Long, ByVal x As Long, ByVal y As Long)
                     ' check if already cut down
                     If ResourceCache(GetPlayerMap(Index)).ResourceData(Resource_num).ResourceState = 0 Then
                     
-                        rX = ResourceCache(GetPlayerMap(Index)).ResourceData(Resource_num).x
-                        rY = ResourceCache(GetPlayerMap(Index)).ResourceData(Resource_num).y
+                        rX = ResourceCache(GetPlayerMap(Index)).ResourceData(Resource_num).X
+                        rY = ResourceCache(GetPlayerMap(Index)).ResourceData(Resource_num).Y
                         
                         Damage = Item(GetPlayerEquipment(Index, Weapon)).Data2
                     
@@ -1541,7 +1551,7 @@ Dim Exp As Long
 End Sub
 
 Public Sub UseItem(ByVal Index As Long, ByVal invNum As Long)
-Dim n As Long, i As Long, tempItem As Long, x As Long, y As Long, itemnum As Long
+Dim n As Long, i As Long, tempItem As Long, X As Long, Y As Long, itemnum As Long
 
     ' Prevent hacking
     If invNum < 1 Or invNum > MAX_ITEMS Then
@@ -1866,8 +1876,8 @@ Dim n As Long, i As Long, tempItem As Long, x As Long, y As Long, itemnum As Lon
                     Case DIR_UP
 
                         If GetPlayerY(Index) > 0 Then
-                            x = GetPlayerX(Index)
-                            y = GetPlayerY(Index) - 1
+                            X = GetPlayerX(Index)
+                            Y = GetPlayerY(Index) - 1
                         Else
                             Exit Sub
                         End If
@@ -1875,8 +1885,8 @@ Dim n As Long, i As Long, tempItem As Long, x As Long, y As Long, itemnum As Lon
                     Case DIR_DOWN
 
                         If GetPlayerY(Index) < Map(GetPlayerMap(Index)).MaxY Then
-                            x = GetPlayerX(Index)
-                            y = GetPlayerY(Index) + 1
+                            X = GetPlayerX(Index)
+                            Y = GetPlayerY(Index) + 1
                         Else
                             Exit Sub
                         End If
@@ -1884,8 +1894,8 @@ Dim n As Long, i As Long, tempItem As Long, x As Long, y As Long, itemnum As Lon
                     Case DIR_LEFT
 
                         If GetPlayerX(Index) > 0 Then
-                            x = GetPlayerX(Index) - 1
-                            y = GetPlayerY(Index)
+                            X = GetPlayerX(Index) - 1
+                            Y = GetPlayerY(Index)
                         Else
                             Exit Sub
                         End If
@@ -1893,8 +1903,8 @@ Dim n As Long, i As Long, tempItem As Long, x As Long, y As Long, itemnum As Lon
                     Case DIR_RIGHT
 
                         If GetPlayerX(Index) < Map(GetPlayerMap(Index)).MaxX Then
-                            x = GetPlayerX(Index) + 1
-                            y = GetPlayerY(Index)
+                            X = GetPlayerX(Index) + 1
+                            Y = GetPlayerY(Index)
                         Else
                             Exit Sub
                         End If
@@ -1902,19 +1912,19 @@ Dim n As Long, i As Long, tempItem As Long, x As Long, y As Long, itemnum As Lon
                 End Select
 
                 ' Check if a key exists
-                If Map(GetPlayerMap(Index)).Tile(x, y).Type = TILE_TYPE_KEY Then
+                If Map(GetPlayerMap(Index)).Tile(X, Y).Type = TILE_TYPE_KEY Then
 
                     ' Check if the key they are using matches the map key
-                    If itemnum = Map(GetPlayerMap(Index)).Tile(x, y).Data1 Then
-                        temptile(GetPlayerMap(Index)).DoorOpen(x, y) = YES
+                    If itemnum = Map(GetPlayerMap(Index)).Tile(X, Y).Data1 Then
+                        temptile(GetPlayerMap(Index)).DoorOpen(X, Y) = YES
                         temptile(GetPlayerMap(Index)).DoorTimer = GetTickCount
-                        SendMapKey Index, x, y, 1
+                        SendMapKey Index, X, Y, 1
                         Call MapMsg(GetPlayerMap(Index), "A door has been unlocked.", White)
                         
-                        Call SendAnimation(GetPlayerMap(Index), Item(itemnum).Animation, x, y)
+                        Call SendAnimation(GetPlayerMap(Index), Item(itemnum).Animation, X, Y)
 
                         ' Check if we are supposed to take away the item
-                        If Map(GetPlayerMap(Index)).Tile(x, y).Data2 = 1 Then
+                        If Map(GetPlayerMap(Index)).Tile(X, Y).Data2 = 1 Then
                             Call TakeInvItem(Index, itemnum, 0)
                             Call PlayerMsg(Index, "The key is destroyed in the lock.", Yellow)
                         End If

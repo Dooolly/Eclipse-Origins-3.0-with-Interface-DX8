@@ -243,7 +243,7 @@ Begin VB.Form frmEditor_Quest
             End
          End
          Begin VB.Frame fraAmount 
-            Caption         =   "Quantidade: 1"
+            Caption         =   "Quantidade: 0"
             ForeColor       =   &H80000011&
             Height          =   615
             Left            =   2280
@@ -255,7 +255,6 @@ Begin VB.Form frmEditor_Quest
                Height          =   255
                Left            =   120
                Max             =   255
-               Min             =   1
                TabIndex        =   93
                Top             =   240
                Value           =   1

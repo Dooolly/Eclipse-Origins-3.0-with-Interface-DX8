@@ -371,7 +371,7 @@ Public Sub LoadTask(ByVal QuestNum As Long, ByVal TaskNum As Long)
     
     With frmEditor_Quest
         'Load the task type
-        .optTask(TaskToLoad.Order).Value = True
+'        .optTask(TaskToLoad.Order).Value = True
         'Load textboxes
         .txtTaskLog.Text = "" & Trim$(TaskToLoad.TaskLog)
         'Set scrolls to 0 and disable them so they can be enabled when needed

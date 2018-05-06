@@ -274,7 +274,7 @@ Public Function CanStartQuest(ByVal Index As Long, ByVal QuestNum As Long) As Bo
                 If Quest(QuestNum).RequiredItem(i).Item > 0 Then
                     'if we don't have it at all then
                     If HasItem(Index, Quest(QuestNum).RequiredItem(i).Item) = 0 Then
-                        PlayerMsg Index, "You need " & Trim$(Item(Quest(QuestNum).RequiredItem(i).Item).Name) & " to take this quest!", BrightRed
+                        PlayerMsg Index, "Você precisa de " & Trim$(Item(Quest(QuestNum).RequiredItem(i).Item).Name) & " para iniciar está missão!", BrightRed
                         Exit Function
                     End If
                 End If
@@ -290,10 +290,10 @@ Public Function CanStartQuest(ByVal Index As Long, ByVal QuestNum As Long) As Bo
             'Go on :)
             CanStartQuest = True
         Else
-            PlayerMsg Index, "You need to be a higher level to take this quest!", BrightRed
+            PlayerMsg Index, "Você não possui level suficiente para iniciar está missão!", BrightRed
         End If
     Else
-        PlayerMsg Index, "You can't start that quest again!", BrightRed
+        PlayerMsg Index, "Você não pode iniciar está missão novamente!", BrightRed
     End If
 End Function
 
@@ -376,10 +376,10 @@ Public Sub CheckTask(ByVal Index As Long, ByVal QuestNum As Long, ByVal TaskType
                 'Count +1
                 Player(Index).PlayerQuest(QuestNum).CurrentCount = Player(Index).PlayerQuest(QuestNum).CurrentCount + 1
                 'show msg
-                PlayerMsg Index, "Quest: " + Trim$(Quest(QuestNum).Name) + " - " + Trim$(Player(Index).PlayerQuest(QuestNum).CurrentCount) + "/" + Trim$(Quest(QuestNum).Task(ActualTask).Amount) + " " + Trim$(NPC(TargetIndex).Name) + " killed.", Yellow
+                PlayerMsg Index, "Missão: " + Trim$(Quest(QuestNum).Name) + " - " + Trim$(Player(Index).PlayerQuest(QuestNum).CurrentCount) + "/" + Trim$(Quest(QuestNum).Task(ActualTask).Amount) + " " + Trim$(NPC(TargetIndex).Name) + " mortos.", Yellow
                 'did i finish the work?
                 If Player(Index).PlayerQuest(QuestNum).CurrentCount >= Quest(QuestNum).Task(ActualTask).Amount Then
-                    QuestMessage Index, QuestNum, "Task completed", 0
+                    QuestMessage Index, QuestNum, "Objetivo concluido!", 0
                     'is the quest's end?
                     If CanEndQuest(Index, QuestNum) Then
                         EndQuest Index, QuestNum
@@ -400,7 +400,7 @@ Public Sub CheckTask(ByVal Index As Long, ByVal QuestNum As Long, ByVal TaskType
                 'Check inventory for the items
                 For i = 1 To MAX_INV
                     If GetPlayerInvItemNum(Index, i) = TargetIndex Then
-                        If Item(i).Type = ITEM_TYPE_CURRENCY Then
+                        If Item(GetPlayerInvItemNum(Index, i)).Type = ITEM_TYPE_CURRENCY Then
                             Player(Index).PlayerQuest(QuestNum).CurrentCount = GetPlayerInvItemValue(Index, i)
                         Else
                             'If is the correct item add it to the count
@@ -409,10 +409,10 @@ Public Sub CheckTask(ByVal Index As Long, ByVal QuestNum As Long, ByVal TaskType
                     End If
                 Next
                 
-                PlayerMsg Index, "Quest: " + Trim$(Quest(QuestNum).Name) + " - You have " + Trim$(Player(Index).PlayerQuest(QuestNum).CurrentCount) + "/" + Trim$(Quest(QuestNum).Task(ActualTask).Amount) + " " + Trim$(Item(TargetIndex).Name), Yellow
+                PlayerMsg Index, "Missão: " + Trim$(Quest(QuestNum).Name) + " - " + Trim$(Player(Index).PlayerQuest(QuestNum).CurrentCount) + "/" + Trim$(Quest(QuestNum).Task(ActualTask).Amount) + " " + Trim$(Item(TargetIndex).Name), Yellow
                 
                 If Player(Index).PlayerQuest(QuestNum).CurrentCount >= Quest(QuestNum).Task(ActualTask).Amount Then
-                    QuestMessage Index, QuestNum, "Task completed", 0
+                    QuestMessage Index, QuestNum, "Objetivo completo!", 0
                     If CanEndQuest(Index, QuestNum) Then
                         EndQuest Index, QuestNum
                     Else
@@ -528,8 +528,8 @@ Public Sub CheckTask(ByVal Index As Long, ByVal QuestNum As Long, ByVal TaskType
     SendPlayerQuests Index
 End Sub
 
-Public Sub EndQuest(ByVal Index As Long, ByVal QuestNum As Long)
-    Dim i As Long, n As Long
+Public Sub EndQuest(ByVal Index As Integer, ByVal QuestNum As Integer)
+    Dim i As Integer, n As Integer
     
     Player(Index).PlayerQuest(QuestNum).Status = QUEST_COMPLETED
     
@@ -537,8 +537,12 @@ Public Sub EndQuest(ByVal Index As Long, ByVal QuestNum As Long)
     Player(Index).PlayerQuest(QuestNum).ActualTask = 0
     Player(Index).PlayerQuest(QuestNum).CurrentCount = 0
     
-    'give experience
+    ' Give Experience
     GivePlayerEXP Index, Quest(QuestNum).RewardExp
+    
+    ' Give Money
+    Call SetPlayerMoney(Index, GetPlayerMoney(Index) + Quest(QuestNum).RewardMoney)
+    Call SendMoney(Index)
     
     'remove items on the end
     For i = 1 To MAX_QUESTS_ITEMS

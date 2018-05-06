@@ -119,7 +119,7 @@ Dim fogtmr As Long, TmrChat As Long
 
             ' Process npc movements (actually move them)
             For i = 1 To Npc_HighIndex
-                If Map.Npc(i) > 0 Then
+                If Map.NPC(i) > 0 Then
                     Call ProcessNpcMovement(i)
                 End If
             Next i
@@ -367,22 +367,22 @@ errorhandler:
 End Sub
 
 Sub CheckMapGetItem()
-Dim buffer As New clsBuffer
+Dim Buffer As New clsBuffer
 
     ' If debug mode, handle error then exit out
     If Options.Debug = 1 Then On Error GoTo errorhandler
     
-    Set buffer = New clsBuffer
+    Set Buffer = New clsBuffer
 
     If GetTickCount > Player(MyIndex).MapGetTimer + 250 Then
         If Trim$(MyText) = vbNullString Then
             Player(MyIndex).MapGetTimer = GetTickCount
-            buffer.WriteLong CMapGetItem
-            SendData buffer.ToArray()
+            Buffer.WriteLong CMapGetItem
+            SendData Buffer.ToArray()
         End If
     End If
 
-    Set buffer = Nothing
+    Set Buffer = Nothing
     
     ' Error handler
     Exit Sub
@@ -393,7 +393,7 @@ errorhandler:
 End Sub
 
 Public Sub CheckAttack()
-Dim buffer As clsBuffer
+Dim Buffer As clsBuffer
 Dim attackspeed As Long, X As Long, Y As Long, i As Long
 
     ' If debug mode, handle error then exit out
@@ -419,10 +419,10 @@ Dim attackspeed As Long, X As Long, Y As Long, i As Long
                     .AttackTimer = GetTickCount
                 End With
 
-                Set buffer = New clsBuffer
-                buffer.WriteLong CAttack
-                SendData buffer.ToArray()
-                Set buffer = Nothing
+                Set Buffer = New clsBuffer
+                Buffer.WriteLong CAttack
+                SendData Buffer.ToArray()
+                Set Buffer = Nothing
             End If
         End If
         
@@ -445,11 +445,11 @@ Dim attackspeed As Long, X As Long, Y As Long, i As Long
             For i = 1 To Map.CurrentEvents
                 If Map.MapEvents(i).Visible = 1 Then
                     If Map.MapEvents(i).X = X And Map.MapEvents(i).Y = Y Then
-                        Set buffer = New clsBuffer
-                        buffer.WriteLong CEvent
-                        buffer.WriteLong i
-                        SendData buffer.ToArray()
-                        Set buffer = Nothing
+                        Set Buffer = New clsBuffer
+                        Buffer.WriteLong CEvent
+                        Buffer.WriteLong i
+                        SendData Buffer.ToArray()
+                        Set Buffer = Nothing
                         Player(MyIndex).EventTimer = GetTickCount + 200
                     End If
                 End If
@@ -840,7 +840,7 @@ Public Sub UpdateDrawMapName()
     ' If debug mode, handle error then exit out
     If Options.Debug = 1 Then On Error GoTo errorhandler
     
-    DrawMapNameX = ((MAX_MAPX + 1) * PIC_X / 2) - (TextWidth(Fonts.Verdana, Trim$(Map.name)) / 2)
+    DrawMapNameX = ((MAX_MAPX + 1) * PIC_X / 2) - (TextWidth(Fonts.Verdana, Trim$(Map.Name)) / 2)
     DrawMapNameY = 1
 
     Select Case Map.Moral
@@ -880,7 +880,7 @@ errorhandler:
 End Sub
 
 Public Sub ForgetSpell(ByVal spellslot As Long)
-Dim buffer As clsBuffer
+Dim Buffer As clsBuffer
 
     ' If debug mode, handle error then exit out
     If Options.Debug = 1 Then On Error GoTo errorhandler
@@ -903,11 +903,11 @@ Dim buffer As clsBuffer
     End If
     
     If PlayerSpells(spellslot).Num > 0 Then
-        Set buffer = New clsBuffer
-        buffer.WriteLong CForgetSpell
-        buffer.WriteLong spellslot
-        SendData buffer.ToArray()
-        Set buffer = Nothing
+        Set Buffer = New clsBuffer
+        Buffer.WriteLong CForgetSpell
+        Buffer.WriteLong spellslot
+        SendData Buffer.ToArray()
+        Set Buffer = Nothing
     End If
     
     ' Error handler
@@ -919,7 +919,7 @@ errorhandler:
 End Sub
 
 Public Sub CastSpell(ByVal spellslot As Long)
-Dim buffer As clsBuffer
+Dim Buffer As clsBuffer
 
     ' If debug mode, handle error then exit out
     If Options.Debug = 1 Then On Error GoTo errorhandler
@@ -938,18 +938,18 @@ Dim buffer As clsBuffer
 
     ' Check if player has enough MP
     If GetPlayerVital(MyIndex, Vitals.MP) < Spell(PlayerSpells(spellslot).Num).MPCost Then
-        Call AddText("Não há chakra para usar" & Trim$(Spell(PlayerSpells(spellslot).Num).name) & ".", BrightRed)
+        Call AddText("Não há chakra para usar" & Trim$(Spell(PlayerSpells(spellslot).Num).Name) & ".", BrightRed)
         Exit Sub
     End If
 
     If PlayerSpells(spellslot).Num > 0 Then
         If GetTickCount > Player(MyIndex).AttackTimer + 1000 Then
             If Player(MyIndex).Moving = 0 Then
-                Set buffer = New clsBuffer
-                buffer.WriteLong CCast
-                buffer.WriteLong spellslot
-                SendData buffer.ToArray()
-                Set buffer = Nothing
+                Set Buffer = New clsBuffer
+                Buffer.WriteLong CCast
+                Buffer.WriteLong spellslot
+                SendData Buffer.ToArray()
+                Set Buffer = Nothing
                 SpellBuffer = spellslot
                 SpellBufferTimer = GetTickCount
             Else
@@ -989,17 +989,17 @@ errorhandler:
     Exit Sub
 End Sub
 
-Public Sub DevMsg(ByVal text As String, ByVal Color As Byte)
+Public Sub DevMsg(ByVal Text As String, ByVal Color As Byte)
     ' If debug mode, handle error then exit out
     If Options.Debug = 1 Then On Error GoTo errorhandler
     
     If InGame Then
         If GetPlayerAccess(MyIndex) > ADMIN_DEVELOPER Then
-            Call AddText(text, Color)
+            Call AddText(Text, Color)
         End If
     End If
 
-    Debug.Print text
+    Debug.Print Text
     
     ' Error handler
     Exit Sub
@@ -1110,7 +1110,7 @@ Dim i As Long
         
         If LastSpellDesc = SpellNum Then Exit Sub
         
-        .lblSpellName.Caption = Trim$(Spell(SpellNum).name)
+        .lblSpellName.Caption = Trim$(Spell(SpellNum).Name)
         .lblSpellDesc.Caption = Trim$(Spell(SpellNum).Desc)
         frmMain.picSpellDescPic.Refresh
     End With
@@ -1126,17 +1126,17 @@ End Sub
 Public Sub UpdateDescWindow(ByVal itemNum As Long, ByVal X As Long, ByVal Y As Long)
 Dim i As Long
 Dim FirstLetter As String * 1
-Dim name As String
+Dim Name As String
     
     ' If debug mode, handle error then exit out
     If Options.Debug = 1 Then On Error GoTo errorhandler
     
-    FirstLetter = LCase$(Left$(Trim$(Item(itemNum).name), 1))
+    FirstLetter = LCase$(Left$(Trim$(Item(itemNum).Name), 1))
    
     If FirstLetter = "$" Then
-        name = (Mid$(Trim$(Item(itemNum).name), 2, Len(Trim$(Item(itemNum).name)) - 1))
+        Name = (Mid$(Trim$(Item(itemNum).Name), 2, Len(Trim$(Item(itemNum).Name)) - 1))
     Else
-        name = Trim$(Item(itemNum).name)
+        Name = Trim$(Item(itemNum).Name)
     End If
     
     ' check for off-screen
@@ -1171,7 +1171,7 @@ Dim name As String
         End Select
         
         ' set captions
-        .lblItemName.Caption = name
+        .lblItemName.Caption = Name
         .lblItemDesc.Caption = Trim$(Item(itemNum).Desc)
         
         ' render the item
@@ -1483,7 +1483,7 @@ Dim soundName As String
         ' npcs
         Case SoundEntity.seNpc
             If entityNum > MAX_NPCS Then Exit Sub
-            soundName = Trim$(Npc(entityNum).sound)
+            soundName = Trim$(NPC(entityNum).sound)
         ' resources
         Case SoundEntity.seResource
             If entityNum > MAX_RESOURCES Then Exit Sub
@@ -1775,7 +1775,7 @@ Dim i As Long
     Next
 End Sub
 
-Public Sub AddChatBubble(ByVal target As Long, ByVal targetType As Byte, ByVal Msg As String, ByVal Colour As Long)
+Public Sub AddChatBubble(ByVal target As Integer, ByVal targetType As Byte, ByVal Msg As String, ByVal Colour As Long)
 Dim i As Long, Index As Long
 
     ' set the global index
