@@ -15,6 +15,9 @@ por uma feita completamente do zero, e totalmente feita com Directx8
 - Adicionar janela de personagem
 - Alterado a estrutura dos itens ligados ao jogador, permitindo aprimoramento
 - Alterado boa parte dos tipos de variaveis, reduzindo o gasto excessivo de memoria(Não está 100%)
+- Animações somente no cliente agora
+- Corrigido variáveis de long para integer
+- Alterações no sistema de missões
 
 # Creditos
 - Robin Perris
